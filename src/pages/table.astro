@@ -1,0 +1,17 @@
+---
+import {ObTable} from '../components/ob-table.tsx'
+import data from '../lib/sample-data.json'
+---
+
+<html lang="en" class="h-full">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+	</head>
+	<body class="h-full">
+		<main class="h-full">
+			<div class="m-12"><ObTable client:load tableClassName="border" data={data}/></div>
+		</main>
+	</body>
+</html>
