@@ -16,9 +16,7 @@ import { TWStyles } from '../../tailwind' // <-- /tailwind/index.js
 @customElement('outerbase-table')
 export class OuterbaseTable extends LitElement {
     static styles = TWStyles
-    render = () =>
-        html`<p>succinct example</p>
-            <p></p>`
+    render = () => html`<p>succinct example</p>`
 }
 ```
 
