@@ -4,7 +4,7 @@
 
 ## TailwindCSS with LitElement
 
-> ⚠️ When adding a previously unused Tailwind class, the page may reload before those styles are properly available. Refresh the page to manifest your changes.
+> When adding a previously unused Tailwind class, the page may reload before those styles are properly available. Refresh the page to manifest your changes.
 
 ### TailwindCSS in LitElement (or any Web Component)
 
