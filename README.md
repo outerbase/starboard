@@ -22,7 +22,7 @@ export class OuterbaseTable extends LitElement {
 
 ### Themes
 
-Themes can override styles via CSS or JavaScript
+Themes may override default styles via CSS or JavaScript
 
 #### CSS
 
