@@ -4,38 +4,52 @@
 
 ## TailwindCSS with LitElement
 
-> ⚠️ When adding a previously unused TW class the page will reload the component before the updated Tailwind files are available. You'll need to either save the file a second time (to trigger a refresh) or explicitly reload the page.
+> ⚠️ When adding a previously unused Tailwind class, the page may reload before those styles are properly available. Refresh the page to manifest your changes.
 
-### Example usage of TailwindCSS in a LitElement component
+### TailwindCSS in LitElement (or any Web Component)
 
 ```ts
-import { TWStyles } from '../../tailwind'
+import { LitElement, html, css } from 'lit'
+import { customElement } from 'lit/decorators.js'
+import { TWStyles } from '../../tailwind' // <-- /tailwind/index.js
+
+@customElement('outerbase-table')
 export class OuterbaseTable extends LitElement {
     static styles = TWStyles
+    render = () =>
+        html`<p>succinct example</p>
+            <p></p>`
 }
-customElements.define('outerbase-table', OuterbaseTable)
 ```
 
-### // TODO Variables
+### Themes
 
-Next step is to update `tailwind.config.mjs` to use variables instead of explicitly values.
+Themes can override styles via CSS or JavaScript
 
-#### Example
+#### CSS
 
+##### Inline
+
+```html
+<style>
+    :root {
+        --primary-color: white;
+        --secondary-color: black;
+    }
+</style>
 ```
-{ "table-header-text-color": "#000" }
+
+##### External
+
+```html
+<link rel="stylesheet" type="text/css" href="theme.css" />
 ```
 
-⬇️ ⬇️ ⬇️
+#### Programmaticaly
 
-```
-{ "table-header-text-color": "var(--table-header-text-color") }
-```
-
--   `class="table-header-text-color"` will reflect that variable at runtime
--   This allows the host of `<outerbase-table />` to customize those variables
--   Starboard will receive those variables as a message from Dashboard and update them via the following example
-
-```
-root.style.setProperty('--table-header-text-color', 'green');
+```html
+<script>
+    /* themes may also be set dynamically/programatically */
+    document.documentElement.style.setProperty('--success-color', 'lime')
+</script>
 ```
