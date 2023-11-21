@@ -16,6 +16,15 @@ export default {
                 '3xl': ['30px', '40px'],
             },
             colors: {
+                theme: {
+                    primary: 'var(--primary-color, black)',
+                    secondary: 'var(--secondary-color, white)',
+                    tertiary: 'var(--tertiary-color, purple)',
+                    success: 'var(--success-color, green)',
+                    warning: 'var(--warning-color, yellow)',
+                    error: 'var(--error-color, red)',
+                },
+
                 light: {
                     primary: {
                         400: '#834FF8',

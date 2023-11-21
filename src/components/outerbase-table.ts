@@ -1,11 +1,15 @@
-import { LitElement, html } from 'lit'
+import { LitElement, html, css } from 'lit'
 import { TWStyles } from '../../tailwind'
 import { customElement } from 'lit/decorators.js'
 
 @customElement('outerbase-table')
 export class OuterbaseTable extends LitElement {
-    static styles = TWStyles
+    static styles = [css``, TWStyles]
     render() {
-        return html` <p class="text-yellow-400">This text is yellow.</p> `
+        return html`
+            <p class="text-theme-primary bg-theme-secondary">
+                What did one snowman say to the other snowman?
+            </p>
+        `
     }
 }

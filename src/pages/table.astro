@@ -9,11 +9,22 @@ import data from '../lib/sample-data.json'
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
+		<style>
+			:root {
+				/* consider this as a placeholder for a theme */
+				--primary-color: white;
+				--secondary-color: black;
+			}
+		</style>
+		<script>
+				/* themes may also be set dynamically/programatically */
+				document.documentElement.style.setProperty("--success-color", "lime");
+		</script>
 	</head>
 	<body class="h-full">
 		<main class="h-full">
-			<div class="m-12"><ObTable client:load tableClassName="border" data={data}/></div>
-			<div class="m-12"><OuterbaseTable client:load />
+			<div class="m-12"><h1 class="text-theme-success">Preact</h1><ObTable client:load tableClassName="border" data={data}/></div>
+			<div class="m-12"><h1 class="text-theme-success">LitElement</h1><OuterbaseTable client:load />
 		</main>
 	</body>
 </html>
