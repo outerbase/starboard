@@ -1,5 +1,6 @@
 ---
 import {ObTable} from '../components/ob-table.tsx'
+import {OuterbaseTable} from '../components/outerbase-table'
 import data from '../lib/sample-data.json'
 ---
 
@@ -12,6 +13,7 @@ import data from '../lib/sample-data.json'
 	<body class="h-full">
 		<main class="h-full">
 			<div class="m-12"><ObTable client:load tableClassName="border" data={data}/></div>
+			<div class="m-12"><OuterbaseTable client:load />
 		</main>
 	</body>
 </html>

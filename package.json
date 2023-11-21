@@ -3,23 +3,28 @@
     "type": "module",
     "version": "0.0.1",
     "scripts": {
-        "dev": "astro dev",
-        "start": "astro dev",
-        "build": "astro check && astro build",
+        "dev": "concurrently \"astro dev\" \"pnpm dev-tailwind --watch\"",
+        "build": "pnpm build-tailwind && astro check && astro build",
         "preview": "astro preview",
-        "astro": "astro"
+        "dev-tailwind": "concurrently \"tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css --watch\" \"node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.js --watch\"",
+        "build-tailwind": "tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css && node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.js"
     },
     "dependencies": {
         "@astrojs/check": "^0.3.1",
+        "@astrojs/lit": "^3.0.3",
         "@astrojs/preact": "^3.0.1",
         "@astrojs/tailwind": "^5.0.2",
         "@preact/signals": "^1.2.1",
+        "@webcomponents/template-shadowroot": "^0.2.1",
         "astro": "^3.5.5",
+        "lit": "^2.7.0",
         "preact": "^10.17.1",
         "tailwindcss": "^3.0.24",
-        "typescript": "^5.2.2"
+        "typescript": "^5.2.2",
+        "yargs": "^17.7.2"
     },
     "devDependencies": {
+        "concurrently": "^8.2.2",
         "prettier": "^3.1.0",
         "prettier-plugin-astro": "^0.12.2"
     }
