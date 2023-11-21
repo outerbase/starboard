@@ -2,7 +2,7 @@
 
 ![](https://cdn.theasc.com/Spaceballs-Eagle-5.jpg)
 
-## TailwindCSS with LitElement
+## TailwindCSS + LitElement
 
 > When adding a previously unused Tailwind class, the page may reload before those styles are properly available. Refresh the page to manifest your changes.
 
