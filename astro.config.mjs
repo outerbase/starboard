@@ -6,5 +6,5 @@ import lit from '@astrojs/lit'
 // https://astro.build/config
 export default defineConfig({
     // Enable Preact to support Preact JSX components.
-    integrations: [preact(), tailwind(), lit()],
+    integrations: [preact({ include: ['**/*[jt]sx'] }), tailwind(), lit()],
 })
