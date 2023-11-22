@@ -1,6 +1,6 @@
+import { customElement } from 'lit/decorators.js'
 import { LitElement, html, css } from 'lit'
 import { TWStyles } from '../../tailwind' // this may show an import error until you run the serve once and generate the file
-import { customElement } from 'lit/decorators.js'
 
 @customElement('outerbase-table')
 export class OuterbaseTable extends LitElement {

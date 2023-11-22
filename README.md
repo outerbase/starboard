@@ -9,24 +9,22 @@
 ### TailwindCSS in LitElement (or any Web Component)
 
 ```ts
-import { LitElement, html, css } from 'lit'
 import { customElement } from 'lit/decorators.js'
+import { LitElement, html, css } from 'lit'
 import { TWStyles } from '../../tailwind' // <-- /tailwind/index.js
 
-@customElement('outerbase-table')
-export class OuterbaseTable extends LitElement {
+@customElement('succinct-example')
+export class SuccinctExample extends LitElement {
     static styles = TWStyles
-    render = () => html`<p>succinct example</p>`
+    render = () => html`<p class="text-theme-success">succinct example</p>`
 }
 ```
 
 ### Themes
 
-Themes may override default styles via CSS or JavaScript
+Themes may override default styles via CSS or JavaScript.
 
-#### CSS
-
-##### Inline
+#### Inline CSS
 
 ```html
 <style>
@@ -37,17 +35,16 @@ Themes may override default styles via CSS or JavaScript
 </style>
 ```
 
-##### External
+#### External CSS
 
 ```html
 <link rel="stylesheet" type="text/css" href="theme.css" />
 ```
 
-#### Programmaticaly
+#### Dynamically
 
 ```html
 <script>
-    /* themes may also be set dynamically/programatically */
     document.documentElement.style.setProperty('--success-color', 'lime')
 </script>
 ```
