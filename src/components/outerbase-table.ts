@@ -93,7 +93,7 @@ export class OuterbaseTable extends ClassifiedElement {
                             idx // omit column resizer on the last column because... it's awkward.
                         ) => {
                             const withResizer = (this.columns?.length ?? 0) - 1 !== idx
-                            return html`<outerbase-th ?with-resizer="${withResizer}" classes="">${k}</outerbase-th>`
+                            return html`<outerbase-th ?with-resizer="${withResizer}">${k}</outerbase-th>`
                         }
                     )}
                 </outerbase-tr>
