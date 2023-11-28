@@ -1,8 +1,6 @@
 ---
-import {ObTable} from '../components/ob-table.tsx'
-import { OuterbaseTable } from '../components/outerbase-table'
+import { Table } from '../components/outerbase-table'
 import data from '../lib/sample-data.json'
-
 ---
 <html lang="en" class="h-full">
     <head>
@@ -26,15 +24,9 @@ import data from '../lib/sample-data.json'
     <body class="h-full">
         <main class="h-full">
             <div class="m-12">
-                <h1 class="text-theme-success">Preact</h1>
-                <ObTable client:load tableClassName="border" data={data}/>
+                <h1 class="text-theme-success font-bold">LitTable</h1>
+                <Table source-id="asdf" data={data}></Table>
             </div>
-            <div class="m-12">
-                <h1 class="text-theme-success">LitElement</h1>
-                    <OuterbaseTable client:load source-id="asdf" data={data}>
-                </OuterbaseTable>
-            </div>
-            
         </main>
     </body>
 </html>
