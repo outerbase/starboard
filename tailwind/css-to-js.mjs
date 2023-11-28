@@ -25,9 +25,7 @@ const convert = () => {
         try {
             contents = fs.readFileSync(input, 'utf8')
         } catch (e) {
-            console.error(
-                `Failed to read file ${input}. Might just not be created yet? retrying..`
-            )
+            console.error(`Failed to read file ${input}. Might just not be created yet? retrying..`)
         }
 
         let cleanContents = contents.replaceAll('`', '')
