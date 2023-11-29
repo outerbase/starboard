@@ -38,6 +38,9 @@ dependencies:
   typescript:
     specifier: ^5.2.2
     version: 5.2.2
+  yargs:
+    specifier: ^17.7.2
+    version: 17.7.2
 
 devDependencies:
   concurrently:
@@ -49,9 +52,6 @@ devDependencies:
   prettier-plugin-astro:
     specifier: ^0.12.2
     version: 0.12.2
-  yargs:
-    specifier: ^17.7.2
-    version: 17.7.2
 
 packages:
 
