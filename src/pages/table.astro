@@ -2,7 +2,8 @@
 import { Table as OuterbaseTable } from '../components/outerbase-table'
 import dbRowsForSource from '../lib/rows-for-source-id';
 
-// import data from '../lib/sample-data.json'
+// import spaceballs from '../lib/sample-data.json'
+// const data = {items: spaceballs}
 const data = await dbRowsForSource('placeholder', import.meta.env.PUBLIC_AUTH_TOKEN)
 ---
 <html lang="en" class="h-full">
@@ -27,8 +28,7 @@ const data = await dbRowsForSource('placeholder', import.meta.env.PUBLIC_AUTH_TO
     <body class="h-full">
         <main class="h-full">
             <div class="m-12">
-                <h1 class="text-theme-success font-bold">LitTable</h1>
-                <OuterbaseTable client:load data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
+                <OuterbaseTable client:load db-query={JSON.stringify(data)} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
             </div>
         </main>
     </body>

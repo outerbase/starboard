@@ -9,9 +9,6 @@ import classMapToClassName from '../lib/class-map-to-class-name'
 // ClassifiedElement deals primarily with ensuring that each Super Class's style
 // is propogated to the DOM and therefore it's CSS is applied
 export class ClassifiedElement extends LitElement {
-    // include CSS for all the Tailwind classes present in our code
-    static styles = [css``, TWStyles]
-
     // `classes` are additive to our internal `class` attribute
     // if `class` is specified it will not be reflected in the DOM (except for a momentary initial render)
     @property({ type: String })
@@ -56,7 +53,14 @@ export class ClassifiedElement extends LitElement {
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
-    static override styles = [css``, ...super.styles]
+    // alternative way to load styles, but WARNING Astro's SSR fails to include the styles during SSR
+    // override connectedCallback() {
+    //     super.connectedCallback()
+    //     adoptStyles(this.shadowRoot, sharedStyles)
+    // }
+
+    static override styles = [TWStyles]
+
     protected columns: Array<string> = []
     protected rows: Array<Array<string>> = []
 
@@ -72,7 +76,7 @@ export class Table extends ClassifiedElement {
     @property({ type: String, attribute: 'auth-token' })
     authToken?: string
 
-    @property({ type: Object, attribute: 'data' })
+    @property({ type: Object, attribute: 'db-query' })
     data?: Queryd
 
     protected willUpdate(_changedProperties: PropertyValueMap<this> | Map<PropertyKey, unknown>): void {
