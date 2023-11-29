@@ -1,22 +1,10 @@
 import { customElement, property } from 'lit/decorators.js'
 import { LitElement, html, css, type PropertyValueMap } from 'lit'
-import { TWStyles } from '../../tailwind' // this may show an import error until you run the serve once and generate the file
 import { map } from 'lit/directives/map.js'
-
-// an Array of Objects, where each Object is a Row from a Database
-type Tabular = Array<Record<string, string>>
-
-// takes in an Object of the form `{ 'class1 class2': true, 'class3': false }`
-// where the Boolean true/false is determined at runtime
-// based on conditions set in each Subclass's `_class()` method
-//
-// inspired by (but different than) Lit's [classMap](https://lit.dev/docs/templates/directives/#classmap) feature
-function classMapToClassName(classObj: Record<string, boolean>) {
-    return Object.entries(classObj)
-        .map(([c, isActive]) => (isActive ? c : false))
-        .filter(Boolean)
-        .join(' ')
-}
+import type { Queryd } from '../types'
+import { TWStyles } from '../../tailwind'
+import dbRowsForSource from '../lib/rows-for-source-id'
+import classMapToClassName from '../lib/class-map-to-class-name'
 
 // ClassifiedElement deals primarily with ensuring that each Super Class's style
 // is propogated to the DOM and therefore it's CSS is applied
@@ -77,37 +65,41 @@ export class Table extends ClassifiedElement {
         return `${super._class} table w-full text-theme-primary bg-theme-secondary`
     }
 
-    // source-id identifies and authenticates fetching the data from Outerbase
+    // fetch data from Outerbase when `sourceId` changes
     @property({ type: String, attribute: 'source-id' })
-    set sourceId(sourceId: string) {
-        const previousSourceId = this.sourceId
-        if (previousSourceId !== sourceId) {
-            this.data = Table.dataForSourceId(sourceId)
-            // Notify LitElement that the property has changed
-            // Note: this might be automatic and unnecessary? TBD.
-            // this.requestUpdate('sourceId', sourceId)
-        }
-    }
+    sourceId?: string
 
-    // data is an Array of Objects whose key/value map to each DB column's value
-    @property({ type: Array, attribute: 'data' })
-    data: Tabular = []
+    @property({ type: String, attribute: 'auth-token' })
+    authToken?: string
 
-    protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    @property({ type: Object, attribute: 'data' })
+    data?: Queryd
+
+    protected willUpdate(_changedProperties: PropertyValueMap<this> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
         // when `data` changes, update `rows` and `columns`
         if (_changedProperties.has('data')) {
-            this.columns = this.data?.length > 0 ? Object.keys(this.data[0]) : []
-            this.rows = this.data?.length > 0 ? this.data.map((d) => Object.values(d)) : []
+            if (this.data && this.data.items?.length > 0) {
+                this.columns = Object.keys(this.data.items[0])
+                this.rows = this.data.items.map((d) => Object.values(d))
+            } else {
+                console.warn('this.data: ', this.data)
+            }
         }
-    }
 
-    // fetch and return data from Outerbase with the provided `sourceId`
-    // TODO implement this
-    protected static dataForSourceId(_sourceId: string) {
-        // TODO fetch data from Outerbase
-        return [{ column: 'foo' }, { column: 'bar' }]
+        // Note: if both `data` and `source-id` are passed to `<outerbase-component />`
+        //       then it will initially render with the provided data but immediately fetch data for the provided `source-id`
+        if (_changedProperties.has('sourceId')) {
+            const previousSourceId = _changedProperties.get('sourceId')
+            if (this.sourceId && this.sourceId !== previousSourceId) {
+                console.info(`sourceId changed from ${previousSourceId} to ${this.sourceId}`)
+                console.info(`fetching data for ${this.sourceId}`)
+                dbRowsForSource(this.sourceId).then((data) => {
+                    this.data = data
+                })
+            }
+        }
     }
 
     render() {
