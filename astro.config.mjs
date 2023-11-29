@@ -7,4 +7,7 @@ import lit from '@astrojs/lit'
 export default defineConfig({
     // Enable Preact to support Preact JSX components.
     integrations: [preact({ include: ['**/*[jt]sx'] }), tailwind(), lit()],
+    server: {
+        host: '0.0.0.0',
+    },
 })
