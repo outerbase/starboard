@@ -69,6 +69,8 @@ export class ClassifiedElement extends LitElement {
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
     static override styles = [css``, ...super.styles]
+    protected columns: Array<string> = []
+    protected rows: Array<Array<string>> = []
 
     // style `<outerbase-table />
     protected get _class() {
@@ -83,32 +85,30 @@ export class Table extends ClassifiedElement {
             this.data = Table.dataForSourceId(sourceId)
             // Notify LitElement that the property has changed
             // Note: this might be automatic and unnecessary? TBD.
-            this.requestUpdate('sourceId', sourceId)
+            // this.requestUpdate('sourceId', sourceId)
         }
     }
 
     // data is an Array of Objects whose key/value map to each DB column's value
-    @property({ type: Array })
-    set data(data: Tabular) {
-        // extract columns and rows into their own collections
-        this.columns = data?.length > 0 ? Object.keys(data[0]) : []
-        this.rows = data.length > 0 ? data.map((d) => Object.values(d)) : []
+    @property({ type: Array, attribute: 'data' })
+    data: Tabular = []
 
-        // Notify LitElement that the property has changed
-        // TBD if this is necessary or automatic
-        this.requestUpdate('columns', this.columns)
-        this.requestUpdate('rows', this.rows)
+    protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.willUpdate(_changedProperties)
+
+        // when `data` changes, update `rows` and `columns`
+        if (_changedProperties.has('data')) {
+            this.columns = this.data?.length > 0 ? Object.keys(this.data[0]) : []
+            this.rows = this.data?.length > 0 ? this.data.map((d) => Object.values(d)) : []
+        }
     }
 
     // fetch and return data from Outerbase with the provided `sourceId`
     // TODO implement this
-    protected static dataForSourceId(sourceId: string) {
+    protected static dataForSourceId(_sourceId: string) {
         // TODO fetch data from Outerbase
         return [{ column: 'foo' }, { column: 'bar' }]
     }
-
-    protected columns: Array<string> = []
-    protected rows: Array<Array<string>> = []
 
     render() {
         return html`
@@ -132,7 +132,7 @@ export class Table extends ClassifiedElement {
                 <!-- render a TableRow element for each row of data -->
                 ${map(
                     this.rows,
-                    (row, idx) =>
+                    (row) =>
                         html`<outerbase-tr>
                             <!-- render a TableCell for each column of data in the curernt row -->
                             <!-- NOTE: the Array.isArray(etc) is jsut temporary to render stubbed data more better -->
