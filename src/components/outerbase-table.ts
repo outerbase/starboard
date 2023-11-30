@@ -66,7 +66,19 @@ export class ClassifiedElement extends LitElement {
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
+    override connectedCallback() {
+        super.connectedCallback()
 
+        this.resizeObserver = new ResizeObserver((_entries) => {
+        })
+
+        this.resizeObserver.observe(this)
+    }
+
+    override disconnectedCallback() {
+        super.disconnectedCallback()
+        resizeObserver.disconnect()
+    }
 
     protected columns: Array<string> = []
     protected rows: Array<Array<string>> = []
@@ -86,6 +98,9 @@ export class Table extends ClassifiedElement {
 
     @property({ type: Object, attribute: 'db-query' })
     data?: Queryd
+
+    @property({ attribute: false })
+    resizeObserver: ResizeObserver
 
     protected willUpdate(_changedProperties: PropertyValueMap<this> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
