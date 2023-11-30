@@ -1,6 +1,5 @@
 import { customElement, property, state } from 'lit/decorators.js'
-import { LitElement, html, adoptStyles, type PropertyValueMap, css } from 'lit'
-import { classMap } from 'lit/directives/class-map.js'
+import { LitElement, html, adoptStyles, type PropertyValueMap } from 'lit'
 import { map } from 'lit/directives/map.js'
 import type { Queryd } from '../types'
 import { TWStyles } from '../../tailwind'
@@ -26,43 +25,27 @@ export class ClassifiedElement extends LitElement {
         adoptStyles(this.shadowRoot, [TWStyles])
     }
 
-    // `classes` are additive to our internal `class` attribute
-    // if `class` is specified it will not be reflected in the DOM (except for a momentary initial render)
-    @state()
-    classes = ''
+    @property({ reflect: true, attribute: 'class', type: String })
+    private _class = ''
 
-    // _class() is overriden by each subclass to specify the classes it craves
-    // each subclass should call `super._class` to include the classes returned here
-    @property({ type: String, attribute: false })
-    protected get _class() {
-        // return the `classes` attribute, if any
-        // otherwise no particular styling is desired here
-        return this.classes
+    // classMap is a pairing of class(es) (a string) with a boolean expression
+    // such that only the truthy values are rendered out and the rest are dropped
+    // if a property used in such a boolean expression changes, this value is recomputed
+    @state()
+    protected get classMap() {
+        return {}
     }
 
-    // here we hack our CSS classes into the HTML `class` attribute
-    // a user of our components can set additional classes via `<foo classes="text-red-500" .../>`
-    // but they cannot specify a replacement `class`, i.e. `<foo class="text-red-500"/>` as it will be replaced
-    // with this, each subcomponent of ClassifiedElement can override `get _class(){}` to specify it's own styles (classes)
-    @property({ reflect: true, attribute: 'class', type: String })
-    className = this._class
-
-    // FIXME this only runs when `_class` is redefined, not when a condition inside of it in a subclass changes
-    // reset `className` when any of the dependencies in `_class` change
-    // since `className` is associated with the attribute `class`, this updates the DOM element to specify these classes
-    // and consequently causes the underlying styles (to those CSS classes) to be applied
-    protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
-        // update `className` if `_class` has changed
-        if (this.className !== this._class) {
-            this.className = this._class
-        }
+        // ensure `_class` reflects our latest state
+        this._class = classMapToClassName(this.classMap)
     }
 
     // this render() looks like it does next-to-nothing,
     // but our component itself is being rendered,
-    // and it's appearance/style is provided by each component's `get _class() {}` override
+    // and it's appearance/style is provided by each component's `get _componentsInitialClassAttribute() {}` override
     // i.e. `table` vs `table-row-group` vs `table-cell` vs ...etc...
     render() {
         return html`<slot></slot>`
@@ -71,15 +54,23 @@ export class ClassifiedElement extends LitElement {
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
-    // this is alternative `adoptStyles()` called in ClassifiedElement
-    // BUT it increases the build size more than adoptStyles (which is odd?)
-    // static override styles = [TWStyles]
+    // static override styles = [TWStyles] // alternative to calling `adoptStyles()` (called in <ClassifiedElement />); increases the build size proportional to the number of columns/rows
+
+    protected get classMap() {
+        return { 'table w-full select-none text-theme-primary bg-theme-secondary': true }
+    }
+
+    @state()
+    private _height?: number
+
+    @state()
+    resizeObserver?: ResizeObserver
 
     override connectedCallback() {
         super.connectedCallback()
 
         this.resizeObserver = new ResizeObserver((_entries) => {
-            this.height = this.offsetHeight
+            this._height = this.offsetHeight
         })
         this.resizeObserver.observe(this)
     }
@@ -95,11 +86,6 @@ export class Table extends ClassifiedElement {
     @state()
     protected rows: Array<Array<string>> = []
 
-    // style `<outerbase-table />
-    protected override get _class() {
-        return `${super._class} table w-full select-none text-theme-primary bg-theme-secondary`
-    }
-
     // fetch data from Outerbase when `sourceId` changes
     @property({ type: String, attribute: 'source-id' })
     sourceId?: string
@@ -110,13 +96,7 @@ export class Table extends ClassifiedElement {
     @property({ type: Object, attribute: 'db-query' })
     data?: Queryd
 
-    @property({ type: Number })
-    private height?: number
-
-    @state()
-    resizeObserver?: ResizeObserver
-
-    protected willUpdate(_changedProperties: PropertyValueMap<this> | Map<PropertyKey, unknown>): void {
+    protected override willUpdate(_changedProperties: PropertyValueMap<this> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
         // when `data` changes, update `rows` and `columns`
@@ -154,7 +134,7 @@ export class Table extends ClassifiedElement {
                             idx // omit column resizer on the last column because... it's awkward.
                         ) => {
                             return html`<outerbase-th
-                                table-height=${ifDefined(this.height)}
+                                table-height=${ifDefined(this._height)}
                                 ?with-resizer=${idx !== this.columns.length - 1}
                                 >${k}</outerbase-th
                             >`
@@ -192,28 +172,26 @@ export class Table extends ClassifiedElement {
 // tl;dr <tbody/>, table-row-group
 @customElement('outerbase-rowgroup')
 export class TBody extends ClassifiedElement {
-    protected get _class() {
-        return `${super._class} table-row-group`
+    protected get classMap() {
+        return { 'table-row-group': true }
     }
 }
 
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
 export class TH extends ClassifiedElement {
+    protected override get classMap() {
+        return {
+            'table-cell relative first:border-l border-b last:border-r border-t whitespace-nowrap p-1.5': true,
+            'shadow-sm': typeof this.tableHeight !== 'undefined',
+        }
+    }
+
     @property({ attribute: 'table-height', type: Number })
     tableHeight?: number
 
     @property({ attribute: 'with-resizer', type: Boolean })
     withResizer = false
-
-    protected override get _class() {
-        // FIXME `_class` isn't re-called when arbitrary internal state changes, therefore this won't be updated when state changes
-        return classMapToClassName({
-            [super._class]: true,
-            'table-cell relative first:border-l border-b last:border-r border-t whitespace-nowrap p-1.5': true,
-            'shadow-sm': typeof this.tableHeight !== 'undefined',
-        })
-    }
 
     render() {
         return this.withResizer
@@ -225,31 +203,41 @@ export class TH extends ClassifiedElement {
 // tl;dr <thead/>, table-header-group
 @customElement('outerbase-thead')
 export class THead extends ClassifiedElement {
-    protected get _class() {
-        return `${super._class} table-header-group font-bold sticky top-0`
+    protected override get classMap() {
+        return { 'table-header-group font-bold sticky top-0': true }
     }
 }
 
 // tl;dr <tr/>, table-row
 @customElement('outerbase-tr')
 export class TableRow extends ClassifiedElement {
-    @property({ type: Boolean, attribute: 'header', reflect: true })
-    isHeaderRow: boolean = false
-
-    protected get _class() {
-        // FIXME `_class` isn't re-called when arbitrary internal state changes, therefore this won't be updated when state changes
-        return classMapToClassName({
-            [super._class]: true,
+    protected override get classMap() {
+        return {
             'table-row': true,
             'bg-white/80 border-b-neutral-200 backdrop-blur-sm': this.isHeaderRow,
             'hover:bg-neutral-300/10': !this.isHeaderRow,
-        })
+        }
     }
+
+    @property({ type: Boolean, attribute: 'header', reflect: true })
+    isHeaderRow: boolean = false
 }
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
 export class TableData extends ClassifiedElement {
+    protected override get classMap() {
+        return {
+            'max-w-xs': !this.maxWidth, // default max width, unless specified
+            [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
+            'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
+            'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
+            'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
+            'table-cell p-1.5 text-ellipsis whitespace-nowrap overflow-hidden': true, // the baseline styles for our <td/>
+            'select-text': !this._columnIsResizing,
+        }
+    }
+
     // allows, for example, <outerbase-td max-width="max-w-xl" />
     @property({ type: String, attribute: 'max-width' })
     maxWidth: string = ''
@@ -284,48 +272,34 @@ export class TableData extends ClassifiedElement {
         document.addEventListener('column-resize-start', onColumnResizeStart)
     }
 
-    // dynamically determines the CSS classes that get set on the `class` attribute
-    // i.e. <outerbase-td class="___" />
-    protected get _class() {
-        // FIXME `_class` isn't re-called when arbitrary internal state changes, therefore this won't be updated when state changes
-        return classMapToClassName({
-            [super._class]: true, // classes set by `ClassifiedElement`
-            'max-w-xs': !this.maxWidth, // default max width, unless specified
-            [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
-            'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
-            'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
-            'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
-            'table-cell p-1.5 text-ellipsis whitespace-nowrap overflow-hidden': true, // the baseline styles for our <td/>
-        })
-    }
-
     render() {
-        // omit `select-text` while resizing, or else the user will inadvertantly highlight text
-        const classes = { 'select-text': !this._columnIsResizing }
-        return html`<span class=${classMap(classes)}><slot></slot></span>`
+        return html`<slot></slot>`
     }
 }
 
 @customElement('column-resizer')
 export class ColumnResizer extends ClassifiedElement {
+    protected override get classMap() {
+        // Why `h-[var(...)]`?
+        //
+        // I attempted to assign `table-height` via `static styles`,
+        // but for reasons that allude me, that approach only works when the page is pre-rendered on the server and then hydrated.
+        // i.e. client side litearlly omits the `<style />` tag that should be set to `static styles` contents
+
+        return {
+            'h-[var(--table-height)] absolute top-0 right-[3px] hover:right-0 z-10 w-[1px] hover:w-1.5 active:w-1.5 cursor-col-resize bg-neutral-200 hover:bg-blue-300 active:bg-blue-500':
+                true,
+        }
+    }
+
     @property({ type: Number })
     protected height?: number
 
-    protected override get _class() {
-        return `h-[var(--table-height)] absolute top-0 right-[3px] hover:right-0 z-10 w-[1px] hover:w-1.5 active:w-1.5 cursor-col-resize bg-neutral-200 hover:bg-blue-300 active:bg-blue-500`
-    }
-
-    // Wait, why did you `h-[var(...)]`???
-    //
-    // I attempted to assign `table-height` via `static styles`,
-    // but for reasons that allude me, that approach only works when the page is pre-rendered on the server and then hydrated.
-    // i.e. client side litearlly omits the `<style />` tag that should be set to `static styles` contents
-
     // this successfully sets/receives `column` when `.column={...}` is passed
-    // but it's unclear whether updates to `.column` are reflects
+    // but it's unclear whether updates to `.column` are reflected
     // the docs explicitly say it won't be observed, but it has been tested to definitely work on the initial render
     @property({ attribute: false })
-    column?: TH
+    column: TH | null = null
 
     private xPosition?: number
     private width?: number
@@ -342,6 +316,7 @@ export class ColumnResizer extends ClassifiedElement {
 
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
+
         if (_changedProperties.has('height')) {
             document.documentElement.style.setProperty('--table-height', `${this.height}px`)
         }
