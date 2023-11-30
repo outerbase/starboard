@@ -1,5 +1,6 @@
 import { customElement, property, state } from 'lit/decorators.js'
 import { LitElement, html, adoptStyles, type PropertyValueMap, css } from 'lit'
+import { classMap } from 'lit/directives/class-map.js'
 import { map } from 'lit/directives/map.js'
 import type { Queryd } from '../types'
 import { TWStyles } from '../../tailwind'
@@ -18,7 +19,7 @@ export class ClassifiedElement extends LitElement {
     override connectedCallback() {
         super.connectedCallback()
 
-        // NOTE Astro's SSR fails to include these styles during SSR,
+        // NOTE Astro's SSR (?) fails to include these styles during SSR,
         //      but they appear client-side during hydration.
         //      It's unclear if that makes sense or is actually an Astro bug
         if (!this.shadowRoot) throw new Error('`this.shadowRoot` is null')
@@ -27,12 +28,12 @@ export class ClassifiedElement extends LitElement {
 
     // `classes` are additive to our internal `class` attribute
     // if `class` is specified it will not be reflected in the DOM (except for a momentary initial render)
-    @property({ type: String })
-    classes: string = ''
+    @state()
+    classes = ''
 
     // _class() is overriden by each subclass to specify the classes it craves
-    // each subclass should call `super._class` to include the classest returned here
-    @property({ type: String, attribute: 'false' })
+    // each subclass should call `super._class` to include the classes returned here
+    @property({ type: String, attribute: false })
     protected get _class() {
         // return the `classes` attribute, if any
         // otherwise no particular styling is desired here
@@ -46,6 +47,7 @@ export class ClassifiedElement extends LitElement {
     @property({ reflect: true, attribute: 'class', type: String })
     className = this._class
 
+    // FIXME this only runs when `_class` is redefined, not when a condition inside of it in a subclass changes
     // reset `className` when any of the dependencies in `_class` change
     // since `className` is associated with the attribute `class`, this updates the DOM element to specify these classes
     // and consequently causes the underlying styles (to those CSS classes) to be applied
@@ -87,13 +89,15 @@ export class Table extends ClassifiedElement {
         this.resizeObserver?.disconnect()
     }
 
+    @state()
     protected columns: Array<string> = []
+
+    @state()
     protected rows: Array<Array<string>> = []
 
     // style `<outerbase-table />
     protected override get _class() {
-        // TODO dynamically add/remove `select-none` when columns are being resized
-        return `${super._class} table w-full text-theme-primary bg-theme-secondary`
+        return `${super._class} table w-full select-none text-theme-primary bg-theme-secondary`
     }
 
     // fetch data from Outerbase when `sourceId` changes
@@ -203,6 +207,7 @@ export class TH extends ClassifiedElement {
     withResizer = false
 
     protected override get _class() {
+        // FIXME `_class` isn't re-called when arbitrary internal state changes, therefore this won't be updated when state changes
         return classMapToClassName({
             [super._class]: true,
             'table-cell relative first:border-l border-b last:border-r border-t whitespace-nowrap p-1.5': true,
@@ -232,6 +237,7 @@ export class TableRow extends ClassifiedElement {
     isHeaderRow: boolean = false
 
     protected get _class() {
+        // FIXME `_class` isn't re-called when arbitrary internal state changes, therefore this won't be updated when state changes
         return classMapToClassName({
             [super._class]: true,
             'table-row': true,
@@ -259,9 +265,29 @@ export class TableData extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'draw-right-border' })
     private _drawRightBorder = false
 
+    @state()
+    private _columnIsResizing = false
+
+    override connectedCallback() {
+        super.connectedCallback()
+
+        const onColumnResizeEnd = (event: Event) => {
+            document.removeEventListener('column-resize-end', onColumnResizeEnd)
+            this._columnIsResizing = false
+        }
+
+        const onColumnResizeStart = (event: Event) => {
+            document.addEventListener('column-resize-end', onColumnResizeEnd)
+            this._columnIsResizing = true
+        }
+
+        document.addEventListener('column-resize-start', onColumnResizeStart)
+    }
+
     // dynamically determines the CSS classes that get set on the `class` attribute
     // i.e. <outerbase-td class="___" />
     protected get _class() {
+        // FIXME `_class` isn't re-called when arbitrary internal state changes, therefore this won't be updated when state changes
         return classMapToClassName({
             [super._class]: true, // classes set by `ClassifiedElement`
             'max-w-xs': !this.maxWidth, // default max width, unless specified
@@ -271,6 +297,12 @@ export class TableData extends ClassifiedElement {
             'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
             'table-cell p-1.5 text-ellipsis whitespace-nowrap overflow-hidden': true, // the baseline styles for our <td/>
         })
+    }
+
+    render() {
+        // omit `select-text` while resizing, or else the user will inadvertantly highlight text
+        const classes = { 'select-text': !this._columnIsResizing }
+        return html`<span class=${classMap(classes)}><slot></slot></span>`
     }
 }
 
@@ -318,6 +350,8 @@ export class ColumnResizer extends ClassifiedElement {
     private _mouseDown(e: MouseEvent) {
         if (!this.column) throw new Error('`column` is unset; aborting')
 
+        document.dispatchEvent(new Event('column-resize-start'))
+
         const _mouseMove = (e: MouseEvent) => {
             if (!this.column) throw new Error('`column` is unset; aborting')
             if (!this.xPosition) throw new Error('`xPosition` is unset; aborting')
@@ -330,6 +364,7 @@ export class ColumnResizer extends ClassifiedElement {
         const _mouseUp = (e: Event) => {
             document.removeEventListener('mouseup', _mouseUp)
             document.removeEventListener('mousemove', _mouseMove)
+            document.dispatchEvent(new Event('column-resize-end'))
         }
 
         document.addEventListener('mousemove', _mouseMove)
