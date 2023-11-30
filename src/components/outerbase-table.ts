@@ -1,5 +1,5 @@
 import { customElement, property } from 'lit/decorators.js'
-import { LitElement, html, css, type PropertyValueMap } from 'lit'
+import { LitElement, html, css, adoptStyles, type PropertyValueMap } from 'lit'
 import { map } from 'lit/directives/map.js'
 import type { Queryd } from '../types'
 import { TWStyles } from '../../tailwind'
@@ -9,6 +9,19 @@ import classMapToClassName from '../lib/class-map-to-class-name'
 // ClassifiedElement deals primarily with ensuring that each Super Class's style
 // is propogated to the DOM and therefore it's CSS is applied
 export class ClassifiedElement extends LitElement {
+    // uncommenting the following line causes a copy of TWStyles
+    // to be included for every instance that extends ClassifiedElement
+    // ...but it also resolves style flickering when SSR is enabled :|
+    // static override styles = [TWStyles]
+
+    override connectedCallback() {
+        super.connectedCallback()
+
+        // NOTE Astro's SSR fails to include these styles during SSR,
+        //      but they appear client-side during hydration
+        adoptStyles(this.shadowRoot, [TWStyles])
+    }
+
     // `classes` are additive to our internal `class` attribute
     // if `class` is specified it will not be reflected in the DOM (except for a momentary initial render)
     @property({ type: String })
@@ -53,13 +66,7 @@ export class ClassifiedElement extends LitElement {
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
-    // alternative way to load styles, but WARNING Astro's SSR fails to include the styles during SSR
-    // override connectedCallback() {
-    //     super.connectedCallback()
-    //     adoptStyles(this.shadowRoot, sharedStyles)
-    // }
 
-    static override styles = [TWStyles]
 
     protected columns: Array<string> = []
     protected rows: Array<Array<string>> = []
