@@ -305,7 +305,9 @@ export class ColumnResizer extends ClassifiedElement {
 
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
-        if (this.height) document.documentElement.style.setProperty('--table-height', `${this.height}px`)
+        if (_changedProperties.has('height')) {
+            document.documentElement.style.setProperty('--table-height', `${this.height}px`)
+        }
     }
 
     private _mouseDown(e: MouseEvent) {
