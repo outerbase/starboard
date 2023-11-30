@@ -149,7 +149,11 @@ export class Table extends ClassifiedElement {
                             k,
                             idx // omit column resizer on the last column because... it's awkward.
                         ) => {
-                            return html`<outerbase-th table-height="${ifDefined(this.height)}">${k}</outerbase-th>`
+                            return html`<outerbase-th
+                                table-height=${ifDefined(this.height)}
+                                ?with-resizer=${idx !== this.columns.length - 1}
+                                >${k}</outerbase-th
+                            >`
                         }
                     )}
                 </outerbase-tr>
@@ -195,6 +199,9 @@ export class TH extends ClassifiedElement {
     @property({ attribute: 'table-height', type: Number })
     tableHeight?: number
 
+    @property({ attribute: 'with-resizer', type: Boolean })
+    withResizer = false
+
     protected override get _class() {
         return classMapToClassName({
             [super._class]: true,
@@ -204,7 +211,7 @@ export class TH extends ClassifiedElement {
     }
 
     render() {
-        return this.tableHeight
+        return this.withResizer
             ? html`<slot></slot><column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer>`
             : html`<slot></slot>`
     }
