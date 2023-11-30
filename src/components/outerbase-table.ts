@@ -72,7 +72,8 @@ export class Table extends ClassifiedElement {
     protected rows: Array<Array<string>> = []
 
     // style `<outerbase-table />
-    protected get _class() {
+    protected override get _class() {
+        // TODO dynamically add/remove `select-none` when columns are being resized
         return `${super._class} table w-full text-theme-primary bg-theme-secondary`
     }
 
@@ -168,12 +169,16 @@ export class TH extends ClassifiedElement {
     @property({ attribute: 'with-resizer', type: Boolean })
     withResizer: boolean = false
 
-    protected get _class() {
+    protected override get _class() {
         return classMapToClassName({
             [super._class]: true,
             'table-cell relative first:border-l border-b border-r border-t whitespace-nowrap p-1.5': true,
             'shadow-sm': !this.withResizer,
         })
+    }
+
+    override render() {
+        return html`<slot></slot><column-resizer .column=${this}></column-resizer>`
     }
 }
 
@@ -227,5 +232,48 @@ export class TableData extends ClassifiedElement {
             'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
             'table-cell p-1.5 text-ellipsis whitespace-nowrap overflow-hidden': true, // the baseline styles for our <td/>
         })
+    }
+}
+
+@customElement('column-resizer')
+export class ColumnResizer extends ClassifiedElement {
+    protected override get _class() {
+        // TODO remove `h-8` and rely on dynamically using the Table's height
+        // TODO ask GPT if there is a CSS-only way to do this instead of using an ResizeObserver
+        return 'top-0 h-8 absolute right-[3px] h-[100px] hover:right-0 z-10 w-[1px] hover:w-1.5 active:w-1.5 cursor-col-resize bg-neutral-200 hover:bg-blue-300 active:bg-blue-500'
+    }
+
+    @property()
+    column: typeof TH
+
+    private xPosition: number
+    private width: number
+
+    override connectedCallback() {
+        super.connectedCallback()
+        this.addEventListener('mousedown', this._mouseDown)
+    }
+
+    override disconnectedCallback() {
+        super.disconnectedCallback()
+        this.removeEventListener('mousedown', this._mouseDown)
+    }
+
+    private _mouseDown(e: Event) {
+        const _mouseMove = (e: Event) => {
+            const dx = e.clientX - this.xPosition
+            this.column.style.width = `${this.width + dx}px`
+        }
+
+        const _mouseUp = (e: Event) => {
+            document.removeEventListener('mouseup', _mouseUp)
+            document.removeEventListener('mousemove', _mouseMove)
+        }
+
+        document.addEventListener('mousemove', _mouseMove)
+        document.addEventListener('mouseup', _mouseUp)
+
+        this.xPosition = e.clientX
+        this.width = parseInt(window.getComputedStyle(this.column).width, 10)
     }
 }
