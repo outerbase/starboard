@@ -1,5 +1,5 @@
 import { customElement, property } from 'lit/decorators.js'
-import { LitElement, html, css, adoptStyles, type PropertyValueMap } from 'lit'
+import { LitElement, html, adoptStyles, type PropertyValueMap } from 'lit'
 import { map } from 'lit/directives/map.js'
 import type { Queryd } from '../types'
 import { TWStyles } from '../../tailwind'
@@ -18,7 +18,9 @@ export class ClassifiedElement extends LitElement {
         super.connectedCallback()
 
         // NOTE Astro's SSR fails to include these styles during SSR,
-        //      but they appear client-side during hydration
+        //      but they appear client-side during hydration.
+        //      It's unclear if that makes sense or is actually an Astro bug
+        if (!this.shadowRoot) throw new Error('`this.shadowRoot` is null')
         adoptStyles(this.shadowRoot, [TWStyles])
     }
 
@@ -66,18 +68,20 @@ export class ClassifiedElement extends LitElement {
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
+    // this is alternative `adoptStyles()` called in ClassifiedElement
+    // BUT it increases the build size more than adoptStyles (which is odd?)
+    // static override styles = [TWStyles]
+
     override connectedCallback() {
         super.connectedCallback()
 
-        this.resizeObserver = new ResizeObserver((_entries) => {
-        })
-
+        this.resizeObserver = new ResizeObserver((_entries) => {})
         this.resizeObserver.observe(this)
     }
 
     override disconnectedCallback() {
         super.disconnectedCallback()
-        resizeObserver.disconnect()
+        this.resizeObserver?.disconnect()
     }
 
     protected columns: Array<string> = []
@@ -100,7 +104,7 @@ export class Table extends ClassifiedElement {
     data?: Queryd
 
     @property({ attribute: false })
-    resizeObserver: ResizeObserver
+    resizeObserver?: ResizeObserver
 
     protected willUpdate(_changedProperties: PropertyValueMap<this> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
@@ -118,11 +122,13 @@ export class Table extends ClassifiedElement {
         // Note: if both `data` and `source-id` are passed to `<outerbase-component />`
         //       then it will initially render with the provided data but immediately fetch data for the provided `source-id`
         if (_changedProperties.has('sourceId')) {
+            if (!this.authToken) throw new Error('Unable to fetch data without `auth-token`')
+
             const previousSourceId = _changedProperties.get('sourceId')
             if (this.sourceId && this.sourceId !== previousSourceId) {
                 console.info(`sourceId changed from ${previousSourceId} to ${this.sourceId}`)
                 console.info(`fetching data for ${this.sourceId}`)
-                dbRowsForSource(this.sourceId).then((data) => {
+                dbRowsForSource(this.sourceId, this.authToken).then((data) => {
                     this.data = data
                 })
             }
@@ -258,11 +264,11 @@ export class ColumnResizer extends ClassifiedElement {
         return 'top-0 h-8 absolute right-[3px] h-[100px] hover:right-0 z-10 w-[1px] hover:w-1.5 active:w-1.5 cursor-col-resize bg-neutral-200 hover:bg-blue-300 active:bg-blue-500'
     }
 
-    @property()
-    column: typeof TH
+    @property({ attribute: false })
+    column?: TH
 
-    private xPosition: number
-    private width: number
+    private xPosition?: number
+    private width?: number
 
     override connectedCallback() {
         super.connectedCallback()
@@ -274,8 +280,14 @@ export class ColumnResizer extends ClassifiedElement {
         this.removeEventListener('mousedown', this._mouseDown)
     }
 
-    private _mouseDown(e: Event) {
-        const _mouseMove = (e: Event) => {
+    private _mouseDown(e: MouseEvent) {
+        if (!this.column) throw new Error('`column` is unset; aborting')
+
+        const _mouseMove = (e: MouseEvent) => {
+            if (!this.column) throw new Error('`column` is unset; aborting')
+            if (!this.xPosition) throw new Error('`xPosition` is unset; aborting')
+            if (!this.width) throw new Error('`width` is unset; aborting')
+
             const dx = e.clientX - this.xPosition
             this.column.style.width = `${this.width + dx}px`
         }
