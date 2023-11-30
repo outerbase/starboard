@@ -162,11 +162,14 @@ export class Table extends ClassifiedElement {
                     (row) =>
                         html`<outerbase-tr>
                             <!-- render a TableCell for each column of data in the curernt row -->
-                            <!-- NOTE: the Array.isArray(etc) is jsut temporary to render stubbed data more better -->
+                            <!-- NOTE: the Array.isArray(etc) is jsut temporary to render stubbed data more better (spaceballs demo data) -->
                             ${map(
                                 row,
-                                (value) => html`
-                                    <outerbase-td ?separate-cells=${true} ?bottom-border=${true}
+                                (value, idx) => html`
+                                    <outerbase-td
+                                        ?separate-cells=${true}
+                                        ?draw-right-border=${idx === row.length - 1}
+                                        ?bottom-border=${true}
                                         >${Array.isArray(value) ? value.join(', ') : value}</outerbase-td
                                     >
                                 `
@@ -195,13 +198,15 @@ export class TH extends ClassifiedElement {
     protected override get _class() {
         return classMapToClassName({
             [super._class]: true,
-            'table-cell relative first:border-l border-b border-r border-t whitespace-nowrap p-1.5': true,
+            'table-cell relative first:border-l border-b last:border-r border-t whitespace-nowrap p-1.5': true,
             'shadow-sm': typeof this.tableHeight !== 'undefined',
         })
     }
 
-    override render() {
-        return html`<slot></slot><column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer>`
+    render() {
+        return this.tableHeight
+            ? html`<slot></slot><column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer>`
+            : html`<slot></slot>`
     }
 }
 
@@ -244,6 +249,9 @@ export class TableData extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'bottom-border' })
     withBottomBorder: boolean = false
 
+    @property({ type: Boolean, attribute: 'draw-right-border' })
+    private _drawRightBorder = false
+
     // dynamically determines the CSS classes that get set on the `class` attribute
     // i.e. <outerbase-td class="___" />
     protected get _class() {
@@ -251,7 +259,8 @@ export class TableData extends ClassifiedElement {
             [super._class]: true, // classes set by `ClassifiedElement`
             'max-w-xs': !this.maxWidth, // default max width, unless specified
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
-            'border-r first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
+            'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
+            'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
             'table-cell p-1.5 text-ellipsis whitespace-nowrap overflow-hidden': true, // the baseline styles for our <td/>
         })
