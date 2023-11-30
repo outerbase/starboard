@@ -1,10 +1,11 @@
-import { customElement, property } from 'lit/decorators.js'
-import { LitElement, html, adoptStyles, type PropertyValueMap } from 'lit'
+import { customElement, property, state } from 'lit/decorators.js'
+import { LitElement, html, adoptStyles, type PropertyValueMap, css } from 'lit'
 import { map } from 'lit/directives/map.js'
 import type { Queryd } from '../types'
 import { TWStyles } from '../../tailwind'
 import dbRowsForSource from '../lib/rows-for-source-id'
 import classMapToClassName from '../lib/class-map-to-class-name'
+import { ifDefined } from 'lit/directives/if-defined.js'
 
 // ClassifiedElement deals primarily with ensuring that each Super Class's style
 // is propogated to the DOM and therefore it's CSS is applied
@@ -75,7 +76,9 @@ export class Table extends ClassifiedElement {
     override connectedCallback() {
         super.connectedCallback()
 
-        this.resizeObserver = new ResizeObserver((_entries) => {})
+        this.resizeObserver = new ResizeObserver((_entries) => {
+            this.height = this.offsetHeight
+        })
         this.resizeObserver.observe(this)
     }
 
@@ -103,7 +106,10 @@ export class Table extends ClassifiedElement {
     @property({ type: Object, attribute: 'db-query' })
     data?: Queryd
 
-    @property({ attribute: false })
+    @property({ type: Number })
+    private height?: number
+
+    @state()
     resizeObserver?: ResizeObserver
 
     protected willUpdate(_changedProperties: PropertyValueMap<this> | Map<PropertyKey, unknown>): void {
@@ -114,8 +120,6 @@ export class Table extends ClassifiedElement {
             if (this.data && this.data.items?.length > 0) {
                 this.columns = Object.keys(this.data.items[0])
                 this.rows = this.data.items.map((d) => Object.values(d))
-            } else {
-                console.warn('this.data: ', this.data)
             }
         }
 
@@ -126,8 +130,7 @@ export class Table extends ClassifiedElement {
 
             const previousSourceId = _changedProperties.get('sourceId')
             if (this.sourceId && this.sourceId !== previousSourceId) {
-                console.info(`sourceId changed from ${previousSourceId} to ${this.sourceId}`)
-                console.info(`fetching data for ${this.sourceId}`)
+                console.debug(`sourceId changed from ${previousSourceId} to ${this.sourceId}; fetching new data`)
                 dbRowsForSource(this.sourceId, this.authToken).then((data) => {
                     this.data = data
                 })
@@ -146,8 +149,7 @@ export class Table extends ClassifiedElement {
                             k,
                             idx // omit column resizer on the last column because... it's awkward.
                         ) => {
-                            const withResizer = (this.columns?.length ?? 0) - 1 !== idx
-                            return html`<outerbase-th ?with-resizer="${withResizer}">${k}</outerbase-th>`
+                            return html`<outerbase-th table-height="${ifDefined(this.height)}">${k}</outerbase-th>`
                         }
                     )}
                 </outerbase-tr>
@@ -187,19 +189,19 @@ export class TBody extends ClassifiedElement {
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
 export class TH extends ClassifiedElement {
-    @property({ attribute: 'with-resizer', type: Boolean })
-    withResizer: boolean = false
+    @property({ attribute: 'table-height', type: Number })
+    tableHeight?: number
 
     protected override get _class() {
         return classMapToClassName({
             [super._class]: true,
             'table-cell relative first:border-l border-b border-r border-t whitespace-nowrap p-1.5': true,
-            'shadow-sm': !this.withResizer,
+            'shadow-sm': typeof this.tableHeight !== 'undefined',
         })
     }
 
     override render() {
-        return html`<slot></slot><column-resizer .column=${this}></column-resizer>`
+        return html`<slot></slot><column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer>`
     }
 }
 
@@ -258,12 +260,24 @@ export class TableData extends ClassifiedElement {
 
 @customElement('column-resizer')
 export class ColumnResizer extends ClassifiedElement {
+    @property({ type: Number })
+    protected height?: number
+
     protected override get _class() {
-        // TODO remove `h-8` and rely on dynamically using the Table's height
-        // TODO ask GPT if there is a CSS-only way to do this instead of using an ResizeObserver
-        return 'top-0 h-8 absolute right-[3px] h-[100px] hover:right-0 z-10 w-[1px] hover:w-1.5 active:w-1.5 cursor-col-resize bg-neutral-200 hover:bg-blue-300 active:bg-blue-500'
+        return `absolute top-0 right-[3px] hover:right-0 z-10 w-[1px] hover:w-1.5 active:w-1.5 cursor-col-resize bg-neutral-200 hover:bg-blue-300 active:bg-blue-500`
     }
 
+    // `styles` isn't dynamic, so whatever the initial value(s) specified are stuck
+    // so we leverage CSS variables and dynamically update that variable
+    static styles = css`
+        :host {
+            height: var(--table-height);
+        }
+    `
+
+    // this successfully sets/receives `column` when `.column={...}` is passed
+    // but it's unclear whether updates to `.column` are reflects
+    // the docs explicitly say it won't be observed, but it has been tested to definitely work on the initial render
     @property({ attribute: false })
     column?: TH
 
@@ -278,6 +292,11 @@ export class ColumnResizer extends ClassifiedElement {
     override disconnectedCallback() {
         super.disconnectedCallback()
         this.removeEventListener('mousedown', this._mouseDown)
+    }
+
+    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.willUpdate(_changedProperties)
+        if (this.height) document.documentElement.style.setProperty('--table-height', `${this.height}px`)
     }
 
     private _mouseDown(e: MouseEvent) {
