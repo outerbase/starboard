@@ -273,16 +273,14 @@ export class ColumnResizer extends ClassifiedElement {
     protected height?: number
 
     protected override get _class() {
-        return `absolute top-0 right-[3px] hover:right-0 z-10 w-[1px] hover:w-1.5 active:w-1.5 cursor-col-resize bg-neutral-200 hover:bg-blue-300 active:bg-blue-500`
+        return `h-[var(--table-height)] absolute top-0 right-[3px] hover:right-0 z-10 w-[1px] hover:w-1.5 active:w-1.5 cursor-col-resize bg-neutral-200 hover:bg-blue-300 active:bg-blue-500`
     }
 
-    // `styles` isn't dynamic, so whatever the initial value(s) specified are stuck
-    // so we leverage CSS variables and dynamically update that variable
-    static styles = css`
-        :host {
-            height: var(--table-height);
-        }
-    `
+    // Wait, why did you `h-[var(...)]`???
+    //
+    // I attempted to assign `table-height` via `static styles`,
+    // but for reasons that allude me, that approach only works when the page is pre-rendered on the server and then hydrated.
+    // i.e. client side litearlly omits the `<style />` tag that should be set to `static styles` contents
 
     // this successfully sets/receives `column` when `.column={...}` is passed
     // but it's unclear whether updates to `.column` are reflects
