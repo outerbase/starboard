@@ -172,7 +172,7 @@ export class InnerTable extends ClassifiedElement {
                                 (value, idx) => html`
                                     <outerbase-td
                                         ?separate-cells=${true}
-                                        ?draw-right-border=${idx === row.length - 1}
+                                        ?draw-right-border=${idx === row.length - 1 || !this.columnResizerEnabled}
                                         ?bottom-border=${true}
                                         >${Array.isArray(value) ? value.join(', ') : value}</outerbase-td
                                     >
@@ -198,7 +198,11 @@ export class TBody extends ClassifiedElement {
 export class TH extends ClassifiedElement {
     protected override get classMap() {
         return {
+            // 'select-text': true, // allow text selection, but need to only apply this while a column is NOT resizing
             'shadow-sm table-cell relative first:border-l border-b last:border-r border-t whitespace-nowrap p-1.5': true,
+            // prevent double borders
+            'first:border-l': this.withResizer, // omit regular border
+            'border-l': !this.withResizer, // use regular border
         }
     }
 
