@@ -1,7 +1,6 @@
 import { LitElement, html, type PropertyValueMap, css } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
-import { classMap } from 'lit/directives/class-map.js'
 import { map } from 'lit/directives/map.js'
 import type { Queryd } from '../types'
 import { TWStyles } from '../../tailwind'
@@ -56,21 +55,6 @@ export class ClassifiedElement extends LitElement {
 
 @customElement('outerbase-table')
 export class Table extends LitElement {
-    // static override styles = TWStyles // necessary, or `height` is 0
-    // determined that only these classes are necesssary
-    // ..why?...who knows....
-    static override styles = css`
-        /* this is required in Safari, but not Chromium, or else the Resizer is MIA because the computed height is 0 */
-        .table {
-            display: table;
-        }
-
-        /* this is required in both Safari and Chromium or else the Table won't stretch to fill it's container */
-        .w-full {
-            width: 100%;
-        }
-    `
-
     @property({ type: Object })
     data?: Queryd
 
@@ -83,25 +67,20 @@ export class Table extends LitElement {
 export class InnerTable extends ClassifiedElement {
     static override styles = TWStyles // necessary, or *nothing* is styled
 
-    protected override get classMap() {
-        return {
-            // overflow-hidden is here to prevent the <column-resizer /> from extending beyond the table
-            // ...even though it's height is exactly the height of the table
-            // OBSERVATION the columns resize nicer when `w-full` is omitted here
-            // ..so w-full is omitted for now
-            'table table-fixed w-full overflow-hidden select-none text-theme-primary bg-theme-secondary dark:text-theme-secondary dark:bg-theme-primary':
-                true,
-        }
-    }
-
     @state()
     private _height?: number
+
+    @state()
+    private columnResizerEnabled = false
 
     @state()
     resizeObserver?: ResizeObserver
 
     override connectedCallback() {
         super.connectedCallback()
+
+        // without this `setTimeout`, then a client-side-only Table updates properly but SSR'd tables do NOT
+        setTimeout(() => (this.columnResizerEnabled = true), 0)
 
         this.resizeObserver = new ResizeObserver((_entries) => {
             this._height = getTotalHeight(_entries[0]?.target)
@@ -157,24 +136,26 @@ export class InnerTable extends ClassifiedElement {
     }
 
     render() {
-        // this `<div />` here is the `<table />`
-        return html`<div class=${classMap(this.classMap)}>
+        // 'overflow-hidden' is necessary to prevent the ColumnResizer from going beyond the table.
+        // It's unclear (so far) why this is happening; the height is correct
+        // Looks like it may have something to do with the header being `sticky`
+        // as I'm observing that the Resizer stays in place as you scroll down the page
+        // while the rest of the table scrolls out of view
+
+        return html`<div
+            class="overflow-hidden table table-fixed w-full select-none text-theme-primary bg-theme-secondary dark:text-theme-secondary dark:bg-theme-primary"
+        >
             <outerbase-thead>
                 <outerbase-tr header>
                     <!-- render an TableHeader for each column -->
-                    ${map(
-                        this.columns,
-                        (
-                            k,
-                            idx // omit column resizer on the last column because... it's awkward.
-                        ) => {
-                            return html`<outerbase-th
-                                table-height=${ifDefined(this._height)}
-                                ?with-resizer=${idx !== this.columns.length - 1}
-                                >${k}</outerbase-th
-                            >`
-                        }
-                    )}
+                    ${map(this.columns, (k, idx) => {
+                        // omit column resizer on the last column because it's sort-of awkward
+                        return html`<outerbase-th
+                            table-height=${ifDefined(this._height)}
+                            ?with-resizer=${this.columnResizerEnabled && idx !== this.columns.length - 1}
+                            >${k}</outerbase-th
+                        >`
+                    })}
                 </outerbase-tr>
             </outerbase-thead>
 
