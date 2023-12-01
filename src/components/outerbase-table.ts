@@ -1,30 +1,32 @@
+import { LitElement, html, type PropertyValueMap, css } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
-import { LitElement, html, adoptStyles, type PropertyValueMap } from 'lit'
+import { ifDefined } from 'lit/directives/if-defined.js'
+import { classMap } from 'lit/directives/class-map.js'
 import { map } from 'lit/directives/map.js'
 import type { Queryd } from '../types'
 import { TWStyles } from '../../tailwind'
 import dbRowsForSource from '../lib/rows-for-source-id'
 import classMapToClassName from '../lib/class-map-to-class-name'
-import { ifDefined } from 'lit/directives/if-defined.js'
+
+function getTotalHeight(element: Element) {
+    const styles = window.getComputedStyle(element)
+    const height = element.getBoundingClientRect().height
+
+    const marginTop = parseFloat(styles.marginTop)
+    const marginBottom = parseFloat(styles.marginBottom)
+    const paddingTop = parseFloat(styles.paddingTop)
+    const paddingBottom = parseFloat(styles.paddingBottom)
+    const borderTop = parseFloat(styles.borderTopWidth)
+    const borderBottom = parseFloat(styles.borderBottomWidth)
+
+    const totalHeight = height + marginTop + marginBottom + paddingTop + paddingBottom + borderTop + borderBottom
+
+    return totalHeight
+}
 
 // ClassifiedElement deals primarily with ensuring that each Super Class's style
 // is propogated to the DOM and therefore it's CSS is applied
 export class ClassifiedElement extends LitElement {
-    // uncommenting the following line causes a copy of TWStyles
-    // to be included for every instance that extends ClassifiedElement
-    // ...but it also resolves style flickering when SSR is enabled :|
-    // static override styles = [TWStyles]
-
-    override connectedCallback() {
-        super.connectedCallback()
-
-        // NOTE Astro's SSR (?) fails to include these styles during SSR,
-        //      but they appear client-side during hydration.
-        //      It's unclear if that makes sense or is actually an Astro bug
-        if (!this.shadowRoot) throw new Error('`this.shadowRoot` is null')
-        adoptStyles(this.shadowRoot, [TWStyles])
-    }
-
     @property({ reflect: true, attribute: 'class', type: String })
     private _class = ''
 
@@ -53,11 +55,43 @@ export class ClassifiedElement extends LitElement {
 }
 
 @customElement('outerbase-table')
-export class Table extends ClassifiedElement {
-    // static override styles = [TWStyles] // alternative to calling `adoptStyles()` (called in <ClassifiedElement />); increases the build size proportional to the number of columns/rows
+export class Table extends LitElement {
+    // static override styles = TWStyles // necessary, or `height` is 0
+    // determined that only these classes are necesssary
+    // ..why?...who knows....
+    static override styles = css`
+        /* this is required in Safari, but not Chromium, or else the Resizer is MIA because the computed height is 0 */
+        .table {
+            display: table;
+        }
 
-    protected get classMap() {
-        return { 'table w-full select-none text-theme-primary bg-theme-secondary': true }
+        /* this is required in both Safari and Chromium or else the Table won't stretch to fill it's container */
+        .w-full {
+            width: 100%;
+        }
+    `
+
+    @property({ type: Object })
+    data?: Queryd
+
+    render() {
+        return html`<inner-table .data="${this.data}" auth-token="${import.meta.env.PUBLIC_AUTH_TOKEN}"></inner-table>`
+    }
+}
+
+@customElement('inner-table')
+export class InnerTable extends ClassifiedElement {
+    static override styles = TWStyles // necessary, or *nothing* is styled
+
+    protected override get classMap() {
+        return {
+            // overflow-hidden is here to prevent the <column-resizer /> from extending beyond the table
+            // ...even though it's height is exactly the height of the table
+            // OBSERVATION the columns resize nicer when `w-full` is omitted here
+            // ..so w-full is omitted for now
+            'table table-fixed w-full overflow-hidden select-none text-theme-primary bg-theme-secondary dark:text-theme-secondary dark:bg-theme-primary':
+                true,
+        }
     }
 
     @state()
@@ -70,7 +104,7 @@ export class Table extends ClassifiedElement {
         super.connectedCallback()
 
         this.resizeObserver = new ResizeObserver((_entries) => {
-            this._height = this.offsetHeight
+            this._height = getTotalHeight(_entries[0]?.target)
         })
         this.resizeObserver.observe(this)
     }
@@ -93,10 +127,10 @@ export class Table extends ClassifiedElement {
     @property({ type: String, attribute: 'auth-token' })
     authToken?: string
 
-    @property({ type: Object, attribute: 'db-query' })
+    @property({ type: Object })
     data?: Queryd
 
-    protected override willUpdate(_changedProperties: PropertyValueMap<this> | Map<PropertyKey, unknown>): void {
+    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
         // when `data` changes, update `rows` and `columns`
@@ -123,7 +157,8 @@ export class Table extends ClassifiedElement {
     }
 
     render() {
-        return html`
+        // this `<div />` here is the `<table />`
+        return html`<div class=${classMap(this.classMap)}>
             <outerbase-thead>
                 <outerbase-tr header>
                     <!-- render an TableHeader for each column -->
@@ -165,7 +200,7 @@ export class Table extends ClassifiedElement {
                         </outerbase-tr>`
                 )}
             </outerbase-rowgroup>
-        `
+        </div> `
     }
 }
 
@@ -182,8 +217,7 @@ export class TBody extends ClassifiedElement {
 export class TH extends ClassifiedElement {
     protected override get classMap() {
         return {
-            'table-cell relative first:border-l border-b last:border-r border-t whitespace-nowrap p-1.5': true,
-            'shadow-sm': typeof this.tableHeight !== 'undefined',
+            'shadow-sm table-cell relative first:border-l border-b last:border-r border-t whitespace-nowrap p-1.5': true,
         }
     }
 
@@ -279,27 +313,16 @@ export class TableData extends ClassifiedElement {
 
 @customElement('column-resizer')
 export class ColumnResizer extends ClassifiedElement {
-    protected override get classMap() {
-        // Why `h-[var(...)]`?
-        //
-        // I attempted to assign `table-height` via `static styles`,
-        // but for reasons that allude me, that approach only works when the page is pre-rendered on the server and then hydrated.
-        // i.e. client side litearlly omits the `<style />` tag that should be set to `static styles` contents
+    static override styles = TWStyles
 
-        return {
-            'h-[var(--table-height)] absolute top-0 right-[3px] hover:right-0 z-10 w-[1px] hover:w-1.5 active:w-1.5 cursor-col-resize bg-neutral-200 hover:bg-blue-300 active:bg-blue-500':
-                true,
-        }
-    }
-
-    @property({ type: Number })
+    @property({ type: Number, attribute: 'height' })
     protected height?: number
 
     // this successfully sets/receives `column` when `.column={...}` is passed
     // but it's unclear whether updates to `.column` are reflected
     // the docs explicitly say it won't be observed, but it has been tested to definitely work on the initial render
-    @property({ attribute: false })
-    column: TH | null = null
+    @property({ type: Object })
+    column: TH | undefined
 
     private xPosition?: number
     private width?: number
@@ -347,5 +370,13 @@ export class ColumnResizer extends ClassifiedElement {
 
         this.xPosition = e.clientX
         this.width = parseInt(window.getComputedStyle(this.column).width, 10)
+    }
+
+    render() {
+        return html`
+            <div
+                class="h-[var(--table-height)] absolute top-0 right-[3px] hover:right-0 z-10 w-[1px] hover:w-1.5 active:w-1.5 cursor-col-resize bg-neutral-200 hover:bg-blue-300 active:bg-blue-500"
+            ></div>
+        `
     }
 }

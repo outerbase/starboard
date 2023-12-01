@@ -3,7 +3,7 @@ const defaultTheme = require('tailwindcss/defaultTheme')
 
 export default {
     mode: 'jit',
-    darkMode: 'class',
+    // darkMode: 'class',
     content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
     theme: {
         extend: {
@@ -17,7 +17,7 @@ export default {
             },
             colors: {
                 theme: {
-                    primary: 'var(--primary-color, black)',
+                    primary: 'var(--primary-color, indigo)',
                     secondary: 'var(--secondary-color, white)',
                     tertiary: 'var(--tertiary-color, purple)',
                     success: 'var(--success-color, green)',

@@ -3,7 +3,7 @@ import { Table as OuterbaseTable } from '../components/outerbase-table'
 
 // local, faux data
 import spaceballs from '../lib/sample-data.json'
-const data = {items: spaceballs}
+const data = {items: [...spaceballs,...spaceballs,...spaceballs,...spaceballs,...spaceballs]}
 
 // api, real data
 // import dbRowsForSource from '../lib/rows-for-source-id';
@@ -29,14 +29,15 @@ const data = {items: spaceballs}
         </script>
     </head>
 
-    <body class="h-full">
-        <main class="h-full">
-            <div class="m-12">
-                <h1 class="font-bold text-xl">Static</h1>
-                <OuterbaseTable client:only="lit" db-query={JSON.stringify(data)} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
-                <h1 class="font-bold text-xl mt-8">SSR + Hydration</h1>
-                <OuterbaseTable client:load db-query={JSON.stringify(data)} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
-            </div>
+    <body class="vh-full">
+        <main class="m-12 pb-24">
+            <h1 class="font-bold text-xl">Static</h1>
+            <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
+            <OuterbaseTable client:only="lit" data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
+            
+            <h1 class="font-bold text-xl mt-8">SSR + Hydration</h1>
+            <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
+            <OuterbaseTable client:load data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
         </main>
     </body>
 </html>
