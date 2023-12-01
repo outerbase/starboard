@@ -1,27 +1,12 @@
-import { LitElement, html, type PropertyValueMap } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
+import { LitElement, html, type PropertyValueMap } from 'lit'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { map } from 'lit/directives/map.js'
 import type { Queryd } from '../types'
 import { TWStyles } from '../../tailwind'
 import dbRowsForSource from '../lib/rows-for-source-id'
+import { heightOfElement } from '../lib/height-of-element'
 import classMapToClassName from '../lib/class-map-to-class-name'
-
-function getTotalHeight(element: Element) {
-    const styles = window.getComputedStyle(element)
-    const height = element.getBoundingClientRect().height
-
-    const marginTop = parseFloat(styles.marginTop)
-    const marginBottom = parseFloat(styles.marginBottom)
-    const paddingTop = parseFloat(styles.paddingTop)
-    const paddingBottom = parseFloat(styles.paddingBottom)
-    const borderTop = parseFloat(styles.borderTopWidth)
-    const borderBottom = parseFloat(styles.borderBottomWidth)
-
-    const totalHeight = height + marginTop + marginBottom + paddingTop + paddingBottom + borderTop + borderBottom
-
-    return totalHeight
-}
 
 // ClassifiedElement deals primarily with ensuring that each Super Class's style
 // is propogated to the DOM and therefore it's CSS is applied
@@ -83,7 +68,7 @@ export class InnerTable extends ClassifiedElement {
         setTimeout(() => (this.columnResizerEnabled = true), 0)
 
         this.resizeObserver = new ResizeObserver((_entries) => {
-            this._height = getTotalHeight(_entries[0]?.target)
+            this._height = heightOfElement(_entries[0]?.target)
         })
         this.resizeObserver.observe(this)
     }
