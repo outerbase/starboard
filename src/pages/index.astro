@@ -35,9 +35,14 @@ const data = {items: [...spaceballs,...spaceballs,...spaceballs,...spaceballs,..
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
             <OuterbaseTable client:only="lit" data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
             
-            <h1 class="font-bold text-xl mt-8">SSR + Hydration</h1>
+            <h1 class="font-bold text-xl mt-8">SSR w/ Hydration</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
             <OuterbaseTable client:load data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
+            
+            <h1 class="font-bold text-xl mt-8">SSR w/o Hydration</h1>
+            <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
+            <OuterbaseTable data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
+            <!-- TODO don't render the resize handler when javascript won't be present... but how -->
         </main>
     </body>
 </html>
