@@ -3,12 +3,18 @@ import { Table as OuterbaseTable } from '../components/outerbase-table'
 
 // local, faux data
 import spaceballs from '../lib/sample-data.json'
-const data = {items: spaceballs}
 
 // api, real data
-// import dbRowsForSource from '../lib/rows-for-source-id';
-// const data = await dbRowsForSource('placeholder', import.meta.env.PUBLIC_AUTH_TOKEN)
-// console.log('data',data)
+import dbRowsForSource from '../lib/rows-for-source-id';
+let data
+try {
+    // attempt to use the Movies DB
+    data = await dbRowsForSource('placeholder', import.meta.env.PUBLIC_AUTH_TOKEN)
+} catch (err) {
+    // fallback to Spaceballs
+    console.error(err)
+    data = {items: spaceballs}
+}
 ---
 <html lang="en" class="h-full">
     <head>
