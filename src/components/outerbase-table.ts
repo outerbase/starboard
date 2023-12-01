@@ -359,9 +359,11 @@ export class ColumnResizer extends ClassifiedElement {
 
     render() {
         return html`
-            <div
-                class="h-[var(--table-height)] absolute top-0 right-[3px] hover:right-0 z-10 w-[1px] hover:w-1.5 active:w-1.5 cursor-col-resize bg-neutral-200 hover:bg-blue-300 active:bg-blue-500"
-            ></div>
+            <div class="absolute top-0 -right-[2px] hover:right-0 cursor-col-resize z-10 w-1 group">
+                <div
+                    class="h-[var(--table-height)] w-[1px] group-hover:w-1.5 group-active:w-1.5 bg-neutral-200 group-hover:bg-blue-300 group-active:bg-blue-500"
+                ></div>
+            </div>
         `
     }
 }
