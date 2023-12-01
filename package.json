@@ -3,11 +3,12 @@
     "type": "module",
     "version": "0.0.1",
     "scripts": {
-        "dev": "concurrently \"astro dev\" \"pnpm dev-tailwind --watch\"",
-        "build": "pnpm build-tailwind && astro check && astro build",
+        "dev": "pnpm print-welcome-msg; concurrently \"astro dev\" \"pnpm dev-tailwind --watch\"",
+        "build": "pnpm print-welcome-msg; pnpm build-tailwind && astro check && astro build",
         "preview": "astro preview",
         "dev-tailwind": "concurrently \"tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css --watch\" \"node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.js --watch\"",
-        "build-tailwind": "tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css && node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.js"
+        "build-tailwind": "tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css && node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.js",
+        "print-welcome-msg": "node .welcome-message.js"
     },
     "dependencies": {
         "@astrojs/check": "^0.3.1",
