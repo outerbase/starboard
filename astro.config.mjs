@@ -1,7 +1,6 @@
 import { defineConfig } from 'astro/config'
 import tailwind from '@astrojs/tailwind'
 import lit from '@astrojs/lit'
-import cloudflare from '@astrojs/cloudflare'
 
 // https://astro.build/config
 export default defineConfig({
@@ -9,6 +8,4 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',
     },
-    output: 'server',
-    adapter: cloudflare(),
 })
