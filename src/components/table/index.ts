@@ -1,25 +1,22 @@
 import { customElement, property, state } from 'lit/decorators.js'
-import { LitElement, html, type PropertyValueMap } from 'lit'
-import { ifDefined } from 'lit/directives/if-defined.js'
-import { map } from 'lit/directives/map.js'
+import { html, type PropertyValueMap } from 'lit'
 import { heightOfElement } from '../../lib/height-of-element'
 import dbRowsForSource from '../../lib/rows-for-source-id'
 import { ClassifiedElement } from '../classified-element'
+import { ifDefined } from 'lit/directives/if-defined.js'
 import { TWStyles } from '../../../tailwind'
+import { map } from 'lit/directives/map.js'
 import type { Queryd } from '../../types'
 
+// import subcomponents
+import './tbody'
+import './td'
+import './th'
+import './thead'
+import './tr'
+
 @customElement('outerbase-table')
-export class Table extends LitElement {
-    @property({ type: Object })
-    data?: Queryd
-
-    render() {
-        return html`<inner-table .data="${this.data}" auth-token="${import.meta.env.PUBLIC_AUTH_TOKEN}"></inner-table>`
-    }
-}
-
-@customElement('inner-table')
-class InnerTable extends ClassifiedElement {
+export class Table extends ClassifiedElement {
     static override styles = TWStyles // necessary, or *nothing* is styled
 
     @state()

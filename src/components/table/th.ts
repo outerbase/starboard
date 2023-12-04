@@ -3,6 +3,9 @@ import { customElement, property } from 'lit/decorators.js'
 import { ClassifiedElement } from '../classified-element'
 import { ifDefined } from 'lit/directives/if-defined.js'
 
+// import subcomponents
+import '../column-resizer'
+
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
 export class TH extends ClassifiedElement {
