@@ -7,12 +7,15 @@ import { html } from 'lit'
 export class TableData extends ClassifiedElement {
     protected override get classMap() {
         return {
+            'border-neutral-100 dark:border-neutral-900': true,
+            'px-cell-padding-x py-cell-padding-y-sm': true,
+            'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
             'max-w-xs': !this.maxWidth, // default max width, unless specified
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
             'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
             'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
-            'table-cell p-1.5 text-ellipsis whitespace-nowrap overflow-hidden': true, // the baseline styles for our <td/>
+            'table-cell text-ellipsis whitespace-nowrap overflow-hidden': true, // the baseline styles for our <td/>
             'select-text': !this._columnIsResizing,
         }
     }
@@ -38,6 +41,10 @@ export class TableData extends ClassifiedElement {
     @property({ type: String, attribute: 'order-by' })
     protected orderBy?: 'ascending' | 'descending'
 
+    @property({ type: String, attribute: 'odd' })
+    protected isOdd?: string
+
+    @property({ type: String, attribute: 'even' })
     @state()
     private _columnIsResizing = false
 

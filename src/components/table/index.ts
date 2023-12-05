@@ -95,7 +95,7 @@ export class Table extends ClassifiedElement {
         // while the rest of the table scrolls out of view
 
         return html`<div
-            class="overflow-hidden table table-fixed w-full select-none text-theme-primary bg-theme-secondary dark:text-theme-secondary dark:bg-theme-primary"
+            class="overflow-hidden table table-fixed w-full select-none bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark"
         >
             <outerbase-thead>
                 <outerbase-tr header>
@@ -105,8 +105,8 @@ export class Table extends ClassifiedElement {
                         return html`<outerbase-th
                             table-height=${ifDefined(this._height)}
                             ?with-resizer=${this.columnResizerEnabled && idx !== this.columns.length - 1}
-                            >${k}</outerbase-th
-                        >`
+                            >${k}
+                        </outerbase-th>`
                     })}
                 </outerbase-tr>
             </outerbase-thead>
@@ -126,8 +126,8 @@ export class Table extends ClassifiedElement {
                                         ?separate-cells=${true}
                                         ?draw-right-border=${idx === row.length - 1 || !this.columnResizerEnabled}
                                         ?bottom-border=${true}
-                                        >${Array.isArray(value) ? value.join(', ') : value}</outerbase-td
-                                    >
+                                        >${Array.isArray(value) ? value.join(', ') : value}
+                                    </outerbase-td>
                                 `
                             )}
                         </outerbase-tr>`

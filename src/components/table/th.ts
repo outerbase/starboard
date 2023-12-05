@@ -12,7 +12,8 @@ export class TH extends ClassifiedElement {
     protected override get classMap() {
         return {
             // 'select-text': true, // allow text selection, but need to only apply this while a column is NOT resizing
-            'shadow-sm table-cell relative first:border-l border-b last:border-r border-t whitespace-nowrap p-1.5': true,
+            'table-cell relative px-cell-padding-x py-cell-padding-y shadow-sm first:border-l border-b last:border-r border-t border-neutral-100 dark:border-neutral-900 whitespace-nowrap px-theme-cell-padding py-1 bg-theme-column dark:bg-theme-column-dark':
+                true,
             // prevent double borders
             'first:border-l': this.withResizer, // omit regular border
             'border-l': !this.withResizer, // use regular border

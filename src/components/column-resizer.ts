@@ -15,7 +15,7 @@ export class ColumnResizer extends ClassifiedElement {
     // but it's unclear whether updates to `.column` are reflected
     // the docs explicitly say it won't be observed, but it has been tested to definitely work on the initial render
     @property({ type: Object })
-    column: TH | undefined
+    column?: TH
 
     private xPosition?: number
     private width?: number
@@ -69,7 +69,7 @@ export class ColumnResizer extends ClassifiedElement {
         return html`
             <div class="absolute top-0 -right-[2px] hover:right-0 cursor-col-resize z-10 w-1 group">
                 <div
-                    class="h-[var(--table-height)] w-[1px] group-hover:w-1.5 group-active:w-1.5 bg-neutral-200 group-hover:bg-blue-300 group-active:bg-blue-500"
+                    class="h-[var(--table-height)] w-[1px] group-hover:w-1.5 group-active:w-1.5 bg-neutral-200 dark:bg-neutral-800 group-hover:bg-blue-50 group-active:bg-blue-100 dark:group-hover:bg-blue-950 dark:group-active:bg-blue-900"
                 ></div>
             </div>
         `

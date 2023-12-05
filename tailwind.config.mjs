@@ -15,6 +15,11 @@ export default {
                 '2xl': ['24px', '32px'],
                 '3xl': ['30px', '40px'],
             },
+            spacing: {
+                'cell-padding-x': 'var(--cell-padding-x, 0.5rem)',
+                'cell-padding-y': 'var(--cell-padding-y, 0.5rem)',
+                'cell-padding-y-sm': 'var(--cell-padding-y, 0.3rem)',
+            },
             colors: {
                 theme: {
                     primary: 'var(--primary-color, indigo)',
@@ -23,6 +28,37 @@ export default {
                     success: 'var(--success-color, green)',
                     warning: 'var(--warning-color, yellow)',
                     error: 'var(--error-color, red)',
+
+                    page: 'var(--page-background-color, #ffffff)',
+                    'page-dark': 'var(--page-background-color-dark, #000000)',
+                    text: 'var(--text-color, #000000)',
+                    'text-dark': 'var(--text-color-dark, #ffffff)',
+
+                    // TABLES ///
+                    column: 'var(--column-header-background-color, rgba(0,0,0,0.1))',
+                    'column-dark': 'var(--column-header-background-color-dark, rgba(255,255,255,0.1))',
+                    'column-text': 'var(--column-header-text-color-dark, #000000)',
+                    'column-text-dark': 'var(--column-header-text-color-dark, #ffffff)',
+                    'row-even': 'var(--table-row-even-background-color, #ffffff)',
+                    'row-odd': 'var(--table-row-odd-background-color, #fefefe)',
+                    'row-even-dark': 'var(--table-row-even-background-color-dark, #000000)',
+                    'row-odd-dark': 'var(--table-row-odd-background-color-dark, #010101)',
+                    hover: 'var(--hover-background-color, #fafafa)',
+                    'hover-dark': 'var(--hover-background-color-dark, #0a0a0a)',
+                    //
+                    // unused
+                    // active: 'var(--active-background-color-dark, #fefefe)',
+                    // 'active-dark': 'var(--active-background-color-dark, red)',
+                    // 'active-text': 'var(--active-text-color, yellow)',
+                    // 'active-text-dark': 'var(--active-text-color-dark,blue)',
+                    //
+                    // these class may be redundant vs using `row-even` and `row-odd`
+                    // cell: 'var(--cell-background-color, lime)',
+                    // 'cell-dark': 'var(--cell-background-color-dark, green)',
+                    // 'cell-text': 'var(--cell-text-color, indigo)',
+                    // 'cell-text-dark': 'var(--cell-text-color, pink)',
+                    //
+                    // TABLES ///
                 },
 
                 light: {
