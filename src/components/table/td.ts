@@ -18,7 +18,7 @@ export class TableData extends ClassifiedElement {
             'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
             'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
-            'table-cell text-ellipsis whitespace-nowrap overflow-hidden': true, // the baseline styles for our <td/>
+            'table-cell text-ellipsis whitespace-nowrap overflow-hidden cursor-pointer': true, // the baseline styles for our <td/>
         }
     }
 
