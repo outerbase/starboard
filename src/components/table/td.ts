@@ -1,6 +1,6 @@
 import { customElement, property, state } from 'lit/decorators.js'
 import { ClassifiedElement } from '../classified-element'
-import { html } from 'lit'
+import { html, type PropertyValues } from 'lit'
 import { TWStyles } from '../../../tailwind'
 import { classMap } from 'lit/directives/class-map.js'
 
@@ -11,7 +11,6 @@ export class TableData extends ClassifiedElement {
     protected override get classMap() {
         return {
             'border-neutral-100 dark:border-neutral-900': true,
-            'px-cell-padding-x py-cell-padding-y-sm': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
             'max-w-xs': !this.maxWidth, // default max width, unless specified
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
@@ -43,60 +42,52 @@ export class TableData extends ClassifiedElement {
     @property({ type: String, attribute: 'order-by' })
     protected orderBy?: 'ascending' | 'descending'
 
-    @property({ type: String, attribute: 'odd' })
-    protected isOdd?: string
+    @property({ type: Boolean, attribute: 'odd' })
+    protected isOdd?: boolean
 
-    @property({ type: String, attribute: 'even' })
-    @state()
-    private _columnIsResizing = false
+    get inputClasses() {
+        return {
+            'w-full bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900': true,
+            'px-cell-padding-x py-cell-padding-y': true,
+        }
+    }
 
-    // WARNING these don't recompute!
-    internalContainerClassMap = { 'select-text block': !this._columnIsResizing, 'bg-red-500': this.value !== this.originalValue }
-    inputClassMap = {
-        'bg-black w-full bg-green-50 dark:bg-green-950': true,
+    onKeyPress(event: KeyboardEvent) {
+        // abort changes
+        if (event.code === 'Escape') {
+            this.value = this.originalValue
+            delete this.originalValue
+            this.isEditing = false
+        }
+
+        // commit changes
+        if (event.code === 'Enter' || event.code === 'Tab') {
+            // TODO change `originalValue` to be this new value? or leave it as the very first value?
+            this.isEditing = false
+            this.dispatchEvent(
+                new Event('cell-data-change', {
+                    // TODO include details about what changed
+                    bubbles: true,
+                    composed: true,
+                })
+            )
+        }
     }
 
     override connectedCallback() {
         super.connectedCallback()
-
-        this.originalValue = this.value
-
-        const onColumnResizeEnd = (event: Event) => {
-            document.removeEventListener('column-resize-end', onColumnResizeEnd)
-            this._columnIsResizing = false
-        }
-
-        const onColumnResizeStart = (event: Event) => {
-            document.addEventListener('column-resize-end', onColumnResizeEnd)
-            this._columnIsResizing = true
-        }
-
-        document.addEventListener('column-resize-start', onColumnResizeStart)
-
-        // TODO remove this event listener?
-        this.addEventListener('keydown', (event: KeyboardEvent) => {
-            // abort changes
-            if (event.code === 'Escape') {
-                this.value = this.originalValue
-                delete this.originalValue
-                this.isEditing = false
-            }
-
-            // commit changes
-            if (event.code === 'Enter' || event.code === 'Tab') {
-                // TODO change `originalValue` to be this new value? or leave it as the OG?
-                // TODO propogate this change via a bubbling event
-
-                this.isEditing = false
-            }
-        })
+        this.addEventListener('keydown', this.onKeyPress)
     }
 
-    @state()
-    originalValue?: string
+    override disconnectedCallback() {
+        this.removeEventListener('keydown', this.onKeyPress)
+    }
 
     @property({ type: String })
     value?: string
+
+    @state()
+    originalValue?: string
 
     @state()
     isEditing = false
@@ -112,19 +103,31 @@ export class TableData extends ClassifiedElement {
 
     // focus and select text
     // stop editing onblur
-    updated(changedProps: Map<string, string>) {
+    override updated(changedProps: PropertyValues<this>) {
+        super.updated(changedProps)
         if (changedProps.has('isEditing')) {
             if (this.isEditing) {
                 const input = this.shadowRoot?.querySelector('input')
                 if (input) {
                     input.select()
 
-                    // TODO remove this event listener
-                    input.addEventListener('blur', () => {
+                    const onBlur = () => {
                         this.isEditing = false
-                    })
+                        input.removeEventListener('blur', onBlur)
+                    }
+
+                    input.addEventListener('blur', onBlur)
                 }
             }
+        }
+    }
+
+    override willUpdate(changedProperties: PropertyValues<this>) {
+        super.willUpdate(changedProperties)
+
+        // when using SSR, the assignment of `this.origalValue` in `connectedCallback` is `undefined`
+        if (changedProperties.has('value') && this.originalValue === undefined) {
+            this.originalValue = this.value
         }
     }
 
@@ -132,14 +135,13 @@ export class TableData extends ClassifiedElement {
         // this wrapper <span/> improves the UX when selection text (instead of it selecting blank space below the slot)
         return this.isEditing
             ? html`<input .value="${this.value}" @input="${this.onChange}" @dblclick="${this.onDoubleClick}" class=${classMap(
-                  this.inputClassMap
+                  this.inputClasses
               )}></input>`
             : html`<div
                   @dblclick="${this.onDoubleClick}"
                   class=${classMap({
-                      'select-text': !this._columnIsResizing,
-                      'select-none': this._columnIsResizing,
                       'bg-yellow-50 dark:bg-yellow-950': this.value !== this.originalValue,
+                      'px-cell-padding-x py-cell-padding-y': true,
                   })}
               >
                   ${this.value}

@@ -41,7 +41,12 @@ export class ColumnResizer extends ClassifiedElement {
     private _mouseDown(e: MouseEvent) {
         if (!this.column) throw new Error('`column` is unset; aborting')
 
-        document.dispatchEvent(new Event('column-resize-start'))
+        this.dispatchEvent(
+            new Event('resize-start', {
+                bubbles: true,
+                composed: true,
+            })
+        )
 
         const _mouseMove = (e: MouseEvent) => {
             if (!this.column) throw new Error('`column` is unset; aborting')
@@ -55,7 +60,13 @@ export class ColumnResizer extends ClassifiedElement {
         const _mouseUp = (e: Event) => {
             document.removeEventListener('mouseup', _mouseUp)
             document.removeEventListener('mousemove', _mouseMove)
-            document.dispatchEvent(new Event('column-resize-end'))
+
+            this.dispatchEvent(
+                new Event('resize-end', {
+                    bubbles: true,
+                    composed: true,
+                })
+            )
         }
 
         document.addEventListener('mousemove', _mouseMove)

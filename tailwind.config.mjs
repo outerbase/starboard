@@ -16,9 +16,10 @@ export default {
                 '3xl': ['30px', '40px'],
             },
             spacing: {
-                'cell-padding-x': 'var(--cell-padding-x, 0.5rem)',
-                'cell-padding-y': 'var(--cell-padding-y, 0.5rem)',
-                'cell-padding-y-sm': 'var(--cell-padding-y, 0.3rem)',
+                'cell-padding-x': 'var(--cell-padding-x, 0.25rem)',
+                'cell-padding-y': 'var(--cell-padding-y, 0.25rem)',
+                // 'cell-padding-x-sm': 'var(--cell-padding-x, 0.1rem)',
+                // 'cell-padding-y-sm': 'var(--cell-padding-y, 0.1rem)',
             },
             colors: {
                 theme: {

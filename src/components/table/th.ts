@@ -11,10 +11,10 @@ import '../column-resizer'
 export class TH extends ClassifiedElement {
     protected override get classMap() {
         return {
-            // 'select-text': true, // allow text selection, but need to only apply this while a column is NOT resizing
+            'table-cell h-full relative whitespace-nowrap': true,
             'first:border-l border-b last:border-r border-t border-neutral-100 dark:border-neutral-900': true,
-            'table-cell h-full relative px-cell-padding-x py-cell-padding-y whitespace-nowrap px-theme-cell-padding py-1 bg-theme-column dark:bg-theme-column-dark':
-                true,
+            'px-cell-padding-x py-cell-padding-y': true,
+            'bg-theme-column dark:bg-theme-column-dark': true,
             // prevent double borders
             'first:border-l': this.withResizer, // omit regular border
             'border-l': !this.withResizer, // use regular border

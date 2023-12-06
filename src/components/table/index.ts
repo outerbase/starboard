@@ -14,6 +14,7 @@ import './td'
 import './th'
 import './thead'
 import './tr'
+import { classMap } from 'lit/directives/class-map.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -87,21 +88,29 @@ export class Table extends ClassifiedElement {
         }
     }
 
+    onColumnResizeStart(_event: Event) {
+        document.body.classList.add('select-none')
+    }
+
+    onColumnResizeEnd(_event: Event) {
+        document.body.classList.remove('select-none')
+    }
+
     render() {
         // WARNING `overflow-hidden` breaks the stickyness of the header
         // 'overflow-hidden' is necessary to prevent the ColumnResizer from going beyond the table.
         // because the Resizer stays in place as you scroll down the page
         // while the rest of the table scrolls out of view
 
-        return html`<div
-            class="table table-fixed w-full select-none bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark"
-        >
+        return html`<div class="table table-fixed w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
             <outerbase-thead>
                 <outerbase-tr header>
                     <!-- render an TableHeader for each column -->
                     ${map(this.columns, (k, idx) => {
                         // omit column resizer on the last column because it's sort-of awkward
                         return html`<outerbase-th
+                            @resize-start=${this.onColumnResizeStart}
+                            @resize-end=${this.onColumnResizeEnd}
                             table-height=${ifDefined(this._height)}
                             ?with-resizer=${this.columnResizerEnabled}
                             ?is-last=${idx === this.columns.length - 1}
