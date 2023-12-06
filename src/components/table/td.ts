@@ -18,7 +18,7 @@ export class TableData extends ClassifiedElement {
             'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
             'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
-            'table-cell text-ellipsis whitespace-nowrap overflow-hidden cursor-pointer': true, // the baseline styles for our <td/>
+            'table-cell overflow-hidden cursor-pointer': true, // the baseline styles for our <td/>
         }
     }
 
@@ -164,6 +164,7 @@ export class TableData extends ClassifiedElement {
             : html`<div
                   @dblclick="${this.onDoubleClick}"
                   class=${classMap({
+                      'whitespace-nowrap text-ellipsis overflow-hidden': true,
                       'px-cell-padding-x py-cell-padding-y': true,
                       'bg-yellow-50 dark:bg-yellow-950': this.value !== this.originalValue, // dirty cells
                   })}
