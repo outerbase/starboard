@@ -27,8 +27,11 @@ export class TH extends ClassifiedElement {
     @property({ attribute: 'with-resizer', type: Boolean })
     withResizer = false
 
+    @property({ attribute: 'is-last', type: Boolean })
+    isLastColumn = false
+
     render() {
-        return this.withResizer
+        return this.withResizer && !this.isLastColumn
             ? html`<slot></slot><column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer>`
             : html`<slot></slot>`
     }

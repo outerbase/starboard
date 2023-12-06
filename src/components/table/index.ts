@@ -103,7 +103,8 @@ export class Table extends ClassifiedElement {
                         // omit column resizer on the last column because it's sort-of awkward
                         return html`<outerbase-th
                             table-height=${ifDefined(this._height)}
-                            ?with-resizer=${this.columnResizerEnabled && idx !== this.columns.length - 1}
+                            ?with-resizer=${this.columnResizerEnabled}
+                            ?is-last=${idx === this.columns.length - 1}
                             >${k}
                         </outerbase-th>`
                     })}
