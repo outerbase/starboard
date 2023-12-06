@@ -1,10 +1,13 @@
 import { customElement, property, state } from 'lit/decorators.js'
 import { ClassifiedElement } from '../classified-element'
 import { html } from 'lit'
+import { TWStyles } from '../../../tailwind'
+import { classMap } from 'lit/directives/class-map.js'
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
 export class TableData extends ClassifiedElement {
+    static override styles = TWStyles
     protected override get classMap() {
         return {
             'border-neutral-100 dark:border-neutral-900': true,
@@ -16,7 +19,6 @@ export class TableData extends ClassifiedElement {
             'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
             'table-cell text-ellipsis whitespace-nowrap overflow-hidden': true, // the baseline styles for our <td/>
-            'select-text': !this._columnIsResizing,
         }
     }
 
@@ -48,6 +50,8 @@ export class TableData extends ClassifiedElement {
     @state()
     private _columnIsResizing = false
 
+    internalContainerClassMap = { 'select-text': !this._columnIsResizing }
+
     override connectedCallback() {
         super.connectedCallback()
 
@@ -65,6 +69,7 @@ export class TableData extends ClassifiedElement {
     }
 
     render() {
-        return html`<slot></slot>`
+        // this wrapper <span/> improves the UX when selection text (instead of it selecting blank space below the slot)
+        return html`<span class=${classMap(this.internalContainerClassMap)}><slot></slot></span>`
     }
 }
