@@ -3,6 +3,7 @@ import { ClassifiedElement } from '../classified-element'
 import { html, type PropertyValues } from 'lit'
 import { TWStyles } from '../../../tailwind'
 import { classMap } from 'lit/directives/class-map.js'
+import { CellUpdateEvent, type Position } from '../../lib/events'
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
@@ -52,16 +53,17 @@ export class TableData extends ClassifiedElement {
         }
     }
 
-    onKeyPress(event: KeyboardEvent) {
-        // abort changes
+    onKeyDown(event: KeyboardEvent) {
         if (event.code === 'Escape') {
+            // abort changes
             this.value = this.originalValue
             delete this.originalValue
             this.isEditing = false
+            // TODO trigger blur?
         }
 
-        // commit changes
         if (event.code === 'Enter' || event.code === 'Tab') {
+            // commit changes
             // TODO change `originalValue` to be this new value? or leave it as the very first value?
             this.isEditing = false
             this.dispatchEvent(
@@ -71,20 +73,17 @@ export class TableData extends ClassifiedElement {
                     composed: true,
                 })
             )
+            // TODO trigger blur?
         }
     }
 
-    override connectedCallback() {
-        super.connectedCallback()
-        this.addEventListener('keydown', this.onKeyPress)
-    }
-
-    override disconnectedCallback() {
-        this.removeEventListener('keydown', this.onKeyPress)
-    }
-
+    // this cell's _current_ value
     @property({ type: String })
     value?: string
+
+    // the cell's row & column index
+    @property({ type: Object })
+    position?: Position
 
     @state()
     originalValue?: string
@@ -101,10 +100,28 @@ export class TableData extends ClassifiedElement {
         this.value = value
     }
 
+    protected dispatchChangedEvent() {
+        if (this.value !== this.originalValue) {
+            if (!this.position) {
+                console.debug('cell-updated event not fired due to missing position')
+                return
+            }
+
+            this.dispatchEvent(
+                new CellUpdateEvent({
+                    position: this.position,
+                    previousValue: this.originalValue,
+                    value: this.value,
+                })
+            )
+        }
+    }
+
     // focus and select text
     // stop editing onblur
     override updated(changedProps: PropertyValues<this>) {
         super.updated(changedProps)
+
         if (changedProps.has('isEditing')) {
             if (this.isEditing) {
                 const input = this.shadowRoot?.querySelector('input')
@@ -113,11 +130,18 @@ export class TableData extends ClassifiedElement {
 
                     const onBlur = () => {
                         this.isEditing = false
+                        this.dispatchChangedEvent()
                         input.removeEventListener('blur', onBlur)
                     }
 
+                    // TODO @johnny this listener isn't (explicitly) removed if the user presses `Enter`
+                    //              because that removes the element from the DOM before a `blur` can occur
+                    //              ...it's unclear to me whether this is a leak or resolved by the DOM element being removed
                     input.addEventListener('blur', onBlur)
                 }
+            } else {
+                // when editing has stopped
+                this.dispatchChangedEvent()
             }
         }
     }
@@ -125,23 +149,23 @@ export class TableData extends ClassifiedElement {
     override willUpdate(changedProperties: PropertyValues<this>) {
         super.willUpdate(changedProperties)
 
-        // when using SSR, the assignment of `this.origalValue` in `connectedCallback` is `undefined`
+        // set initial `originalValue`
+        // this is done here instead of, say, connectedCallback() because of a quirk with SSR
         if (changedProperties.has('value') && this.originalValue === undefined) {
             this.originalValue = this.value
         }
     }
 
     render() {
-        // this wrapper <span/> improves the UX when selection text (instead of it selecting blank space below the slot)
         return this.isEditing
-            ? html`<input .value="${this.value}" @input="${this.onChange}" @dblclick="${this.onDoubleClick}" class=${classMap(
+            ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap(
                   this.inputClasses
               )}></input>`
             : html`<div
                   @dblclick="${this.onDoubleClick}"
                   class=${classMap({
-                      'bg-yellow-50 dark:bg-yellow-950': this.value !== this.originalValue,
                       'px-cell-padding-x py-cell-padding-y': true,
+                      'bg-yellow-50 dark:bg-yellow-950': this.value !== this.originalValue, // dirty cells
                   })}
               >
                   ${this.value}

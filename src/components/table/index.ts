@@ -14,7 +14,7 @@ import './td'
 import './th'
 import './thead'
 import './tr'
-import { classMap } from 'lit/directives/class-map.js'
+import type { CellUpdateEvent } from '../../lib/events'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -102,7 +102,13 @@ export class Table extends ClassifiedElement {
         // because the Resizer stays in place as you scroll down the page
         // while the rest of the table scrolls out of view
 
-        return html`<div class="table table-fixed w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
+        return html`<div
+        
+            // TODO @johnny remove this cell-updated handler and let the user of this component handle it
+            @cell-updated=${(event: CellUpdateEvent) => console.debug(`${JSON.stringify(event.detail, null, 2)}`)}
+
+            class="table table-fixed w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark"
+        >
             <outerbase-thead>
                 <outerbase-tr header>
                     <!-- render an TableHeader for each column -->
@@ -124,18 +130,19 @@ export class Table extends ClassifiedElement {
                 <!-- render a TableRow element for each row of data -->
                 ${map(
                     this.rows,
-                    (row) =>
+                    (row, rowIdx) =>
                         html`<outerbase-tr>
                             <!-- render a TableCell for each column of data in the curernt row -->
                             <!-- NOTE: the Array.isArray(etc) is jsut temporary to render stubbed data more better (spaceballs demo data) -->
                             ${map(
                                 row,
-                                (value, idx) => html`
+                                (value, colIdx) => html`
                                     <outerbase-td
                                         ?separate-cells=${true}
-                                        ?draw-right-border=${idx === row.length - 1 || !this.columnResizerEnabled}
+                                        ?draw-right-border=${colIdx === row.length - 1 || !this.columnResizerEnabled}
                                         ?bottom-border=${true}
                                         .value=${value}
+                                        .position=${{ row: rowIdx, column: colIdx }}
                                     >
                                     </outerbase-td>
                                 `
