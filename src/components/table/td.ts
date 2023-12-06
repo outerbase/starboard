@@ -139,7 +139,7 @@ export class TableData extends ClassifiedElement {
                   class=${classMap({
                       'select-text': !this._columnIsResizing,
                       'select-none': this._columnIsResizing,
-                      'bg-yellow-50': this.value !== this.originalValue,
+                      'bg-yellow-50 dark:bg-yellow-950': this.value !== this.originalValue,
                   })}
               >
                   ${this.value}
