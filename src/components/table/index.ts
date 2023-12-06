@@ -126,7 +126,8 @@ export class Table extends ClassifiedElement {
                                         ?separate-cells=${true}
                                         ?draw-right-border=${idx === row.length - 1 || !this.columnResizerEnabled}
                                         ?bottom-border=${true}
-                                        >${Array.isArray(value) ? value.join(', ') : value}
+                                        .value=${value}
+                                    >
                                     </outerbase-td>
                                 `
                             )}

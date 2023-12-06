@@ -5,16 +5,16 @@ import { Table as OuterbaseTable } from '../components/table'
 import spaceballs from '../lib/sample-data.json'
 
 // api, real data
-import dbRowsForSource from '../lib/rows-for-source-id';
-let data
-try {
-    // attempt to use the Movies DB
-    data = await dbRowsForSource('placeholder', import.meta.env.PUBLIC_AUTH_TOKEN)
-} catch (err) {
-    // fallback to Spaceballs
-    console.error(err)
-    data = {items: spaceballs}
-}
+let data = {items: spaceballs.map((d) => ({...d, traits: JSON.stringify(d.traits)}))}
+// import dbRowsForSource from '../lib/rows-for-source-id';
+// try {
+//     // attempt to use the Movies DB
+//     data = await dbRowsForSource('placeholder', import.meta.env.PUBLIC_AUTH_TOKEN)
+// } catch (err) {
+//     // fallback to Spaceballs
+//     console.error(err)
+//     data = {items: spaceballs}
+// }
 ---
 <html lang="en" class="h-full">
     <head>

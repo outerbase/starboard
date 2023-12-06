@@ -50,10 +50,16 @@ export class TableData extends ClassifiedElement {
     @state()
     private _columnIsResizing = false
 
-    internalContainerClassMap = { 'select-text': !this._columnIsResizing }
+    // WARNING these don't recompute!
+    internalContainerClassMap = { 'select-text block': !this._columnIsResizing, 'bg-red-500': this.value !== this.originalValue }
+    inputClassMap = {
+        'bg-black w-full bg-green-50 dark:bg-green-950': true,
+    }
 
     override connectedCallback() {
         super.connectedCallback()
+
+        this.originalValue = this.value
 
         const onColumnResizeEnd = (event: Event) => {
             document.removeEventListener('column-resize-end', onColumnResizeEnd)
@@ -66,10 +72,77 @@ export class TableData extends ClassifiedElement {
         }
 
         document.addEventListener('column-resize-start', onColumnResizeStart)
+
+        // TODO remove this event listener?
+        this.addEventListener('keydown', (event: KeyboardEvent) => {
+            // abort changes
+            if (event.code === 'Escape') {
+                this.value = this.originalValue
+                delete this.originalValue
+                this.isEditing = false
+            }
+
+            // commit changes
+            if (event.code === 'Enter' || event.code === 'Tab') {
+                // TODO change `originalValue` to be this new value? or leave it as the OG?
+                // TODO propogate this change via a bubbling event
+
+                this.isEditing = false
+            }
+        })
+    }
+
+    @state()
+    originalValue?: string
+
+    @property({ type: String })
+    value?: string
+
+    @state()
+    isEditing = false
+
+    protected onDoubleClick() {
+        this.isEditing = true
+    }
+
+    protected onChange(event: Event) {
+        const { value } = event.target as HTMLInputElement
+        this.value = value
+    }
+
+    // focus and select text
+    // stop editing onblur
+    updated(changedProps: Map<string, string>) {
+        if (changedProps.has('isEditing')) {
+            if (this.isEditing) {
+                const input = this.shadowRoot?.querySelector('input')
+                if (input) {
+                    input.select()
+
+                    // TODO remove this event listener
+                    input.addEventListener('blur', () => {
+                        this.isEditing = false
+                    })
+                }
+            }
+        }
     }
 
     render() {
         // this wrapper <span/> improves the UX when selection text (instead of it selecting blank space below the slot)
-        return html`<span class=${classMap(this.internalContainerClassMap)}><slot></slot></span>`
+        return this.isEditing
+            ? html`<input .value="${this.value}" @input="${this.onChange}" @dblclick="${this.onDoubleClick}" class=${classMap(
+                  this.inputClassMap
+              )}></input>`
+            : html`<div
+                  @dblclick="${this.onDoubleClick}"
+                  class=${classMap({
+                      'select-text': !this._columnIsResizing,
+                      'select-none': this._columnIsResizing,
+                      'bg-yellow-50': this.value !== this.originalValue,
+                  })}
+              >
+                  ${this.value}
+              </div>`
     }
 }
