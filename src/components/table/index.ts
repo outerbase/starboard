@@ -88,14 +88,13 @@ export class Table extends ClassifiedElement {
     }
 
     render() {
+        // WARNING `overflow-hidden` breaks the stickyness of the header
         // 'overflow-hidden' is necessary to prevent the ColumnResizer from going beyond the table.
-        // It's unclear (so far) why this is happening; the height is correct
-        // Looks like it may have something to do with the header being `sticky`
-        // as I'm observing that the Resizer stays in place as you scroll down the page
+        // because the Resizer stays in place as you scroll down the page
         // while the rest of the table scrolls out of view
 
         return html`<div
-            class="overflow-hidden table table-fixed w-full select-none bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark"
+            class="table table-fixed w-full select-none bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark"
         >
             <outerbase-thead>
                 <outerbase-tr header>

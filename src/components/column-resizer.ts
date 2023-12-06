@@ -34,7 +34,7 @@ export class ColumnResizer extends ClassifiedElement {
         super.willUpdate(_changedProperties)
 
         if (_changedProperties.has('height')) {
-            document.documentElement.style.setProperty('--table-height', `${this.height}px`)
+            // document.documentElement.style.setProperty('--table-height', `${this.height}px`)
         }
     }
 
@@ -66,10 +66,14 @@ export class ColumnResizer extends ClassifiedElement {
     }
 
     render() {
+        // removed full-height because it causes issues when using a `sticky` header
+        // class="h-[var(--table-height)] w-[1px] group-hover:w-1.5 group-active:w-1.5 bg-neutral-200 dark:bg-neutral-800 group-hover:bg-blue-50 group-active:bg-blue-100 dark:group-hover:bg-blue-950 dark:group-active:bg-blue-900"
+
+        // the reason for nested div's here is to increase the click/draggable area while preserving a smaller visual element
         return html`
-            <div class="absolute top-0 -right-[2px] hover:right-0 cursor-col-resize z-10 w-1 group">
+            <div class="absolute flex justify-center h-full top-0 right-0 cursor-col-resize z-10 w-2 group">
                 <div
-                    class="h-[var(--table-height)] w-[1px] group-hover:w-1.5 group-active:w-1.5 bg-neutral-200 dark:bg-neutral-800 group-hover:bg-blue-50 group-active:bg-blue-100 dark:group-hover:bg-blue-950 dark:group-active:bg-blue-900"
+                    class="h-full w-[1px]  group-hover:w-1 group-active:w-1 bg-neutral-300 dark:bg-neutral-800 group-hover:bg-blue-50 group-active:bg-blue-100 dark:group-hover:bg-blue-950 dark:group-active:bg-blue-900"
                 ></div>
             </div>
         `
