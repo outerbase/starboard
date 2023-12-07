@@ -96,10 +96,10 @@ export class Table extends ClassifiedElement {
             }
         }
 
-        // // reset selected rows when rows collection changes; this may be undesirable since it would unselect everything if the owner of the component were to provide an updated rows array because a single attribute changed
-        // if (_changedProperties.has('rows')) {
-        //     this.selectedRows = new Array<boolean>(this.rows.length).fill(false)
-        // }
+        // reset selected rows when rows collection changes
+        if (_changedProperties.has('rows')) {
+            this.selectedRows = new Array<boolean>(this.rows.length).fill(false)
+        }
     }
 
     toggleSelected(idx: number) {
@@ -108,6 +108,7 @@ export class Table extends ClassifiedElement {
             this.selectedRows = new Array<boolean>(this.rows.length).fill(false)
         }
 
+        // update state
         this.selectedRows = this.selectedRows.map((row, _idx) => (idx === _idx ? !row : row))
         this.dispatchEvent(
             new RowSelectedEvent({
@@ -125,13 +126,22 @@ export class Table extends ClassifiedElement {
         document.body.classList.remove('select-none')
     }
 
+    public clearSelection() {
+        this.selectedRows = new Array<boolean>(this.rows.length).fill(false)
+        this.shadowRoot?.querySelectorAll<HTMLInputElement>('.row-select-checkbox').forEach((checkbox) => {
+            checkbox.checked = false
+            checkbox.dispatchEvent(new Event('change'))
+        })
+    }
+
     render() {
         // WARNING `overflow-hidden` breaks the stickyness of the header
         // 'overflow-hidden' is necessary to prevent the ColumnResizer from going beyond the table.
         // because the Resizer stays in place as you scroll down the page
         // while the rest of the table scrolls out of view
 
-        return html`<div class="table table-fixed w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
+        // WARNING!!! `table-auto` breaks the column resizer, while `table-fixed w-full` sort-of allows it but the table is stuck
+        return html`<div class="table table-auto bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
             <outerbase-thead>
                 <outerbase-tr header>
                     <!-- first column of (optional) checkboxes -->
@@ -142,7 +152,7 @@ export class Table extends ClassifiedElement {
                               table-height=${ifDefined(this._height)}
                               ?with-resizer=${this.columnResizerEnabled}
                               ?is-last=${0 < this.columns.length}
-                              >Selected
+                          >
                           </outerbase-th>`
                         : null}
                     <!-- render an TableHeader for each column -->
@@ -175,13 +185,15 @@ export class Table extends ClassifiedElement {
                                       .position=${{
                                           row: -1,
                                           column: -1,
-                                      }} // TODO ??? I think this is set in the TD so it shouldn't even be declared here?
+                                      }}
                                       .type=${null}
                                   >
+                                      <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
                                       <input
+                                          class="row-select-checkbox"
                                           type="checkbox"
-                                          ?checked="${this.selectedRows[rowIdx]}"
-                                          @change="${() => this.toggleSelected(rowIdx)}"
+                                          ?checked="${this.selectedRows[rowIdx] === true}"
+                                          @click="${() => this.toggleSelected(rowIdx)}"
                                       />
                                   </outerbase-td>`
                                 : null}

@@ -13,4 +13,7 @@ export default function dbRowsForSource(sourceId: string, authToken: string) {
     })
         .then((response) => response.json())
         .then((data) => data.response)
+    // .then(() => {
+    //     throw new Error('') // fallback to Spaceballs
+    // })
 }

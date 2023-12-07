@@ -60,8 +60,7 @@ export default {
                     // 'active-text': 'var(--active-text-color, yellow)',
                     // 'active-text-dark': 'var(--active-text-color-dark,blue)',
 
-                    // clean cells
-                    // these classes may be redundant / hide row colors
+                    // clean cells; these classes may be redundant / will shadow row colors
                     cell: 'var(--cell-background-color)',
                     'cell-dark': 'var(--cell-background-color-dark)',
                     'cell-text': 'var(--cell-text-color)',
@@ -70,8 +69,6 @@ export default {
                     // dirty cells
                     'cell-dirty': 'var(--cell-dirty-background-color,rgba(254,249,195,1))',
                     'cell-dirty-dark': 'var(--cell-dirty-background-color,rgba(66,32,6,1))',
-                    //
-                    // TABLES ///
                 },
 
                 light: {

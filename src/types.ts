@@ -17,6 +17,6 @@ export type Queryd = {
 export type Position = Record<'column' | 'row', number>
 export type CellDetail = {
     position: Position
-    previousValue: ColumnType
-    value: ColumnType
+    previousValue?: ColumnType
+    value?: ColumnType
 }
