@@ -7,6 +7,7 @@ import { ifDefined } from 'lit/directives/if-defined.js'
 import { TWStyles } from '../../../tailwind'
 import { map } from 'lit/directives/map.js'
 import type { Queryd } from '../../types'
+import type { CellUpdateEvent } from '../../lib/events'
 
 // import subcomponents
 import './tbody'
@@ -14,7 +15,6 @@ import './td'
 import './th'
 import './thead'
 import './tr'
-import type { CellUpdateEvent } from '../../lib/events'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
