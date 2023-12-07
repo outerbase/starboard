@@ -9,7 +9,7 @@ export class TableRow extends ClassifiedElement {
             'table-row': true,
 
             // when a header
-            'text-theme-column-text dark:text-theme-column-text-dark backdrop-blur-sm': this.isHeaderRow,
+            'text-theme-column-text dark:text-theme-column-text-dark backdrop-blur-md': this.isHeaderRow,
 
             // when not a header AND not selected
             'odd:bg-theme-row-odd dark:odd:bg-theme-row-odd-dark even:bg-theme-row-even dark:even:bg-theme-row-even-dark hover:bg-theme-hover dark:hover:bg-theme-hover-dark':
