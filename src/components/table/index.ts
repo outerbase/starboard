@@ -71,11 +71,16 @@ export class Table extends ClassifiedElement {
             this._height = heightOfElement(_entries[0]?.target)
         })
         this.resizeObserver.observe(this)
+
+        this.onKeyDown_bound = this.onKeyDown.bind(this)
+        document.addEventListener('keydown', this.onKeyDown_bound)
     }
 
     override disconnectedCallback() {
         super.disconnectedCallback()
         this.resizeObserver?.disconnect()
+
+        if (this.onKeyDown_bound) document.removeEventListener('keydown', this.onKeyDown_bound)
     }
 
     override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -157,6 +162,21 @@ export class Table extends ClassifiedElement {
         this.rows = this.rows.map((row) => row.filter((_value, idx) => index !== idx))
     }
 
+    onKeyDown_bound?: ({ shiftKey, key }: KeyboardEvent) => void
+    onKeyDown({ shiftKey, key }: KeyboardEvent) {
+        if (!shiftKey) return
+
+        // create column
+        if (key === 'C') {
+            const defaultName = `Column ${Date.now()}`
+            const columnName = prompt('Choose a unique name for this column', defaultName) || defaultName
+            this.columns = [...this.columns, columnName]
+            this.rows.map((row) => row.push(''))
+        }
+        // create row
+        // delete selection
+    }
+
     public clearSelection() {
         this.selectedRows = new Array<boolean>(this.rows.length).fill(false)
         this.shadowRoot?.querySelectorAll<HTMLInputElement>('.row-select-checkbox').forEach((checkbox) => {
@@ -172,7 +192,7 @@ export class Table extends ClassifiedElement {
         // while the rest of the table scrolls out of view
 
         // WARNING!!! `table-auto` breaks the column resizer, while `table-fixed w-full` sort-of allows it but the table is stuck
-        return html`<div class="table table-auto bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
+        return html`<div class="table table-auto w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
             <outerbase-thead>
                 <outerbase-tr header>
                     <!-- first column of (optional) checkboxes -->

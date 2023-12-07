@@ -166,7 +166,8 @@ export class TableData extends ClassifiedElement {
                       'whitespace-nowrap text-ellipsis overflow-hidden': true,
                   })}
               >
-                  ${this.value}
+                  <!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
+                  ${this.value || '\u00A0'}
                   <slot></slot>
               </div>`
     }
