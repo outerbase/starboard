@@ -192,7 +192,10 @@ export class Table extends ClassifiedElement {
         // while the rest of the table scrolls out of view
 
         // WARNING!!! `table-auto` breaks the column resizer, while `table-fixed w-full` sort-of allows it but the table is stuck
-        return html`<div class="table table-auto w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
+
+        // this commented out version "resolves" the cells changing width with toggling between editing and viewing
+        // return html`<div class="table table-fixed w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
+        return html`<div class="table table-auto bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
             <outerbase-thead>
                 <outerbase-tr header>
                     <!-- first column of (optional) checkboxes -->

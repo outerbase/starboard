@@ -164,6 +164,8 @@ export class TableData extends ClassifiedElement {
                   @dblclick="${this.onDoubleClick}"
                   class=${classMap({
                       'whitespace-nowrap text-ellipsis overflow-hidden': true,
+                      'min-w-[174px]': (this.value?.length ?? 0) > 0, // prevent the first column (checkbox) from being asburdly wide; should do something more explicit instead
+                      'pr-2': !((this.value?.length ?? 0) > 0), // ditto
                   })}
               >
                   <!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
