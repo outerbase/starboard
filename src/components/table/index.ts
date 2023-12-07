@@ -56,6 +56,12 @@ export class Table extends ClassifiedElement {
     @property({ type: Object })
     schema?: Schema
 
+    @property({ type: Array, attribute: 'dirty-row-indices' })
+    dirtyRowIndexArray: Array<number> = []
+
+    @state()
+    dirtyRowIndexSet: Set<number> = new Set()
+
     override connectedCallback() {
         super.connectedCallback()
         // without this `setTimeout`, then a client-side-only Table updates properly but SSR'd tables do NOT
@@ -100,6 +106,11 @@ export class Table extends ClassifiedElement {
         // reset selected rows when rows collection changes
         if (_changedProperties.has('rows')) {
             this.selectedRows = new Array<boolean>(this.rows.length).fill(false)
+        }
+
+        // update dirty row SET when the dirty row ARRAY changes
+        if (_changedProperties.has('dirtyRowIndexArray')) {
+            this.dirtyRowIndexSet = new Set(this.dirtyRowIndexArray)
         }
     }
 
@@ -198,7 +209,7 @@ export class Table extends ClassifiedElement {
                 ${map(
                     this.rows,
                     (rowValues, rowIdx) =>
-                        html`<outerbase-tr .selected=${this.selectedRows[rowIdx]}>
+                        html`<outerbase-tr .selected=${this.selectedRows[rowIdx]} ?dirty=${this.dirtyRowIndexSet.has(rowIdx)}>
                             ${this.selectableRows
                                 ? html`<outerbase-td
                                       ?separate-cells=${true}
