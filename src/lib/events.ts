@@ -1,5 +1,5 @@
 import type { CellDetail, Data, Row } from '../types'
-type ColumnAttributes = { name: string; data: Data }
+type ColumnAttributes = { name: string; data?: Data }
 type RowAttributes = { index: number; row: Row }
 class BubblyEvent extends Event {
     constructor(name: string) {
@@ -19,7 +19,7 @@ export class CellUpdateEvent extends BubblyEvent {
 
 // COLUMNS
 export class ColumnEvent extends BubblyEvent {
-    public data: Data
+    public data?: Data
     public name: string
 
     constructor(type: string, { data, name }: ColumnAttributes) {

@@ -1,5 +1,5 @@
 import type { Queryd, Columns, Rows, Schema } from '../../types'
-import { RowSelectedEvent } from '../../lib/events'
+import { ColumnRemovedEvent, RowSelectedEvent } from '../../lib/events'
 
 import { customElement, property, state } from 'lit/decorators.js'
 import { html, type PropertyValueMap } from 'lit'
@@ -16,6 +16,7 @@ import './td'
 import './th'
 import './thead'
 import './tr'
+import { repeat } from 'lit/directives/repeat.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -126,6 +127,25 @@ export class Table extends ClassifiedElement {
         document.body.classList.remove('select-none')
     }
 
+    onColumnRemoved({ name }: ColumnRemovedEvent) {
+        // TODO @johnny this event isn't propogating when using SSR w/Hydration
+
+        // find the index of the column and remove it
+        let index: number = -1
+        this.columns = this.columns.filter((_name, idx) => {
+            if (name === _name) {
+                index = idx
+                return false
+            }
+            return true
+        })
+
+        if (index === -1) throw new Error(`Could not find/delete column named: ${name}`)
+
+        // remove that index from every row
+        this.rows = this.rows.map((row) => row.filter((_value, idx) => index !== idx))
+    }
+
     public clearSelection() {
         this.selectedRows = new Array<boolean>(this.rows.length).fill(false)
         this.shadowRoot?.querySelectorAll<HTMLInputElement>('.row-select-checkbox').forEach((checkbox) => {
@@ -152,20 +172,22 @@ export class Table extends ClassifiedElement {
                               table-height=${ifDefined(this._height)}
                               ?with-resizer=${this.columnResizerEnabled}
                               ?is-last=${0 < this.columns.length}
-                          >
-                          </outerbase-th>`
+                          /></outerbase-th>`
                         : null}
+
                     <!-- render an TableHeader for each column -->
+                    <!-- TODO this isn't yielding anything when SSR w/o hydration -->
                     ${map(this.columns, (k, idx) => {
                         // omit column resizer on the last column because it's sort-of awkward
                         return html`<outerbase-th
+                            @column-removed=${this.onColumnRemoved}
                             @resize-start=${this.onColumnResizeStart}
                             @resize-end=${this.onColumnResizeEnd}
                             table-height=${ifDefined(this._height)}
                             ?with-resizer=${this.columnResizerEnabled}
                             ?is-last=${idx === this.columns.length - 1}
+                            .name="${k}"
                         >
-                            ${k}
                         </outerbase-th>`
                     })}
                 </outerbase-tr>
@@ -198,8 +220,9 @@ export class Table extends ClassifiedElement {
                                   </outerbase-td>`
                                 : null}
                             <!-- render a TableCell for each column of data in the current row -->
-                            ${map(
+                            ${repeat(
                                 rowValues,
+                                (_row, idx) => this.columns[idx], // use the column name as the unique identifier for each entry in this row
                                 (value, colIdx) => html`
                                     <outerbase-td
                                         ?separate-cells=${true}
