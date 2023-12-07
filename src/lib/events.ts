@@ -1,6 +1,6 @@
-import type { CellDetail, Data } from '../types'
+import type { CellDetail, Data, Row } from '../types'
 type ColumnAttributes = { name: string; data: Data }
-type RowAttributes = { index: number; data: Data }
+type RowAttributes = { index: number; row: Row }
 class BubblyEvent extends Event {
     constructor(name: string) {
         super(name, { bubbles: true, composed: true })
@@ -49,13 +49,19 @@ export class ColumnUpdatedEvent extends ColumnEvent {
 
 // ROWS
 export class RowEvent extends BubblyEvent {
-    public data: Data
+    public row: Row
     public index: number
 
-    constructor(type: string, { data, index }: RowAttributes) {
+    constructor(type: string, { row, index }: RowAttributes) {
         super(type)
         this.index = index
-        this.data = data
+        this.row = row
+    }
+}
+
+export class RowSelectedEvent extends RowEvent {
+    constructor(attr: RowAttributes) {
+        super('row-selected', attr)
     }
 }
 

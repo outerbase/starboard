@@ -15,12 +15,15 @@ export class TableData extends ClassifiedElement {
         return {
             'border-neutral-100 dark:border-neutral-900': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
+            'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.originalValue !== undefined && this.value !== this.originalValue, // dirty cells
             'max-w-xs': !this.maxWidth, // default max width, unless specified
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
             'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
             'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
-            'table-cell overflow-hidden cursor-pointer': true, // the baseline styles for our <td/>
+            'table-cell overflow-hidden': true, // the baseline styles for our <td/>
+            'cursor-pointer': this.value !== undefined,
+            'px-cell-padding-x py-cell-padding-y': true,
         }
     }
 
@@ -47,13 +50,6 @@ export class TableData extends ClassifiedElement {
 
     @property({ type: Boolean, attribute: 'odd' })
     protected isOdd?: boolean
-
-    get inputClasses() {
-        return {
-            'w-full bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900': true,
-            'px-cell-padding-x py-cell-padding-y': true,
-        }
-    }
 
     onKeyDown(event: KeyboardEvent) {
         if (event.code === 'Escape') {
@@ -94,6 +90,7 @@ export class TableData extends ClassifiedElement {
     isEditing = false
 
     protected onDoubleClick() {
+        if (this.value === undefined) return
         this.isEditing = true
     }
 
@@ -160,18 +157,17 @@ export class TableData extends ClassifiedElement {
 
     render() {
         return this.isEditing
-            ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap(
-                  this.inputClasses
-              )}></input>`
+            ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
+                  'w-full bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900': true,
+              })}></input>`
             : html`<div
                   @dblclick="${this.onDoubleClick}"
                   class=${classMap({
                       'whitespace-nowrap text-ellipsis overflow-hidden': true,
-                      'px-cell-padding-x py-cell-padding-y': true,
-                      'bg-yellow-50 dark:bg-yellow-950': this.value !== this.originalValue, // dirty cells
                   })}
               >
                   ${this.value}
+                  <slot></slot>
               </div>`
     }
 }

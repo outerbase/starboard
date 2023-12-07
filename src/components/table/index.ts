@@ -1,5 +1,5 @@
 import type { Queryd, Columns, Rows, Schema } from '../../types'
-import type { CellUpdateEvent } from '../../lib/events'
+import { RowSelectedEvent } from '../../lib/events'
 
 import { customElement, property, state } from 'lit/decorators.js'
 import { html, type PropertyValueMap } from 'lit'
@@ -30,6 +30,31 @@ export class Table extends ClassifiedElement {
     @state()
     resizeObserver?: ResizeObserver
 
+    @state()
+    protected columns: Columns = []
+
+    @state()
+    protected rows: Rows = []
+
+    @property({ type: Object, attribute: 'data' })
+    data?: Queryd
+
+    // fetch data from Outerbase when `sourceId` changes
+    @property({ type: String, attribute: 'source-id' })
+    sourceId?: string
+
+    @property({ type: String, attribute: 'auth-token' })
+    authToken?: string
+
+    @property({ type: Boolean, attribute: 'selectable-rows' })
+    selectableRows = false
+
+    @property({ type: Array, attribute: 'selected-rows' })
+    selectedRows: Array<boolean> = new Array<boolean>(this.rows.length).fill(true)
+
+    @property({ type: Object })
+    schema?: Schema
+
     override connectedCallback() {
         super.connectedCallback()
         // without this `setTimeout`, then a client-side-only Table updates properly but SSR'd tables do NOT
@@ -46,29 +71,7 @@ export class Table extends ClassifiedElement {
         this.resizeObserver?.disconnect()
     }
 
-    @property({ type: Object, attribute: 'data' })
-    data?: Queryd
-
-    @state()
-    protected columns: Columns = []
-
-    @state()
-    protected rows: Rows = []
-
-    // fetch data from Outerbase when `sourceId` changes
-    @property({ type: String, attribute: 'source-id' })
-    sourceId?: string
-
-    @property({ type: String, attribute: 'auth-token' })
-    authToken?: string
-
-    @property({ type: Boolean, attribute: 'removable-rows' })
-    removableRows = false
-
-    @property({ type: Object })
-    schema?: Schema
-
-    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
         // when `data` changes, update `rows` and `columns`
@@ -92,6 +95,26 @@ export class Table extends ClassifiedElement {
                 })
             }
         }
+
+        // // reset selected rows when rows collection changes; this may be undesirable since it would unselect everything if the owner of the component were to provide an updated rows array because a single attribute changed
+        // if (_changedProperties.has('rows')) {
+        //     this.selectedRows = new Array<boolean>(this.rows.length).fill(false)
+        // }
+    }
+
+    toggleSelected(idx: number) {
+        // ensure selectedRows has been
+        if (this.selectedRows.length !== this.rows.length) {
+            this.selectedRows = new Array<boolean>(this.rows.length).fill(false)
+        }
+
+        this.selectedRows = this.selectedRows.map((row, _idx) => (idx === _idx ? !row : row))
+        this.dispatchEvent(
+            new RowSelectedEvent({
+                index: idx,
+                row: this.rows[idx],
+            })
+        )
     }
 
     onColumnResizeStart(_event: Event) {
@@ -108,27 +131,20 @@ export class Table extends ClassifiedElement {
         // because the Resizer stays in place as you scroll down the page
         // while the rest of the table scrolls out of view
 
-        return html`<div
-        
-            // TODO @johnny remove this cell-updated handler and let the user of this component handle it
-            @cell-updated=${(event: CellUpdateEvent) => console.debug(`${JSON.stringify(event.detail, null, 2)}`)}
-
-            class="table table-fixed w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark"
-        >
+        return html`<div class="table table-fixed w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
             <outerbase-thead>
                 <outerbase-tr header>
-                ${
-                    this.removableRows
+                    <!-- first column of (optional) checkboxes -->
+                    ${this.selectableRows
                         ? html`<outerbase-th
                               @resize-start=${this.onColumnResizeStart}
                               @resize-end=${this.onColumnResizeEnd}
                               table-height=${ifDefined(this._height)}
                               ?with-resizer=${this.columnResizerEnabled}
                               ?is-last=${0 < this.columns.length}
-                              >Delete
+                              >Selected
                           </outerbase-th>`
-                        : null
-                }
+                        : null}
                     <!-- render an TableHeader for each column -->
                     ${map(this.columns, (k, idx) => {
                         // omit column resizer on the last column because it's sort-of awkward
@@ -138,7 +154,8 @@ export class Table extends ClassifiedElement {
                             table-height=${ifDefined(this._height)}
                             ?with-resizer=${this.columnResizerEnabled}
                             ?is-last=${idx === this.columns.length - 1}
-                            >${k}
+                        >
+                            ${k}
                         </outerbase-th>`
                     })}
                 </outerbase-tr>
@@ -149,16 +166,24 @@ export class Table extends ClassifiedElement {
                 ${map(
                     this.rows,
                     (rowValues, rowIdx) =>
-                        html`<outerbase-tr>
-                            ${this.removableRows
+                        html`<outerbase-tr .selected=${this.selectedRows[rowIdx]}>
+                            ${this.selectableRows
                                 ? html`<outerbase-td
                                       ?separate-cells=${true}
                                       ?draw-right-border=${!this.columnResizerEnabled}
                                       ?bottom-border=${true}
-                                      .value=${false}
-                                      .position=${{ row: -1, column: -1 }}
+                                      .position=${{
+                                          row: -1,
+                                          column: -1,
+                                      }} // TODO ??? I think this is set in the TD so it shouldn't even be declared here?
                                       .type=${null}
-                                  ></outerbase-td>`
+                                  >
+                                      <input
+                                          type="checkbox"
+                                          ?checked="${this.selectedRows[rowIdx]}"
+                                          @change="${() => this.toggleSelected(rowIdx)}"
+                                      />
+                                  </outerbase-td>`
                                 : null}
                             <!-- render a TableCell for each column of data in the current row -->
                             ${map(
