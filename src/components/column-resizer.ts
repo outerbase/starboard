@@ -1,8 +1,9 @@
+import type { TH } from './table/th'
+
 import { customElement, property } from 'lit/decorators.js'
 import { html, type PropertyValueMap } from 'lit'
 import { TWStyles } from '../../tailwind'
 import { ClassifiedElement } from './classified-element'
-import type { TH } from './table/th'
 
 @customElement('column-resizer')
 export class ColumnResizer extends ClassifiedElement {

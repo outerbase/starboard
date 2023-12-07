@@ -1,20 +1,13 @@
-type ColumnType = string | number | boolean | null
-type Blob = {
-    [key: string]: ColumnType | Blob
-}
-export type Position = Record<'column' | 'row', number>
-export type CellDetail = {
-    position: Position
-    previousValue: ColumnType
-    value: ColumnType
-}
-
+import type { CellDetail, Data } from '../types'
+type ColumnAttributes = { name: string; data: Data }
+type RowAttributes = { index: number; data: Data }
 class BubblyEvent extends Event {
     constructor(name: string) {
         super(name, { bubbles: true, composed: true })
     }
 }
 
+// CELLS
 export class CellUpdateEvent extends BubblyEvent {
     public detail: CellDetail
 
@@ -24,62 +17,62 @@ export class CellUpdateEvent extends BubblyEvent {
     }
 }
 
-export class ColumnAddedEvent extends BubblyEvent {
-    public blob: Blob
-
-    constructor(blob: Blob) {
-        super('column-added')
-        this.blob = blob
-    }
-}
-
-export class ColumnRemovedEvent extends BubblyEvent {
+// COLUMNS
+export class ColumnEvent extends BubblyEvent {
+    public data: Data
     public name: string
-    public blob: Blob
 
-    constructor({ name, blob }: { name: string; blob: Blob }) {
-        super('column-removed')
+    constructor(type: string, { data, name }: ColumnAttributes) {
+        super(type)
         this.name = name
-        this.blob = blob
+        this.data = data
     }
 }
 
-export class ColumnUpdatedEvent extends BubblyEvent {
-    public name: string
-    public blob: Blob
-
-    constructor({ name, blob }: { name: string; blob: Blob }) {
-        super('column-updated')
-        this.name = name
-        this.blob = blob
+export class ColumnAddedEvent extends ColumnEvent {
+    constructor(attr: ColumnAttributes) {
+        super('column-added', attr)
     }
 }
 
-export class RowAddedEvent extends BubblyEvent {
-    public blob: Blob
-
-    constructor(blob: Blob) {
-        super('row-added')
-        this.blob = blob
+export class ColumnRemovedEvent extends ColumnEvent {
+    constructor(attr: ColumnAttributes) {
+        super('column-removed', attr)
     }
 }
 
-export class RowRemovedEvent extends BubblyEvent {
-    public blob: Blob
-
-    constructor(blob: Blob) {
-        super('row-removed')
-        this.blob = blob
+export class ColumnUpdatedEvent extends ColumnEvent {
+    constructor(attr: ColumnAttributes) {
+        super('column-updated', attr)
     }
 }
 
-export class RowUpdatedEvent extends BubblyEvent {
-    public name: string
-    public blob: Blob
+// ROWS
+export class RowEvent extends BubblyEvent {
+    public data: Data
+    public index: number
 
-    constructor({ name, blob }: { name: string; blob: Blob }) {
-        super('row-updated')
-        this.name = name
-        this.blob = blob
+    constructor(type: string, { data, index }: RowAttributes) {
+        super(type)
+        this.index = index
+        this.data = data
+    }
+}
+
+export class RowAddedEvent extends RowEvent {
+    constructor(attr: RowAttributes) {
+        super('row-added', attr)
+    }
+}
+
+export class RowRemovedEvent extends RowEvent {
+    constructor(attr: RowAttributes) {
+        super('row-removed', attr)
+    }
+}
+
+export class RowUpdatedEvent extends RowEvent {
+    constructor(attr: RowAttributes) {
+        super('row-updated', attr)
     }
 }

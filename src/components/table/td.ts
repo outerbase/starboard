@@ -1,9 +1,11 @@
+import type { Position } from '../../types'
+
 import { customElement, property, state } from 'lit/decorators.js'
 import { ClassifiedElement } from '../classified-element'
 import { html, type PropertyValues } from 'lit'
 import { TWStyles } from '../../../tailwind'
 import { classMap } from 'lit/directives/class-map.js'
-import { CellUpdateEvent, type Position } from '../../lib/events'
+import { CellUpdateEvent } from '../../lib/events'
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')

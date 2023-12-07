@@ -1,3 +1,6 @@
+import type { Queryd, Columns, Rows, Schema } from '../../types'
+import type { CellUpdateEvent } from '../../lib/events'
+
 import { customElement, property, state } from 'lit/decorators.js'
 import { html, type PropertyValueMap } from 'lit'
 import { heightOfElement } from '../../lib/height-of-element'
@@ -6,8 +9,6 @@ import { ClassifiedElement } from '../classified-element'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { TWStyles } from '../../../tailwind'
 import { map } from 'lit/directives/map.js'
-import type { Queryd } from '../../types'
-import type { CellUpdateEvent } from '../../lib/events'
 
 // import subcomponents
 import './tbody'
@@ -31,7 +32,6 @@ export class Table extends ClassifiedElement {
 
     override connectedCallback() {
         super.connectedCallback()
-
         // without this `setTimeout`, then a client-side-only Table updates properly but SSR'd tables do NOT
         setTimeout(() => (this.columnResizerEnabled = true), 0)
 
@@ -46,11 +46,14 @@ export class Table extends ClassifiedElement {
         this.resizeObserver?.disconnect()
     }
 
-    @state()
-    protected columns: Array<string> = []
+    @property({ type: Object, attribute: 'data' })
+    data?: Queryd
 
     @state()
-    protected rows: Array<Array<string>> = []
+    protected columns: Columns = []
+
+    @state()
+    protected rows: Rows = []
 
     // fetch data from Outerbase when `sourceId` changes
     @property({ type: String, attribute: 'source-id' })
@@ -59,20 +62,20 @@ export class Table extends ClassifiedElement {
     @property({ type: String, attribute: 'auth-token' })
     authToken?: string
 
-    @property({ type: Object, attribute: 'data' })
-    data?: Queryd
-
     @property({ type: Boolean, attribute: 'removable-rows' })
     removableRows = false
+
+    @property({ type: Object })
+    schema?: Schema
 
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
         // when `data` changes, update `rows` and `columns`
         if (_changedProperties.has('data')) {
-            if (this.data && this.data.items?.length > 0) {
-                this.columns = Object.keys(this.data.items[0])
-                this.rows = this.data.items.map((d) => Object.values(d))
+            if (this.data && this.data.rows?.length > 0) {
+                this.columns = this.data.rows?.[0] ? Object.keys(this.data.rows?.[0]) : []
+                this.rows = this.data.rows.map((row) => Object.values(row))
             }
         }
 
@@ -145,7 +148,7 @@ export class Table extends ClassifiedElement {
                 <!-- render a TableRow element for each row of data -->
                 ${map(
                     this.rows,
-                    (row, rowIdx) =>
+                    (rowValues, rowIdx) =>
                         html`<outerbase-tr>
                             ${this.removableRows
                                 ? html`<outerbase-td
@@ -154,15 +157,16 @@ export class Table extends ClassifiedElement {
                                       ?bottom-border=${true}
                                       .value=${false}
                                       .position=${{ row: -1, column: -1 }}
+                                      .type=${null}
                                   ></outerbase-td>`
                                 : null}
                             <!-- render a TableCell for each column of data in the current row -->
                             ${map(
-                                row,
+                                rowValues,
                                 (value, colIdx) => html`
                                     <outerbase-td
                                         ?separate-cells=${true}
-                                        ?draw-right-border=${colIdx === row.length - 1 || !this.columnResizerEnabled}
+                                        ?draw-right-border=${colIdx === rowValues.length - 1 || !this.columnResizerEnabled}
                                         ?bottom-border=${true}
                                         .value=${value}
                                         .position=${{ row: rowIdx, column: colIdx }}
