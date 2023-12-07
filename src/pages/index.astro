@@ -39,15 +39,15 @@ let data = {items: spaceballs.map((d) => ({...d, traits: JSON.stringify(d.traits
         <main class="m-12 pb-24">
             <h1 class="font-bold text-xl">Static</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
-            <OuterbaseTable client:only="lit" data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
+            <OuterbaseTable client:only="lit" data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} removable-rows></OuterbaseTable>
             
             <h1 class="font-bold text-xl mt-8">SSR w/ Hydration</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
-            <OuterbaseTable client:load data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
+            <OuterbaseTable client:load data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} removable-rows></OuterbaseTable>
             
             <h1 class="font-bold text-xl mt-8">SSR w/o Hydration</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
-            <OuterbaseTable data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
+            <OuterbaseTable data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} removable-rows></OuterbaseTable>
         </main>
     </body>
 </html>

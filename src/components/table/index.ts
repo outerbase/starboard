@@ -59,8 +59,11 @@ export class Table extends ClassifiedElement {
     @property({ type: String, attribute: 'auth-token' })
     authToken?: string
 
-    @property({ type: Object })
+    @property({ type: Object, attribute: 'data' })
     data?: Queryd
+
+    @property({ type: Boolean, attribute: 'removable-rows' })
+    removableRows = false
 
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
@@ -111,6 +114,18 @@ export class Table extends ClassifiedElement {
         >
             <outerbase-thead>
                 <outerbase-tr header>
+                ${
+                    this.removableRows
+                        ? html`<outerbase-th
+                              @resize-start=${this.onColumnResizeStart}
+                              @resize-end=${this.onColumnResizeEnd}
+                              table-height=${ifDefined(this._height)}
+                              ?with-resizer=${this.columnResizerEnabled}
+                              ?is-last=${0 < this.columns.length}
+                              >Delete
+                          </outerbase-th>`
+                        : null
+                }
                     <!-- render an TableHeader for each column -->
                     ${map(this.columns, (k, idx) => {
                         // omit column resizer on the last column because it's sort-of awkward
@@ -132,8 +147,16 @@ export class Table extends ClassifiedElement {
                     this.rows,
                     (row, rowIdx) =>
                         html`<outerbase-tr>
-                            <!-- render a TableCell for each column of data in the curernt row -->
-                            <!-- NOTE: the Array.isArray(etc) is jsut temporary to render stubbed data more better (spaceballs demo data) -->
+                            ${this.removableRows
+                                ? html`<outerbase-td
+                                      ?separate-cells=${true}
+                                      ?draw-right-border=${!this.columnResizerEnabled}
+                                      ?bottom-border=${true}
+                                      .value=${false}
+                                      .position=${{ row: -1, column: -1 }}
+                                  ></outerbase-td>`
+                                : null}
+                            <!-- render a TableCell for each column of data in the current row -->
                             ${map(
                                 row,
                                 (value, colIdx) => html`
