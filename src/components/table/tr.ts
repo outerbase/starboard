@@ -1,6 +1,7 @@
 import { customElement, property, state } from 'lit/decorators.js'
-import { ClassifiedElement } from '../classified-element'
 import type { PropertyValueMap } from 'lit'
+
+import { ClassifiedElement } from '../classified-element'
 
 // tl;dr <tr/>, table-row
 @customElement('outerbase-tr')

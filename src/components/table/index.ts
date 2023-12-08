@@ -1,14 +1,14 @@
-import type { Queryd, Columns, Rows, Schema } from '../../types'
-import { ColumnAddedEvent, ColumnRemovedEvent, RowAddedEvent, RowRemovedEvent, RowSelectionEvent, RowUpdatedEvent } from '../../lib/events'
-
 import { customElement, property, state } from 'lit/decorators.js'
+import { ifDefined } from 'lit/directives/if-defined.js'
 import { html, type PropertyValueMap } from 'lit'
+import { map } from 'lit/directives/map.js'
+
+import { ColumnAddedEvent, ColumnRemovedEvent, RowAddedEvent, RowRemovedEvent, RowSelectionEvent, RowUpdatedEvent } from '../../lib/events'
+import type { Queryd, Columns, Rows, Schema } from '../../types'
 import { heightOfElement } from '../../lib/height-of-element'
 import dbRowsForSource from '../../lib/rows-for-source-id'
 import { ClassifiedElement } from '../classified-element'
-import { ifDefined } from 'lit/directives/if-defined.js'
 import { TWStyles } from '../../../tailwind'
-import { map } from 'lit/directives/map.js'
 
 // import subcomponents
 import './tbody'
