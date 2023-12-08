@@ -74,3 +74,9 @@ export class RowRemovedEvent extends RowsEvent {
         super('row-removed', attrs)
     }
 }
+
+export class RowSelectionEvent extends RowsEvent {
+    constructor(attrs: Array<RowAttributes>) {
+        super('row-selected', attrs)
+    }
+}

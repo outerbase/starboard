@@ -1,5 +1,6 @@
-import { customElement, property } from 'lit/decorators.js'
+import { customElement, property, state } from 'lit/decorators.js'
 import { ClassifiedElement } from '../classified-element'
+import type { PropertyValueMap } from 'lit'
 
 // tl;dr <tr/>, table-row
 @customElement('outerbase-tr')
@@ -32,4 +33,12 @@ export class TableRow extends ClassifiedElement {
 
     @property({ type: Boolean, attribute: 'dirty' })
     dirty = false
+
+    @state()
+    hasRenderedOnce = false
+    protected override willUpdate(_changedProperties: PropertyValueMap<this>): void {
+        super.willUpdate(_changedProperties)
+        if (_changedProperties.has('selected') && this.hasRenderedOnce) this.dispatchEvent(new Event('on-selection'))
+        if (!this.hasRenderedOnce) this.hasRenderedOnce = true
+    }
 }

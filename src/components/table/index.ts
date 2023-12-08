@@ -1,5 +1,5 @@
 import type { Queryd, Columns, Rows, Schema } from '../../types'
-import { ColumnAddedEvent, ColumnRemovedEvent, RowAddedEvent, RowRemovedEvent, RowUpdatedEvent } from '../../lib/events'
+import { ColumnAddedEvent, ColumnRemovedEvent, RowAddedEvent, RowRemovedEvent, RowSelectionEvent, RowUpdatedEvent } from '../../lib/events'
 
 import { customElement, property, state } from 'lit/decorators.js'
 import { html, type PropertyValueMap } from 'lit'
@@ -182,6 +182,10 @@ export class Table extends ClassifiedElement {
         }
     }
 
+    onRowSelection() {
+        this.dispatchEvent(new RowSelectionEvent(Array.from(this.selectedRowIndices).map((index) => ({ index, row: this.rows[index] }))))
+    }
+
     public clearSelection() {
         this.selectedRowIndices = new Set()
         this.removedRowIndices = new Set()
@@ -240,7 +244,11 @@ export class Table extends ClassifiedElement {
                 <!-- render a TableRow element for each row of data -->
                 ${map(this.rows, (rowValues, rowIdx) =>
                     !this.removedRowIndices.has(rowIdx)
-                        ? html`<outerbase-tr .selected=${this.selectedRowIndices.has(rowIdx)} ?dirty=${this.dirtyRowIndices.has(rowIdx)}>
+                        ? html`<outerbase-tr
+                              .selected=${this.selectedRowIndices.has(rowIdx)}
+                              ?dirty=${this.dirtyRowIndices.has(rowIdx)}
+                              @on-selection=${this.onRowSelection}
+                          >
                               ${this.selectableRows
                                   ? html`<outerbase-td
                                         ?separate-cells=${true}
@@ -267,7 +275,7 @@ export class Table extends ClassifiedElement {
                               <!-- render a TableCell for each column of data in the current row -->
                               ${repeat(
                                   rowValues,
-                                  (_value, colIdx) => this.columns[colIdx], // use the column name as the unique identifier for each entry in this row
+                                  (_row, idx) => this.columns[idx], // use the column name as the unique identifier for each entry in this row
                                   (value, colIdx) => html`
                                       <outerbase-td
                                           ?separate-cells=${true}

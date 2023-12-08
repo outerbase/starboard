@@ -47,7 +47,9 @@ export class TH extends ClassifiedElement {
 
     render() {
         const deleteBtn = this.name
-            ? html`<span class="text-red-800 hover:text-red-700 active:text-red-600 cursor-pointer" @click=${this.removeColumn}>[x]</span>`
+            ? html`<span class="text-red-800 hover:text-red-700 active:text-red-600 px-2 cursor-pointer" @click=${this.removeColumn}
+                  >x</span
+              >`
             : null
 
         const body = html`<span class="flex items-center justify-between">${this.name} ${deleteBtn}</span>`
