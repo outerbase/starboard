@@ -13,17 +13,18 @@ export class TableData extends ClassifiedElement {
     static override styles = TWStyles
     protected override get classMap() {
         return {
-            'border-neutral-100 dark:border-neutral-900': true,
+            'table-cell px-cell-padding-x py-cell-padding-y relative': true,
+            'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
-            'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.originalValue !== undefined && this.value !== this.originalValue, // dirty cells
+
+            'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark':
+                this.originalValue !== undefined && this.value !== this.originalValue && !this.isEditing, // dirty cells
             'max-w-xs': !this.maxWidth, // default max width, unless specified
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
             'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
             'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
-            'table-cell overflow-hidden': true, // the baseline styles for our <td/>
             'cursor-pointer': this.value !== undefined,
-            'px-cell-padding-x py-cell-padding-y': true,
         }
     }
 
@@ -50,6 +51,9 @@ export class TableData extends ClassifiedElement {
 
     @property({ type: Boolean, attribute: 'odd' })
     protected isOdd?: boolean
+
+    @property({ type: Boolean, attribute: 'no-text' })
+    protected suppressNbsp = false
 
     onKeyDown(event: KeyboardEvent) {
         if (event.code === 'Escape') {
@@ -164,12 +168,12 @@ export class TableData extends ClassifiedElement {
                   @dblclick="${this.onDoubleClick}"
                   class=${classMap({
                       'whitespace-nowrap text-ellipsis overflow-hidden': true,
-                      'min-w-[174px]': (this.value?.length ?? 0) > 0, // prevent the first column (checkbox) from being asburdly wide; should do something more explicit instead
-                      'pr-2': !((this.value?.length ?? 0) > 0), // ditto
+                      'min-w-[200px]': (this.value?.length ?? 0) > 0, // prevent the first column (checkbox) from being asburdly wide; should do something more explicit instead
+                      //   'pr-2': !((this.value?.length ?? 0) > 0), // ditto
                   })}
               >
                   <!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
-                  ${this.value || '\u00A0'}
+                  ${this.suppressNbsp ? null : this.value || html`&nbsp;`}
                   <slot></slot>
               </div>`
     }

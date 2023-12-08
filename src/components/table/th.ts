@@ -16,7 +16,7 @@ export class TH extends ClassifiedElement {
     protected override get classMap() {
         return {
             'table-cell h-full relative whitespace-nowrap': true,
-            'first:border-l border-b last:border-r border-t border-neutral-100 dark:border-neutral-900': true,
+            'first:border-l border-b border-t border-theme-border dark:border-theme-border-dark': true,
             'px-cell-padding-x py-cell-padding-y pr-2': true,
             'bg-theme-column dark:bg-theme-column-dark': true,
             // prevent double borders
@@ -48,14 +48,14 @@ export class TH extends ClassifiedElement {
     render() {
         const deleteBtn = this.name
             ? html`<span class="text-red-800 hover:text-red-700 active:text-red-600 text-xs cursor-pointer" @click=${this.removeColumn}
-                  >delete</span
+                  >[x]</span
               >`
             : null
 
         const body = html`<span class="flex items-center justify-between">${this.name} ${deleteBtn}</span>`
 
         // TODO `delete` is appearing when SSR w/o hydration; it shouldn't since there's no JS available to click it
-        return this.withResizer && !this.isLastColumn
+        return this.withResizer
             ? html`<slot></slot>
                   ${body}
                   <column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer>`

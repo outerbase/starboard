@@ -195,7 +195,9 @@ export class Table extends ClassifiedElement {
 
         // this commented out version "resolves" the cells changing width with toggling between editing and viewing
         // return html`<div class="table table-fixed w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
-        return html`<div class="table table-auto bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
+        return html`<div
+            class="table table-auto bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark font-mono text-sm"
+        >
             <outerbase-thead>
                 <outerbase-tr header>
                     <!-- first column of (optional) checkboxes -->
@@ -236,21 +238,24 @@ export class Table extends ClassifiedElement {
                             ${this.selectableRows
                                 ? html`<outerbase-td
                                       ?separate-cells=${true}
-                                      ?draw-right-border=${!this.columnResizerEnabled}
+                                      ?draw-right-border=${true}
                                       ?bottom-border=${true}
                                       .position=${{
                                           row: -1,
                                           column: -1,
                                       }}
                                       .type=${null}
+                                      ?no-text=${true}
                                   >
                                       <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
-                                      <input
-                                          class="row-select-checkbox"
-                                          type="checkbox"
-                                          ?checked="${this.selectedRows[rowIdx] === true}"
-                                          @click="${() => this.toggleSelected(rowIdx)}"
-                                      />
+                                      <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
+                                          <input
+                                              class="row-select-checkbox h-4 w-4 mr-[1px] block"
+                                              type="checkbox"
+                                              ?checked="${this.selectedRows[rowIdx] === true}"
+                                              @click="${() => this.toggleSelected(rowIdx)}"
+                                          />
+                                      </div>
                                   </outerbase-td>`
                                 : null}
                             <!-- render a TableCell for each column of data in the current row -->
@@ -260,7 +265,7 @@ export class Table extends ClassifiedElement {
                                 (value, colIdx) => html`
                                     <outerbase-td
                                         ?separate-cells=${true}
-                                        ?draw-right-border=${colIdx === rowValues.length - 1 || !this.columnResizerEnabled}
+                                        ?draw-right-border=${true}
                                         ?bottom-border=${true}
                                         .value=${value}
                                         .position=${{ row: rowIdx, column: colIdx }}

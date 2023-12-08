@@ -16,8 +16,8 @@ export default {
                 '3xl': ['30px', '40px'],
             },
             spacing: {
-                'cell-padding-x': 'var(--cell-padding-x, 0.25rem)',
-                'cell-padding-y': 'var(--cell-padding-y, 0.25rem)',
+                'cell-padding-x': 'var(--cell-padding-x, 16px)',
+                'cell-padding-y': 'var(--cell-padding-y, 8px)',
                 // 'cell-padding-x-sm': 'var(--cell-padding-x, 0.1rem)',
                 // 'cell-padding-y-sm': 'var(--cell-padding-y, 0.1rem)',
             },
@@ -35,9 +35,13 @@ export default {
                     text: 'var(--text-color, #000000)',
                     'text-dark': 'var(--text-color-dark, #ffffff)',
 
-                    // column header
-                    column: 'var(--column-header-background-color, rgba(0,0,0,0.1))',
-                    'column-dark': 'var(--column-header-background-color-dark, rgba(255,255,255,0.1))',
+                    // borders
+                    border: 'var(--border-color, #e5e7eb)',
+                    'border-dark': 'var(--border-color-dark, rgb(52,52,56))',
+
+                    // column headers
+                    column: 'var(--column-header-background-color, #ffffff)',
+                    'column-dark': 'var(--column-header-background-color-dark, #000000)',
                     'column-text': 'var(--column-header-text-color-dark, #000000)',
                     'column-text-dark': 'var(--column-header-text-color-dark, #ffffff)',
 
@@ -60,7 +64,8 @@ export default {
                     // 'active-text': 'var(--active-text-color, yellow)',
                     // 'active-text-dark': 'var(--active-text-color-dark,blue)',
 
-                    // clean cells; these classes may be redundant / will shadow row colors
+                    // clean cells
+                    // these classes may be redundant / hide row colors
                     cell: 'var(--cell-background-color)',
                     'cell-dark': 'var(--cell-background-color-dark)',
                     'cell-text': 'var(--cell-text-color)',
@@ -69,6 +74,8 @@ export default {
                     // dirty cells
                     'cell-dirty': 'var(--cell-dirty-background-color,rgba(254,249,195,1))',
                     'cell-dirty-dark': 'var(--cell-dirty-background-color,rgba(66,32,6,1))',
+                    //
+                    // TABLES ///
                 },
 
                 light: {
