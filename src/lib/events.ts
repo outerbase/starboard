@@ -70,7 +70,7 @@ export class RowRemovedEvent extends RowsEvent {
 }
 
 export class RowUpdatedEvent extends RowsEvent {
-    constructor(attrs: Array<RowAttributes>) {
+    constructor(attrs: RowAttributes) {
         super('row-updated', attrs)
     }
 }

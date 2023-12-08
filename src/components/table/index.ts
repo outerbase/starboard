@@ -1,5 +1,5 @@
 import type { Queryd, Columns, Rows, Schema } from '../../types'
-import { ColumnAddedEvent, ColumnRemovedEvent, RowAddedEvent, RowRemovedEvent } from '../../lib/events'
+import { ColumnAddedEvent, ColumnRemovedEvent, RowAddedEvent, RowRemovedEvent, RowUpdatedEvent } from '../../lib/events'
 
 import { customElement, property, state } from 'lit/decorators.js'
 import { html, type PropertyValueMap } from 'lit'
@@ -267,7 +267,7 @@ export class Table extends ClassifiedElement {
                               <!-- render a TableCell for each column of data in the current row -->
                               ${repeat(
                                   rowValues,
-                                  (_row, idx) => this.columns[idx], // use the column name as the unique identifier for each entry in this row
+                                  (_value, colIdx) => this.columns[colIdx], // use the column name as the unique identifier for each entry in this row
                                   (value, colIdx) => html`
                                       <outerbase-td
                                           ?separate-cells=${true}
@@ -275,6 +275,7 @@ export class Table extends ClassifiedElement {
                                           ?bottom-border=${true}
                                           .value=${value}
                                           .position=${{ row: rowIdx, column: colIdx }}
+                                          @cell-updated=${() => this.dispatchEvent(new RowUpdatedEvent({ index: rowIdx, row: rowValues }))}
                                       >
                                       </outerbase-td>
                                   `
