@@ -43,8 +43,8 @@ export default {
                     'border-dark': 'var(--border-color-dark, rgb(52,52,56))',
 
                     // column headers
-                    column: 'var(--column-header-background-color, rgba(255,255,255,0.1))',
-                    'column-dark': 'var(--column-header-background-color-dark, rgba(0,0,0,0.1))',
+                    column: 'var(--column-header-background-color, rgba(255,255,255,0.9))',
+                    'column-dark': 'var(--column-header-background-color-dark, rgba(0,0,0,0.9))',
                     'column-text': 'var(--column-header-text-color, #000000)',
                     'column-text-dark': 'var(--column-header-text-color-dark, #ffffff)',
 
