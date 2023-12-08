@@ -31,6 +31,14 @@ try {
         <script>
             /* themes may also be set dynamically/programatically */
             // document.documentElement.style.setProperty("--success-color", "lime");
+            
+            addEventListener('cell-updated', console.info)
+            addEventListener('row-added', console.info)
+            addEventListener('row-updated', console.info)
+            addEventListener('row-removed', console.info)
+            addEventListener('column-added', console.info)
+            addEventListener('column-updated', console.info)
+            addEventListener('column-removed', console.info)
         </script>
     </head>
 
