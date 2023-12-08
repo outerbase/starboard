@@ -56,6 +56,8 @@ export class ColumnResizer extends ClassifiedElement {
 
             const dx = e.clientX - this.xPosition
             this.column.style.width = `${this.width + dx}px`
+
+            // TODO make the table wider?
         }
 
         const _mouseUp = (e: Event) => {

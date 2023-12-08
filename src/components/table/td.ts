@@ -19,7 +19,7 @@ export class TableData extends ClassifiedElement {
 
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark':
                 this.originalValue !== undefined && this.value !== this.originalValue && !this.isEditing, // dirty cells
-            'max-w-xs': !this.maxWidth, // default max width, unless specified
+            // 'max-w-xs': !this.maxWidth, // default max width, unless specified
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
             'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
             'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
