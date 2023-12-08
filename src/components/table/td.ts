@@ -17,7 +17,7 @@ export class TableData extends ClassifiedElement {
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
 
-            'bg-yellow-100 bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark':
+            'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark':
                 this.originalValue !== undefined && this.value !== this.originalValue && !this.isEditing, // dirty cells
             // 'max-w-xs': !this.maxWidth, // default max width, unless specified
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
@@ -148,9 +148,8 @@ export class TableData extends ClassifiedElement {
             : html`<div
                   @dblclick="${this.onDoubleClick}"
                   class=${classMap({
-                      'whitespace-nowrap text-ellipsis overflow-hidden': true,
-                      'min-w-[200px]': (this.value?.length ?? 0) > 0, // prevent the first column (checkbox) from being asburdly wide; should do something more explicit instead
-                      //   'pr-2': !((this.value?.length ?? 0) > 0), // ditto
+                      'whitespace-nowrap text-ellipsis overflow-hidden max-w-[400px]': true,
+                      'min-w-[200px]': (this.value?.length ?? 0) > 0,
                   })}
               >
                   <!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->

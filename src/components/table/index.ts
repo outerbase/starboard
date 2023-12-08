@@ -207,7 +207,7 @@ export class Table extends ClassifiedElement {
         // this commented out version "resolves" the cells changing width with toggling between editing and viewing
         // return html`<div class="table table-fixed w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
         return html`<div
-            class="table table-auto bg-theme-table dark:bg-theme-table-dark text-theme-text dark:text-theme-text-dark font-mono text-sm"
+            class="table table-fixed bg-theme-table dark:bg-theme-table-dark text-theme-text dark:text-theme-text-dark font-mono text-sm"
         >
             <outerbase-thead>
                 <outerbase-tr header>

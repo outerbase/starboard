@@ -68,14 +68,14 @@ export default {
 
                     // clean cells
                     // these classes may be redundant / hide row colors
-                    cell: 'var(--cell-background-color)',
-                    'cell-dark': 'var(--cell-background-color-dark)',
-                    'cell-text': 'var(--cell-text-color)',
-                    'cell-text-dark': 'var(--cell-text-color)',
+                    // cell: 'var(--cell-background-color)',
+                    // 'cell-dark': 'var(--cell-background-color-dark)',
+                    // 'cell-text': 'var(--cell-text-color)',
+                    // 'cell-text-dark': 'var(--cell-text-color)',
 
                     // dirty cells
-                    'cell-dirty': 'var(--cell-dirty-background-color,#fef9c3)',
-                    'cell-dirty-dark': 'var(--cell-dirty-background-color,#713f12)',
+                    'cell-dirty': 'var(--cell-dirty-background-color, #fef9c3)',
+                    'cell-dirty-dark': 'var(--cell-dirty-background-color, #713f12)',
                 },
 
                 light: {
