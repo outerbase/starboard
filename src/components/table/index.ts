@@ -50,6 +50,9 @@ export class Table extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'selectable-rows' })
     selectableRows = false
 
+    @property({ type: String, attribute: 'keyboard-shortcuts' })
+    kbShortcuts: boolean = false
+
     @property({ type: Object })
     schema?: Schema
 
@@ -71,9 +74,6 @@ export class Table extends ClassifiedElement {
             this._height = heightOfElement(_entries[0]?.target)
         })
         this.resizeObserver.observe(this)
-
-        this.onKeyDown_bound = this.onKeyDown.bind(this)
-        document.addEventListener('keydown', this.onKeyDown_bound)
     }
 
     override disconnectedCallback() {
@@ -81,6 +81,13 @@ export class Table extends ClassifiedElement {
         this.resizeObserver?.disconnect()
 
         if (this.onKeyDown_bound) document.removeEventListener('keydown', this.onKeyDown_bound)
+    }
+
+    protected override firstUpdated(_changedProperties: PropertyValueMap<this>): void {
+        if (this.kbShortcuts) {
+            this.onKeyDown_bound = this.onKeyDown.bind(this)
+            document.addEventListener('keydown', this.onKeyDown_bound)
+        }
     }
 
     override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
