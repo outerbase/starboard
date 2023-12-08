@@ -48,37 +48,29 @@ export class ColumnUpdatedEvent extends ColumnEvent {
 }
 
 // ROWS
-export class RowEvent extends BubblyEvent {
-    public row: Row
-    public index: number
+export class RowsEvent extends BubblyEvent {
+    public rows: RowAttributes | Array<RowAttributes>
 
-    constructor(type: string, { row, index }: RowAttributes) {
+    constructor(type: string, rows: RowAttributes | Array<RowAttributes>) {
         super(type)
-        this.index = index
-        this.row = row
+        this.rows = rows
     }
 }
 
-export class RowSelectedEvent extends RowEvent {
-    constructor(attr: RowAttributes) {
-        super('row-selected', attr)
-    }
-}
-
-export class RowAddedEvent extends RowEvent {
+export class RowAddedEvent extends RowsEvent {
     constructor(attr: RowAttributes) {
         super('row-added', attr)
     }
 }
 
-export class RowRemovedEvent extends RowEvent {
-    constructor(attr: RowAttributes) {
-        super('row-removed', attr)
+export class RowRemovedEvent extends RowsEvent {
+    constructor(attrs: Array<RowAttributes>) {
+        super('row-removed', attrs)
     }
 }
 
-export class RowUpdatedEvent extends RowEvent {
-    constructor(attr: RowAttributes) {
-        super('row-updated', attr)
+export class RowUpdatedEvent extends RowsEvent {
+    constructor(attrs: Array<RowAttributes>) {
+        super('row-updated', attrs)
     }
 }
