@@ -13,7 +13,7 @@ export class TableRow extends ClassifiedElement {
             'text-theme-column-text dark:text-theme-column-text-dark': this.isHeaderRow,
 
             // when not a header AND not selected
-            'odd:bg-theme-row-odd dark:odd:bg-theme-row-odd-dark even:bg-theme-row-even dark:even:bg-theme-row-even-dark hover:bg-theme-hover dark:hover:bg-theme-hover-dark':
+            'odd:bg-theme-row-odd dark:odd:bg-theme-row-odd-dark even:bg-theme-row-even dark:even:bg-theme-row-even-dark hover:bg-theme-row-hover dark:hover:bg-theme-row-hover-dark':
                 !this.isHeaderRow && !this.selected && !this.dirty,
 
             // when selected

@@ -30,33 +30,35 @@ export default {
                     warning: 'var(--warning-color, yellow)',
                     error: 'var(--error-color, red)',
 
-                    page: 'var(--page-background-color, #ffffff)',
-                    'page-dark': 'var(--page-background-color-dark, #000000)',
+                    page: 'var(--page-background-color, rgb(245,245,245))',
+                    'page-dark': 'var(--page-background-color-dark, rgb(10,10,10))',
                     text: 'var(--text-color, #000000)',
                     'text-dark': 'var(--text-color-dark, #ffffff)',
+
+                    table: 'var(--table-background-color, rgb(255,255,255))',
+                    'table-dark': 'var(--table-background-color, rgb(10,10,10))',
 
                     // borders
                     border: 'var(--border-color, #e5e7eb)',
                     'border-dark': 'var(--border-color-dark, rgb(52,52,56))',
 
                     // column headers
-                    column: 'var(--column-header-background-color, #ffffff)',
-                    'column-dark': 'var(--column-header-background-color-dark, #000000)',
-                    'column-text': 'var(--column-header-text-color-dark, #000000)',
+                    column: 'var(--column-header-background-color, rgba(255,255,255,0.1))',
+                    'column-dark': 'var(--column-header-background-color-dark, rgba(0,0,0,0.1))',
+                    'column-text': 'var(--column-header-text-color, #000000)',
                     'column-text-dark': 'var(--column-header-text-color-dark, #ffffff)',
 
                     // rows
-                    'row-even': 'var(--table-row-even-background-color, #ffffff)',
-                    'row-even-dark': 'var(--table-row-even-background-color-dark, #000000)',
-                    'row-odd': 'var(--table-row-odd-background-color, #fefefe)',
-                    'row-odd-dark': 'var(--table-row-odd-background-color-dark, #010101)',
-                    'row-selected': 'var(--table-row-seleted-background-color, rgb(254,253,232))',
-                    'row-selected-dark': 'var(--table-row-seleted-background-color-dark, rgb(66, 32, 6))',
-                    'row-selected-hover': 'var(--table-row-seleted-hover-background-color, rgb(254,249,195))',
-                    'row-selected-hover-dark': 'var(--table-row-seleted-hover-background-color-dark, rgb(113, 63,18))',
-
-                    hover: 'var(--hover-background-color, rgba(0,0,0,0.025))',
-                    'hover-dark': 'var(--hover-background-color-dark, rgba(255,255,255,0.05))',
+                    'row-even': 'var(--table-row-even-background-color, rgba(0,0,0,0.01))',
+                    'row-even-dark': 'var(--table-row-even-background-color-dark, rgba(255,255,255,0.01))',
+                    'row-odd': 'var(--table-row-odd-background-color, rgba(0,0,0,0.02))',
+                    'row-odd-dark': 'var(--table-row-odd-background-color-dark, rgba(255,255,255,0.02))',
+                    'row-hover': 'var(--hover-background-color, rgba(0,0,0,0.03))',
+                    'row-hover-dark': 'var(--hover-background-color-dark, rgba(255,255,255,0.03))',
+                    'row-selected': 'var(--table-row-seleted-background-color, rgba(254,253,232,0.7))',
+                    'row-selected-dark': 'var(--table-row-seleted-background-color-dark, rgba(66, 32, 6, 0.8))',
+                    'row-selected-hover': 'var(--table-row-seleted-hover-background-color, rgba(254,253,232,1))',
+                    'row-selected-hover-dark': 'var(--table-row-seleted-hover-background-color-dark, rgb(66, 32, 6, 1))',
 
                     // unused
                     // active: 'var(--active-background-color-dark, #fefefe)',
@@ -72,10 +74,8 @@ export default {
                     'cell-text-dark': 'var(--cell-text-color)',
 
                     // dirty cells
-                    'cell-dirty': 'var(--cell-dirty-background-color,rgba(254,249,195,1))',
-                    'cell-dirty-dark': 'var(--cell-dirty-background-color,rgba(66,32,6,1))',
-                    //
-                    // TABLES ///
+                    'cell-dirty': 'var(--cell-dirty-background-color,#fef9c3)',
+                    'cell-dirty-dark': 'var(--cell-dirty-background-color,#713f12)',
                 },
 
                 light: {
