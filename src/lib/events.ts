@@ -63,14 +63,14 @@ export class RowAddedEvent extends RowsEvent {
     }
 }
 
-export class RowRemovedEvent extends RowsEvent {
-    constructor(attrs: Array<RowAttributes>) {
-        super('row-removed', attrs)
-    }
-}
-
 export class RowUpdatedEvent extends RowsEvent {
     constructor(attrs: RowAttributes) {
         super('row-updated', attrs)
+    }
+}
+
+export class RowRemovedEvent extends RowsEvent {
+    constructor(attrs: Array<RowAttributes>) {
+        super('row-removed', attrs)
     }
 }

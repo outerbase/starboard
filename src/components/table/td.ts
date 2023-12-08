@@ -56,26 +56,21 @@ export class TableData extends ClassifiedElement {
     protected suppressNbsp = false
 
     onKeyDown(event: KeyboardEvent) {
+        // WARNING: the input's onBlur will NOT called
+
         if (event.code === 'Escape') {
             // abort changes
             this.value = this.originalValue
             delete this.originalValue
+
             this.isEditing = false
-            // TODO trigger blur?
+            this.dispatchChangedEvent()
         }
 
         if (event.code === 'Enter' || event.code === 'Tab') {
-            // commit changes
-            // TODO change `originalValue` to be this new value? or leave it as the very first value?
+            // commit changes [by doing nothing]
             this.isEditing = false
-            this.dispatchEvent(
-                new Event('cell-data-change', {
-                    // TODO include details about what changed
-                    bubbles: true,
-                    composed: true,
-                })
-            )
-            // TODO trigger blur?
+            this.dispatchChangedEvent()
         }
     }
 
@@ -93,58 +88,14 @@ export class TableData extends ClassifiedElement {
     @state()
     isEditing = false
 
-    protected onDoubleClick() {
-        if (this.value === undefined) return
-        this.isEditing = true
-    }
-
-    protected onChange(event: Event) {
-        const { value } = event.target as HTMLInputElement
-        this.value = value
-    }
-
-    protected dispatchChangedEvent() {
-        if (this.value !== this.originalValue) {
-            if (!this.position) {
-                console.debug('cell-updated event not fired due to missing position')
-                return
-            }
-
-            this.dispatchEvent(
-                new CellUpdateEvent({
-                    position: this.position,
-                    previousValue: this.originalValue,
-                    value: this.value,
-                })
-            )
-        }
-    }
-
-    // focus and select text
-    // stop editing onblur
     override updated(changedProps: PropertyValues<this>) {
         super.updated(changedProps)
 
-        if (changedProps.has('isEditing')) {
-            if (this.isEditing) {
-                const input = this.shadowRoot?.querySelector('input')
-                if (input) {
-                    input.select()
-
-                    const onBlur = () => {
-                        this.isEditing = false
-                        this.dispatchChangedEvent()
-                        input.removeEventListener('blur', onBlur)
-                    }
-
-                    // TODO @johnny this listener isn't (explicitly) removed if the user presses `Enter`
-                    //              because that removes the element from the DOM before a `blur` can occur
-                    //              ...it's unclear to me whether this is a leak or resolved by the DOM element being removed
-                    input.addEventListener('blur', onBlur)
-                }
-            } else {
-                // when editing has stopped
-                this.dispatchChangedEvent()
+        if (changedProps.has('isEditing') && this.isEditing) {
+            // focus and select text
+            const input = this.shadowRoot?.querySelector('input')
+            if (input) {
+                input.select()
             }
         }
     }
@@ -159,11 +110,41 @@ export class TableData extends ClassifiedElement {
         }
     }
 
+    protected onDoubleClick() {
+        if (this.value === undefined) return
+        this.isEditing = true
+    }
+
+    protected onChange(event: Event) {
+        const { value } = event.target as HTMLInputElement
+        this.value = value
+    }
+
+    protected dispatchChangedEvent(forced?: boolean) {
+        if (!this.position) {
+            console.debug('cell-updated event not fired due to missing position')
+            return
+        }
+
+        this.dispatchEvent(
+            new CellUpdateEvent({
+                position: this.position,
+                previousValue: this.originalValue,
+                value: this.value,
+            })
+        )
+    }
+
+    protected onBlur() {
+        this.isEditing = false
+        this.dispatchChangedEvent()
+    }
+
     render() {
         return this.isEditing
             ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
                   'w-full bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900': true,
-              })}></input>`
+              })} @blur=${this.onBlur}></input>`
             : html`<div
                   @dblclick="${this.onDoubleClick}"
                   class=${classMap({
