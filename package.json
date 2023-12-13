@@ -2,9 +2,12 @@
     "name": "starboard",
     "version": "0.0.1",
     "type": "module",
-    "main": "lit-dist/src/components/table",
-    "module": "lit-dist/src/components/table",
+    "main": "lit-dist/src/components/table/index.js",
+    "module": "lit-dist/src/components/table/index.js",
     "types": "lit-dist/src/components/table/index.d.ts",
+    "files": [
+        "lit-dist/*"
+    ],
     "scripts": {
         "dev": "pnpm print-welcome-msg; concurrently \"astro dev\" \"pnpm dev-tailwind --watch\"",
         "build": "pnpm print-welcome-msg; pnpm build-tailwind && astro check && astro build",
