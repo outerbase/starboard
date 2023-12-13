@@ -16,17 +16,17 @@ export class ColumnResizer extends ClassifiedElement {
     // but it's unclear whether updates to `.column` are reflected
     // the docs explicitly say it won't be observed, but it has been tested to definitely work on the initial render
     @property({ type: Object })
-    column?: TH
+    protected column?: TH
 
     private xPosition?: number
     private width?: number
 
-    override connectedCallback() {
+    public override connectedCallback() {
         super.connectedCallback()
         this.addEventListener('mousedown', this._mouseDown)
     }
 
-    override disconnectedCallback() {
+    public override disconnectedCallback() {
         super.disconnectedCallback()
         this.removeEventListener('mousedown', this._mouseDown)
     }
@@ -79,7 +79,7 @@ export class ColumnResizer extends ClassifiedElement {
         this.width = parseInt(window.getComputedStyle(this.column).width, 10)
     }
 
-    render() {
+    protected override render() {
         // the reason for nested div's here is to increase the click/draggable area while preserving a smaller visual element
         return html`
             <div class="z-10 absolute top-0 bottom-0 -right-[7px] cursor-col-resize w-4 group flex justify-center">

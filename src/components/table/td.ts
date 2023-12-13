@@ -30,24 +30,24 @@ export class TableData extends ClassifiedElement {
 
     // allows, for example, <outerbase-td max-width="max-w-xl" />
     @property({ type: String, attribute: 'max-width' })
-    maxWidth: string = ''
+    public maxWidth: string = ''
 
     // allows, for example, <outerbase-td separate-cells="true" />
     @property({ type: Boolean, attribute: 'separate-cells' })
-    separateCells: boolean = false
+    public separateCells: boolean = false
 
     // allows, for example, <outerbase-td bottom-border="true" />
     @property({ type: Boolean, attribute: 'bottom-border' })
-    withBottomBorder: boolean = false
+    public withBottomBorder: boolean = false
 
     @property({ type: Boolean, attribute: 'draw-right-border' })
     private _drawRightBorder = false
 
     @property({ type: String, attribute: 'sort-by' })
-    protected sortBy?: string
+    public sortBy?: string
 
     @property({ type: String, attribute: 'order-by' })
-    protected orderBy?: 'ascending' | 'descending'
+    public orderBy?: 'ascending' | 'descending'
 
     @property({ type: Boolean, attribute: 'odd' })
     protected isOdd?: boolean
@@ -55,7 +55,7 @@ export class TableData extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'no-text' })
     protected suppressNbsp = false
 
-    onKeyDown(event: KeyboardEvent) {
+    protected onKeyDown(event: KeyboardEvent) {
         // WARNING: the input's onBlur will NOT called
 
         if (event.code === 'Escape') {
@@ -76,19 +76,19 @@ export class TableData extends ClassifiedElement {
 
     // this cell's _current_ value
     @property({ type: String })
-    value?: string
+    public value?: string
 
     // the cell's row & column index
     @property({ type: Object })
-    position?: Position
+    public position?: Position
 
     @state()
-    originalValue?: string
+    public originalValue?: string
 
     @state()
-    isEditing = false
+    public isEditing = false
 
-    override updated(changedProps: PropertyValues<this>) {
+    protected override updated(changedProps: PropertyValues<this>) {
         super.updated(changedProps)
 
         if (changedProps.has('isEditing') && this.isEditing) {
@@ -100,7 +100,7 @@ export class TableData extends ClassifiedElement {
         }
     }
 
-    override willUpdate(changedProperties: PropertyValues<this>) {
+    protected override willUpdate(changedProperties: PropertyValues<this>) {
         super.willUpdate(changedProperties)
 
         // set initial `originalValue`
@@ -140,7 +140,7 @@ export class TableData extends ClassifiedElement {
         this.dispatchChangedEvent()
     }
 
-    render() {
+    protected render() {
         return this.isEditing
             ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
                   'w-full bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900': true,

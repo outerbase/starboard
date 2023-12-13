@@ -27,13 +27,13 @@ export class TableRow extends ClassifiedElement {
     }
 
     @property({ type: Boolean, attribute: 'header', reflect: true })
-    isHeaderRow: boolean = false
+    protected isHeaderRow: boolean = false
 
     @property({ type: Boolean, attribute: 'selected' })
-    selected: boolean = false
+    public selected: boolean = false
 
     @property({ type: Boolean, attribute: 'dirty' })
-    dirty = false
+    public dirty = false
 
     @state()
     hasRenderedOnce = false

@@ -7,6 +7,7 @@ import classMapToClassName from '../lib/class-map-to-class-name'
 // is propogated to the DOM and therefore it's CSS is applied
 export class ClassifiedElement extends LitElement {
     @property({ reflect: true, attribute: 'class', type: String })
+    // @ts-ignore: Unused variable warning -- `class` is implicitly used by the browser
     private _class = ''
 
     // classMap is a pairing of class(es) (a string) with a boolean expression
@@ -28,7 +29,7 @@ export class ClassifiedElement extends LitElement {
     // but our component itself is being rendered,
     // and it's appearance/style is provided by each component's `get _componentsInitialClassAttribute() {}` override
     // i.e. `table` vs `table-row-group` vs `table-cell` vs ...etc...
-    render() {
+    protected render() {
         return html`<slot></slot>`
     }
 }

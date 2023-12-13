@@ -29,7 +29,7 @@ export class Table extends ClassifiedElement {
     private columnResizerEnabled = false
 
     @state()
-    resizeObserver?: ResizeObserver
+    private resizeObserver?: ResizeObserver
 
     @state()
     protected columns: Columns = []
@@ -38,34 +38,34 @@ export class Table extends ClassifiedElement {
     protected rows: Rows = []
 
     @property({ type: Object, attribute: 'data' })
-    data?: Queryd
+    protected data?: Queryd
 
     // fetch data from Outerbase when `sourceId` changes
     @property({ type: String, attribute: 'source-id' })
-    sourceId?: string
+    protected sourceId?: string
 
     @property({ type: String, attribute: 'auth-token' })
-    authToken?: string
+    protected authToken?: string
 
     @property({ type: Boolean, attribute: 'selectable-rows' })
-    selectableRows = false
+    protected selectableRows = false
 
     @property({ type: String, attribute: 'keyboard-shortcuts' })
-    kbShortcuts: boolean = false
+    protected kbShortcuts: boolean = false
 
     @property({ type: Object })
-    schema?: Schema
+    protected schema?: Schema
 
     @state()
-    selectedRowIndices: Set<number> = new Set<number>()
+    protected selectedRowIndices: Set<number> = new Set<number>()
 
     @state()
-    removedRowIndices: Set<number> = new Set<number>()
+    protected removedRowIndices: Set<number> = new Set<number>()
 
     @state()
-    dirtyRowIndices: Set<number> = new Set()
+    protected dirtyRowIndices: Set<number> = new Set()
 
-    override connectedCallback() {
+    public override connectedCallback() {
         super.connectedCallback()
         // without this `setTimeout`, then a client-side-only Table updates properly but SSR'd tables do NOT
         setTimeout(() => (this.columnResizerEnabled = true), 0)
@@ -76,7 +76,7 @@ export class Table extends ClassifiedElement {
         this.resizeObserver.observe(this)
     }
 
-    override disconnectedCallback() {
+    public override disconnectedCallback() {
         super.disconnectedCallback()
         this.resizeObserver?.disconnect()
 
@@ -90,7 +90,7 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
         // when `data` changes, update `rows` and `columns`
@@ -119,22 +119,15 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    toggleSelected(idx: number) {
-        const _set = this.selectedRowIndices
-        if (_set.has(idx)) _set.delete(idx)
-        else _set.add(idx)
-        this.requestUpdate('selectedRowIndices')
-    }
-
-    onColumnResizeStart(_event: Event) {
+    protected onColumnResizeStart(_event: Event) {
         document.body.classList.add('select-none')
     }
 
-    onColumnResizeEnd(_event: Event) {
+    protected onColumnResizeEnd(_event: Event) {
         document.body.classList.remove('select-none')
     }
 
-    onColumnRemoved({ name }: ColumnRemovedEvent) {
+    private onColumnRemoved({ name }: ColumnRemovedEvent) {
         // TODO @johnny this event isn't propogating when using SSR w/Hydration
 
         // find the index of the column and remove it
@@ -153,8 +146,8 @@ export class Table extends ClassifiedElement {
         this.rows = this.rows.map((row) => row.filter((_value, idx) => index !== idx))
     }
 
-    onKeyDown_bound?: ({ shiftKey, key }: KeyboardEvent) => void
-    onKeyDown({ shiftKey, key }: KeyboardEvent) {
+    protected onKeyDown_bound?: ({ shiftKey, key }: KeyboardEvent) => void
+    protected onKeyDown({ shiftKey, key }: KeyboardEvent) {
         if (!shiftKey) return
 
         // create column
@@ -189,8 +182,15 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    onRowSelection() {
+    protected onRowSelection() {
         this.dispatchEvent(new RowSelectionEvent(Array.from(this.selectedRowIndices).map((index) => ({ index, row: this.rows[index] }))))
+    }
+
+    public toggleSelected(idx: number) {
+        const _set = this.selectedRowIndices
+        if (_set.has(idx)) _set.delete(idx)
+        else _set.add(idx)
+        this.requestUpdate('selectedRowIndices')
     }
 
     public clearSelection() {
@@ -203,7 +203,7 @@ export class Table extends ClassifiedElement {
         })
     }
 
-    render() {
+    protected override render() {
         // WARNING `overflow-hidden` breaks the stickyness of the header
         // 'overflow-hidden' is necessary to prevent the ColumnResizer from going beyond the table.
         // because the Resizer stays in place as you scroll down the page
@@ -300,5 +300,11 @@ export class Table extends ClassifiedElement {
                 )}
             </outerbase-rowgroup>
         </div>`
+    }
+}
+
+declare global {
+    interface HTMLElementTagNameMap {
+        'outerbase-table': Table
     }
 }

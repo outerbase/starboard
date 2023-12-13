@@ -4,7 +4,7 @@ import { ClassifiedElement } from '../classified-element'
 // tl;dr <tbody/>, table-row-group
 @customElement('outerbase-rowgroup')
 export class TBody extends ClassifiedElement {
-    protected get classMap() {
+    protected override get classMap() {
         return { 'table-row-group': true }
     }
 }

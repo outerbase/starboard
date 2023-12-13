@@ -26,18 +26,18 @@ export class TH extends ClassifiedElement {
     }
 
     @property({ attribute: 'table-height', type: Number })
-    tableHeight?: number
+    public tableHeight?: number
 
     @property({ attribute: 'with-resizer', type: Boolean })
-    withResizer = false
+    public withResizer = false
 
     @property({ attribute: 'is-last', type: Boolean })
-    isLastColumn = false
+    protected isLastColumn = false
 
     @property({ attribute: 'name', type: String })
-    name = ''
+    public name = ''
 
-    removeColumn() {
+    protected removeColumn() {
         this.dispatchEvent(
             new ColumnRemovedEvent({
                 name: this.name,
@@ -45,7 +45,7 @@ export class TH extends ClassifiedElement {
         )
     }
 
-    render() {
+    protected override render() {
         const deleteBtn = this.name
             ? html`<span
                   class="h-5 w-5 pl-1.5 hover:bg-red-50 dark:hover:bg-red-950 rounded-full text-red-400 dark:text-red-900 hover:text-red-700 active:text-red-500 dark:active:text-red-600 cursor-pointer"
