@@ -25,7 +25,7 @@
         "@types/yargs": "^17.0.32",
         "@webcomponents/template-shadowroot": "^0.2.1",
         "astro": "^4.0.4",
-        "lit": "^2.7.0",
+        "lit": "^2.8.0",
         "tailwindcss": "^3.3.6",
         "typescript": "^5.3.3",
         "yargs": "^17.7.2"
