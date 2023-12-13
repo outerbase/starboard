@@ -13,7 +13,7 @@ export class TableData extends ClassifiedElement {
     static override styles = TWStyles
     protected override get classMap() {
         return {
-            'table-cell px-cell-padding-x py-cell-padding-y relative': true,
+            'table-cell relative py-cell-padding-y': true,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
 
@@ -118,6 +118,16 @@ export class TableData extends ClassifiedElement {
         this.dispatchChangedEvent()
     }
 
+    public override connectedCallback() {
+        super.connectedCallback()
+        this.addEventListener('dblclick', this.onDoubleClick)
+    }
+
+    public override disconnectedCallback() {
+        super.disconnectedCallback()
+        this.removeEventListener('dblclick', this.onDoubleClick)
+    }
+
     protected override updated(changedProps: PropertyValues<this>) {
         super.updated(changedProps)
 
@@ -143,17 +153,17 @@ export class TableData extends ClassifiedElement {
     protected override render() {
         return this.isEditing
             ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
-                  'w-full bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900': true,
+                  'absolute top-0 bottom-0 right-0 left-0 bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900':
+                      true,
               })} @blur=${this.onBlur}></input>`
             : html`<div
-                  @dblclick="${this.onDoubleClick}"
                   class=${classMap({
                       'whitespace-nowrap text-ellipsis overflow-hidden max-w-[400px]': true,
                       'min-w-[200px]': (this.value?.length ?? 0) > 0,
                   })}
               >
                   <!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
-                  ${this.suppressNbsp ? null : this.value || html`&nbsp;`}
+                  <span class="px-cell-padding-x">${this.suppressNbsp ? null : this.value || html`&nbsp;`}</span>
                   <slot></slot>
               </div>`
     }
