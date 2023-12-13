@@ -12,7 +12,6 @@ import { ColumnRemovedEvent } from '../../lib/events'
 @customElement('outerbase-th')
 export class TH extends ClassifiedElement {
     static styles = TWStyles
-
     protected override get classMap() {
         return {
             'table-cell h-full relative whitespace-nowrap': true,
@@ -31,19 +30,11 @@ export class TH extends ClassifiedElement {
     @property({ attribute: 'with-resizer', type: Boolean })
     public withResizer = false
 
-    @property({ attribute: 'is-last', type: Boolean })
-    protected isLastColumn = false
-
     @property({ attribute: 'name', type: String })
     public name = ''
 
-    protected removeColumn() {
-        this.dispatchEvent(
-            new ColumnRemovedEvent({
-                name: this.name,
-            })
-        )
-    }
+    @property({ attribute: 'is-last', type: Boolean })
+    protected isLastColumn = false
 
     protected override render() {
         const deleteBtn = this.name
@@ -62,5 +53,13 @@ export class TH extends ClassifiedElement {
                   ${body}
                   <column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer>`
             : html`<slot></slot>${body}`
+    }
+
+    protected removeColumn() {
+        this.dispatchEvent(
+            new ColumnRemovedEvent({
+                name: this.name,
+            })
+        )
     }
 }

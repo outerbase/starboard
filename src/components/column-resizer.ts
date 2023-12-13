@@ -21,24 +21,6 @@ export class ColumnResizer extends ClassifiedElement {
     private xPosition?: number
     private width?: number
 
-    public override connectedCallback() {
-        super.connectedCallback()
-        this.addEventListener('mousedown', this._mouseDown)
-    }
-
-    public override disconnectedCallback() {
-        super.disconnectedCallback()
-        this.removeEventListener('mousedown', this._mouseDown)
-    }
-
-    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        super.willUpdate(_changedProperties)
-
-        if (_changedProperties.has('height')) {
-            // document.documentElement.style.setProperty('--table-height', `${this.height}px`)
-        }
-    }
-
     private _mouseDown(e: MouseEvent) {
         if (!this.column) throw new Error('`column` is unset; aborting')
 
@@ -77,6 +59,24 @@ export class ColumnResizer extends ClassifiedElement {
 
         this.xPosition = e.clientX
         this.width = parseInt(window.getComputedStyle(this.column).width, 10)
+    }
+
+    public override connectedCallback() {
+        super.connectedCallback()
+        this.addEventListener('mousedown', this._mouseDown)
+    }
+
+    public override disconnectedCallback() {
+        super.disconnectedCallback()
+        this.removeEventListener('mousedown', this._mouseDown)
+    }
+
+    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.willUpdate(_changedProperties)
+
+        if (_changedProperties.has('height')) {
+            // document.documentElement.style.setProperty('--table-height', `${this.height}px`)
+        }
     }
 
     protected override render() {

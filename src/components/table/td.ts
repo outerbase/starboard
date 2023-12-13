@@ -40,8 +40,13 @@ export class TableData extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'bottom-border' })
     public withBottomBorder: boolean = false
 
-    @property({ type: Boolean, attribute: 'draw-right-border' })
-    private _drawRightBorder = false
+    // this cell's _current_ value
+    @property({ type: String })
+    public value?: string
+
+    // the cell's row & column index
+    @property({ type: Object })
+    public position?: Position
 
     @property({ type: String, attribute: 'sort-by' })
     public sortBy?: string
@@ -54,6 +59,15 @@ export class TableData extends ClassifiedElement {
 
     @property({ type: Boolean, attribute: 'no-text' })
     protected suppressNbsp = false
+
+    @property({ type: Boolean, attribute: 'draw-right-border' })
+    private _drawRightBorder = false
+
+    @state()
+    public originalValue?: string
+
+    @state()
+    public isEditing = false
 
     protected onKeyDown(event: KeyboardEvent) {
         // WARNING: the input's onBlur will NOT called
@@ -71,42 +85,6 @@ export class TableData extends ClassifiedElement {
             // commit changes [by doing nothing]
             this.isEditing = false
             this.dispatchChangedEvent()
-        }
-    }
-
-    // this cell's _current_ value
-    @property({ type: String })
-    public value?: string
-
-    // the cell's row & column index
-    @property({ type: Object })
-    public position?: Position
-
-    @state()
-    public originalValue?: string
-
-    @state()
-    public isEditing = false
-
-    protected override updated(changedProps: PropertyValues<this>) {
-        super.updated(changedProps)
-
-        if (changedProps.has('isEditing') && this.isEditing) {
-            // focus and select text
-            const input = this.shadowRoot?.querySelector('input')
-            if (input) {
-                input.select()
-            }
-        }
-    }
-
-    protected override willUpdate(changedProperties: PropertyValues<this>) {
-        super.willUpdate(changedProperties)
-
-        // set initial `originalValue`
-        // this is done here instead of, say, connectedCallback() because of a quirk with SSR
-        if (changedProperties.has('value') && this.originalValue === undefined) {
-            this.originalValue = this.value
         }
     }
 
@@ -140,7 +118,29 @@ export class TableData extends ClassifiedElement {
         this.dispatchChangedEvent()
     }
 
-    protected render() {
+    protected override updated(changedProps: PropertyValues<this>) {
+        super.updated(changedProps)
+
+        if (changedProps.has('isEditing') && this.isEditing) {
+            // focus and select text
+            const input = this.shadowRoot?.querySelector('input')
+            if (input) {
+                input.select()
+            }
+        }
+    }
+
+    protected override willUpdate(changedProperties: PropertyValues<this>) {
+        super.willUpdate(changedProperties)
+
+        // set initial `originalValue`
+        // this is done here instead of, say, connectedCallback() because of a quirk with SSR
+        if (changedProperties.has('value') && this.originalValue === undefined) {
+            this.originalValue = this.value
+        }
+    }
+
+    protected override render() {
         return this.isEditing
             ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
                   'w-full bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900': true,

@@ -65,6 +65,23 @@ export class Table extends ClassifiedElement {
     @state()
     protected dirtyRowIndices: Set<number> = new Set()
 
+    public toggleSelected(idx: number) {
+        const _set = this.selectedRowIndices
+        if (_set.has(idx)) _set.delete(idx)
+        else _set.add(idx)
+        this.requestUpdate('selectedRowIndices')
+    }
+
+    public clearSelection() {
+        this.selectedRowIndices = new Set()
+        this.removedRowIndices = new Set()
+
+        this.shadowRoot?.querySelectorAll<HTMLInputElement>('.row-select-checkbox').forEach((checkbox) => {
+            checkbox.checked = false
+            checkbox.dispatchEvent(new Event('change'))
+        })
+    }
+
     protected onColumnResizeStart(_event: Event) {
         document.body.classList.add('select-none')
     }
@@ -130,23 +147,6 @@ export class Table extends ClassifiedElement {
 
     protected onRowSelection() {
         this.dispatchEvent(new RowSelectionEvent(Array.from(this.selectedRowIndices).map((index) => ({ index, row: this.rows[index] }))))
-    }
-
-    public toggleSelected(idx: number) {
-        const _set = this.selectedRowIndices
-        if (_set.has(idx)) _set.delete(idx)
-        else _set.add(idx)
-        this.requestUpdate('selectedRowIndices')
-    }
-
-    public clearSelection() {
-        this.selectedRowIndices = new Set()
-        this.removedRowIndices = new Set()
-
-        this.shadowRoot?.querySelectorAll<HTMLInputElement>('.row-select-checkbox').forEach((checkbox) => {
-            checkbox.checked = false
-            checkbox.dispatchEvent(new Event('change'))
-        })
     }
 
     public override connectedCallback() {
