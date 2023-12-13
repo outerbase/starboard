@@ -10,7 +10,8 @@
     const parent = undefined
     const global = undefined
     const globalThis = undefined
-    // TODO ensure all scary globals are shadowed
+
+    window, document, localStorage, sessionStorage, self, parent, global, globalThis // no-op to suppress typescript errors (@ts-nocheck/ignore not working)
 
     // UNPRIVLEDGED CODE GOES HERE
 }).call({})

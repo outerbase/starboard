@@ -60,7 +60,7 @@ export class ColumnResizer extends ClassifiedElement {
             // TODO make the table wider?
         }
 
-        const _mouseUp = (e: Event) => {
+        const _mouseUp = (_e: Event) => {
             document.removeEventListener('mouseup', _mouseUp)
             document.removeEventListener('mousemove', _mouseMove)
 

@@ -120,7 +120,7 @@ export class TableData extends ClassifiedElement {
         this.value = value
     }
 
-    protected dispatchChangedEvent(forced?: boolean) {
+    protected dispatchChangedEvent() {
         if (!this.position) {
             console.debug('cell-updated event not fired due to missing position')
             return

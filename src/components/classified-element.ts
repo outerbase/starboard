@@ -7,7 +7,6 @@ import classMapToClassName from '../lib/class-map-to-class-name'
 // is propogated to the DOM and therefore it's CSS is applied
 export class ClassifiedElement extends LitElement {
     @property({ reflect: true, attribute: 'class', type: String })
-    // @ts-ignore: Unused variable warning -- `class` is implicitly used by the browser
     private _class = ''
 
     // classMap is a pairing of class(es) (a string) with a boolean expression
@@ -23,6 +22,7 @@ export class ClassifiedElement extends LitElement {
 
         // ensure `_class` reflects our latest state
         this._class = classMapToClassName(this.classMap)
+        this._class // no-op line suppress the "hint" warning us that this is unused :eyeroll:
     }
 
     // this render() looks like it does next-to-nothing,
