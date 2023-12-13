@@ -1,14 +1,19 @@
 {
     "name": "starboard",
-    "type": "module",
     "version": "0.0.1",
+    "type": "module",
+    "main": "lit-dist/src/components/table",
+    "module": "lit-dist/src/components/table",
+    "types": "lit-dist/src/components/table/index.d.ts",
     "scripts": {
         "dev": "pnpm print-welcome-msg; concurrently \"astro dev\" \"pnpm dev-tailwind --watch\"",
         "build": "pnpm print-welcome-msg; pnpm build-tailwind && astro check && astro build",
+        "build:lit": "pnpm build-tailwind && tsc -p tsconfig.distribute.json",
         "preview": "astro preview",
-        "dev-tailwind": "concurrently \"tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css --watch\" \"node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.js --watch\"",
-        "build-tailwind": "tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css && node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.js",
-        "print-welcome-msg": "node .welcome-message.js"
+        "dev-tailwind": "concurrently \"tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css --watch\" \"node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.ts --watch\"",
+        "build-tailwind": "tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css && node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.ts",
+        "print-welcome-msg": "node .welcome-message.js",
+        "prepack": "pnpm build:lit"
     },
     "dependencies": {
         "@astrojs/check": "^0.3.1",
