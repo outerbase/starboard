@@ -22,6 +22,25 @@ import { repeat } from 'lit/directives/repeat.js'
 export class Table extends ClassifiedElement {
     static override styles = TWStyles // necessary, or *nothing* is styled
 
+    @property({ type: Object, attribute: 'data' })
+    public data?: Queryd
+
+    @property({ type: Boolean, attribute: 'selectable-rows' })
+    public selectableRows = false
+
+    @property({ type: String, attribute: 'keyboard-shortcuts' })
+    public keyboardShortcuts: boolean = false
+
+    @property({ type: Object, attribute: 'schema' })
+    public schema?: Schema
+
+    // fetch data from Outerbase when `sourceId` changes
+    @property({ type: String, attribute: 'source-id' })
+    protected sourceId?: string
+
+    @property({ type: String, attribute: 'auth-token' })
+    protected authToken?: string
+
     @state()
     private _height?: number
 
@@ -37,25 +56,6 @@ export class Table extends ClassifiedElement {
     @state()
     protected rows: Rows = []
 
-    @property({ type: Object, attribute: 'data' })
-    protected data?: Queryd
-
-    // fetch data from Outerbase when `sourceId` changes
-    @property({ type: String, attribute: 'source-id' })
-    protected sourceId?: string
-
-    @property({ type: String, attribute: 'auth-token' })
-    protected authToken?: string
-
-    @property({ type: Boolean, attribute: 'selectable-rows' })
-    protected selectableRows = false
-
-    @property({ type: String, attribute: 'keyboard-shortcuts' })
-    protected kbShortcuts: boolean = false
-
-    @property({ type: Object })
-    protected schema?: Schema
-
     @state()
     protected selectedRowIndices: Set<number> = new Set<number>()
 
@@ -64,60 +64,6 @@ export class Table extends ClassifiedElement {
 
     @state()
     protected dirtyRowIndices: Set<number> = new Set()
-
-    public override connectedCallback() {
-        super.connectedCallback()
-        // without this `setTimeout`, then a client-side-only Table updates properly but SSR'd tables do NOT
-        setTimeout(() => (this.columnResizerEnabled = true), 0)
-
-        this.resizeObserver = new ResizeObserver((_entries) => {
-            this._height = heightOfElement(_entries[0]?.target)
-        })
-        this.resizeObserver.observe(this)
-    }
-
-    public override disconnectedCallback() {
-        super.disconnectedCallback()
-        this.resizeObserver?.disconnect()
-
-        if (this.onKeyDown_bound) document.removeEventListener('keydown', this.onKeyDown_bound)
-    }
-
-    protected override firstUpdated(_changedProperties: PropertyValueMap<this>): void {
-        if (this.kbShortcuts) {
-            this.onKeyDown_bound = this.onKeyDown.bind(this)
-            document.addEventListener('keydown', this.onKeyDown_bound)
-        }
-    }
-
-    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        super.willUpdate(_changedProperties)
-
-        // when `data` changes, update `rows` and `columns`
-        if (_changedProperties.has('data')) {
-            if (this.data && this.data.rows?.length > 0) {
-                this.columns = this.data.rows?.[0] ? Object.keys(this.data.rows?.[0]) : []
-                this.rows = this.data.rows.map((row) => Object.values(row))
-                this.dirtyRowIndices = new Set()
-                this.selectedRowIndices = new Set()
-                this.removedRowIndices = new Set()
-            }
-        }
-
-        // Note: if both `data` and `source-id` are passed to `<outerbase-component />`
-        //       then it will initially render with the provided data but immediately fetch data for the provided `source-id`
-        if (_changedProperties.has('sourceId')) {
-            if (!this.authToken) throw new Error('Unable to fetch data without `auth-token`')
-
-            const previousSourceId = _changedProperties.get('sourceId')
-            if (this.sourceId && this.sourceId !== previousSourceId) {
-                console.debug(`sourceId changed from ${previousSourceId} to ${this.sourceId}; fetching new data`)
-                dbRowsForSource(this.sourceId, this.authToken).then((data) => {
-                    this.data = data
-                })
-            }
-        }
-    }
 
     protected onColumnResizeStart(_event: Event) {
         document.body.classList.add('select-none')
@@ -201,6 +147,62 @@ export class Table extends ClassifiedElement {
             checkbox.checked = false
             checkbox.dispatchEvent(new Event('change'))
         })
+    }
+
+    public override connectedCallback() {
+        super.connectedCallback()
+        // without this `setTimeout`, then a client-side-only Table updates properly but SSR'd tables do NOT
+        setTimeout(() => (this.columnResizerEnabled = true), 0)
+
+        this.resizeObserver = new ResizeObserver((_entries) => {
+            this._height = heightOfElement(_entries[0]?.target)
+        })
+        this.resizeObserver.observe(this)
+    }
+
+    public override disconnectedCallback() {
+        super.disconnectedCallback()
+        this.resizeObserver?.disconnect()
+
+        if (this.onKeyDown_bound) {
+            document.removeEventListener('keydown', this.onKeyDown_bound)
+        }
+    }
+
+    protected override firstUpdated(_changedProperties: PropertyValueMap<this>): void {
+        if (this.keyboardShortcuts) {
+            this.onKeyDown_bound = this.onKeyDown.bind(this)
+            document.addEventListener('keydown', this.onKeyDown_bound)
+        }
+    }
+
+    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.willUpdate(_changedProperties)
+
+        // when `data` changes, update `rows` and `columns`
+        if (_changedProperties.has('data')) {
+            if (this.data && this.data.rows?.length > 0) {
+                this.columns = this.data.rows?.[0] ? Object.keys(this.data.rows?.[0]) : []
+                this.rows = this.data.rows.map((row) => Object.values(row))
+                this.dirtyRowIndices = new Set()
+                this.selectedRowIndices = new Set()
+                this.removedRowIndices = new Set()
+            }
+        }
+
+        // Note: if both `data` and `source-id` are passed to `<outerbase-component />`
+        //       then it will initially render with the provided data but immediately fetch data for the provided `source-id`
+        if (_changedProperties.has('sourceId')) {
+            if (!this.authToken) throw new Error('Unable to fetch data without `auth-token`')
+
+            const previousSourceId = _changedProperties.get('sourceId')
+            if (this.sourceId && this.sourceId !== previousSourceId) {
+                console.debug(`sourceId changed from ${previousSourceId} to ${this.sourceId}; fetching new data`)
+                dbRowsForSource(this.sourceId, this.authToken).then((data) => {
+                    this.data = data
+                })
+            }
+        }
     }
 
     protected override render() {
