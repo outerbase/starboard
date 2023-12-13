@@ -22,6 +22,7 @@
         "@astrojs/check": "^0.3.2",
         "@astrojs/lit": "^3.0.3",
         "@astrojs/tailwind": "^5.0.3",
+        "@types/yargs": "^17.0.32",
         "@webcomponents/template-shadowroot": "^0.2.1",
         "astro": "^4.0.4",
         "lit": "^2.7.0",
