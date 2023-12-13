@@ -1,15 +1,13 @@
-import { customElement, property, state } from 'lit/decorators.js'
-import { html, type PropertyValues } from 'lit'
+import { customElement, property } from 'lit/decorators.js'
+import { html } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
 
-import { ClassifiedElement } from '../classified-element'
-import type { Position } from '../../types'
 import { TWStyles } from '../../../tailwind'
-import { CellUpdateEvent } from '../../lib/events'
+import { MutableElement } from '../mutable-element'
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
-export class TableData extends ClassifiedElement {
+export class TableData extends MutableElement {
     static override styles = TWStyles
     protected override get classMap() {
         return {
@@ -40,14 +38,6 @@ export class TableData extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'bottom-border' })
     public withBottomBorder: boolean = false
 
-    // this cell's _current_ value
-    @property({ type: String })
-    public value?: string
-
-    // the cell's row & column index
-    @property({ type: Object })
-    public position?: Position
-
     @property({ type: String, attribute: 'sort-by' })
     public sortBy?: string
 
@@ -63,97 +53,10 @@ export class TableData extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'draw-right-border' })
     private _drawRightBorder = false
 
-    @state()
-    public originalValue?: string
-
-    @state()
-    public isEditing = false
-
-    protected onKeyDown(event: KeyboardEvent) {
-        // WARNING: the input's onBlur will NOT called
-
-        if (event.code === 'Escape') {
-            // abort changes
-            this.value = this.originalValue
-            delete this.originalValue
-
-            this.isEditing = false
-            this.dispatchChangedEvent()
-        }
-
-        if (event.code === 'Enter' || event.code === 'Tab') {
-            // commit changes [by doing nothing]
-            this.isEditing = false
-            this.dispatchChangedEvent()
-        }
-    }
-
-    protected onDoubleClick() {
-        if (this.value === undefined) return
-        this.isEditing = true
-    }
-
-    protected onChange(event: Event) {
-        const { value } = event.target as HTMLInputElement
-        this.value = value
-    }
-
-    protected dispatchChangedEvent() {
-        if (!this.position) {
-            console.debug('cell-updated event not fired due to missing position')
-            return
-        }
-
-        this.dispatchEvent(
-            new CellUpdateEvent({
-                position: this.position,
-                previousValue: this.originalValue,
-                value: this.value,
-            })
-        )
-    }
-
-    protected onBlur() {
-        this.isEditing = false
-        this.dispatchChangedEvent()
-    }
-
-    public override connectedCallback() {
-        super.connectedCallback()
-        this.addEventListener('dblclick', this.onDoubleClick)
-    }
-
-    public override disconnectedCallback() {
-        super.disconnectedCallback()
-        this.removeEventListener('dblclick', this.onDoubleClick)
-    }
-
-    protected override updated(changedProps: PropertyValues<this>) {
-        super.updated(changedProps)
-
-        if (changedProps.has('isEditing') && this.isEditing) {
-            // focus and select text
-            const input = this.shadowRoot?.querySelector('input')
-            if (input) {
-                input.select()
-            }
-        }
-    }
-
-    protected override willUpdate(changedProperties: PropertyValues<this>) {
-        super.willUpdate(changedProperties)
-
-        // set initial `originalValue`
-        // this is done here instead of, say, connectedCallback() because of a quirk with SSR
-        if (changedProperties.has('value') && this.originalValue === undefined) {
-            this.originalValue = this.value
-        }
-    }
-
     protected override render() {
         return this.isEditing
             ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
-                  'absolute top-0 bottom-0 right-0 left-0 bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900':
+                  'z-10 absolute top-0 bottom-0 right-0 left-0 bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900':
                       true,
               })} @blur=${this.onBlur}></input>`
             : html`<div

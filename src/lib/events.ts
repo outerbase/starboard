@@ -35,6 +35,12 @@ export class ColumnAddedEvent extends ColumnEvent {
     }
 }
 
+export class ColumnRenameEvent extends ColumnEvent {
+    constructor(attr: ColumnAttributes) {
+        super('column-renamed', attr)
+    }
+}
+
 export class ColumnRemovedEvent extends ColumnEvent {
     constructor(attr: ColumnAttributes) {
         super('column-removed', attr)

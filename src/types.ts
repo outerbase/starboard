@@ -16,7 +16,8 @@ export type Queryd = {
 // <td />:
 export type Position = Record<'column' | 'row', number>
 export type CellDetail = {
-    position: Position
+    label?: string
+    position?: Position
     previousValue?: ColumnType
     value?: ColumnType
 }

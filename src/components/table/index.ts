@@ -233,19 +233,23 @@ export class Table extends ClassifiedElement {
 
                     <!-- render an TableHeader for each column -->
                     <!-- TODO this isn't yielding anything when SSR w/o hydration -->
-                    ${map(this.columns, (k, idx) => {
-                        // omit column resizer on the last column because it's sort-of awkward
-                        return html`<outerbase-th
-                            @column-removed=${this.onColumnRemoved}
-                            @resize-start=${this.onColumnResizeStart}
-                            @resize-end=${this.onColumnResizeEnd}
-                            table-height=${ifDefined(this._height)}
-                            ?with-resizer=${this.columnResizerEnabled}
-                            ?is-last=${idx === this.columns.length - 1}
-                            .name="${k}"
-                        >
-                        </outerbase-th>`
-                    })}
+                    ${repeat(
+                        this.columns,
+                        (name, idx) => name,
+                        (k, idx) => {
+                            // omit column resizer on the last column because it's sort-of awkward
+                            return html`<outerbase-th
+                                @column-removed=${this.onColumnRemoved}
+                                @resize-start=${this.onColumnResizeStart}
+                                @resize-end=${this.onColumnResizeEnd}
+                                table-height=${ifDefined(this._height)}
+                                ?with-resizer=${this.columnResizerEnabled}
+                                ?is-last=${idx === this.columns.length - 1}
+                                name="${k}"
+                            >
+                            </outerbase-th>`
+                        }
+                    )}
                 </outerbase-tr>
             </outerbase-thead>
 
