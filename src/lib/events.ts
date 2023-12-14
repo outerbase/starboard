@@ -86,3 +86,14 @@ export class RowSelectionEvent extends RowsEvent {
         super('row-selected', attrs)
     }
 }
+
+//  MENUS
+
+export class MenuSelectionEvent extends BubblyEvent {
+    value: string
+
+    constructor(value: string) {
+        super('menu-selection')
+        this.value = value
+    }
+}
