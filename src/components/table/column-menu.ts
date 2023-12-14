@@ -18,16 +18,16 @@ export class ColumnMenu extends ClassifiedElement {
     }
 
     @property({ type: Boolean, attribute: 'open' })
-    open = false
+    public open = false
 
     @property({ type: String, attribute: 'selection' })
-    selection?: string
+    public selection?: string
 
     @property({ type: Array, attribute: 'options' })
-    options: Array<Record<'label' | 'value' | 'classes', string>> = []
+    public options: Array<Record<'label' | 'value' | 'classes', string>> = []
 
     @state()
-    focused?: string
+    protected focused?: string
 
     protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.updated(_changedProperties)
@@ -38,18 +38,18 @@ export class ColumnMenu extends ClassifiedElement {
         }
     }
 
-    onTrigger(_event: MouseEvent) {
+    protected onTrigger(_event: MouseEvent) {
         this.open = !this.open
     }
 
-    onItemClick(event: MouseEvent) {
+    protected onItemClick(event: MouseEvent) {
         const el = event.target as HTMLUListElement
         const value = el.getAttribute('data-value')
         if (!value) throw new Error("onItemClick didn't recover a selection value")
         this.onSelection(value)
     }
 
-    onSelection(value: string) {
+    protected onSelection(value: string) {
         const selectionEvent = new MenuSelectionEvent(value)
         this.selection = value
         this.dispatchEvent(selectionEvent)
