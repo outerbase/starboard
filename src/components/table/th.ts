@@ -1,13 +1,14 @@
 import { html, type PropertyValueMap } from 'lit'
-import { customElement, property, state } from 'lit/decorators.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
+import { customElement, property, state } from 'lit/decorators.js'
 
 // import subcomponents
 import '../column-resizer'
 import { TWStyles } from '../../../tailwind'
 import { MutableElement } from '../mutable-element'
-import { ColumnRemovedEvent, ColumnRenameEvent } from '../../lib/events'
+import { CaretDown } from '../../lib/icons/caret-down'
 import { classMap } from 'lit/directives/class-map.js'
+import { ColumnRemovedEvent, ColumnRenameEvent } from '../../lib/events'
 
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
@@ -35,6 +36,9 @@ export class TH extends MutableElement {
     @property({ attribute: 'name', type: String })
     public override value = ''
 
+    @property({ type: Boolean, attribute: 'blank' })
+    public blank = false
+
     @property({ attribute: 'is-last', type: Boolean })
     protected isLastColumn = false
 
@@ -51,27 +55,37 @@ export class TH extends MutableElement {
     }
 
     protected override render() {
-        const deleteBtn = this.removable
-            ? html`<span
-                  class="h-5 w-5 pl-1.5 hover:bg-red-50 dark:hover:bg-red-950 rounded-full text-red-400 dark:text-red-900 hover:text-red-700 active:text-red-500 dark:active:text-red-600 cursor-pointer"
-                  @click=${this.removeColumn}
-                  >x</span
-              >`
-            : null
+        // const deleteBtn = this.removable
+        //     ? html`<span
+        //           class="h-5 w-5 pl-1.5 hover:bg-red-50 dark:hover:bg-red-950 rounded-full text-red-400 dark:text-red-900 hover:text-red-700 active:text-red-500 dark:active:text-red-600 cursor-pointer"
+        //           @click=${this.removeColumn}
+        //           >x</span
+        //       >`
+        //     : null
+        // if (this.blank) {
+        //     return html`<slot></slot>`
+        // }
 
-        const body = this.isEditing
-            ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
-                  'z-10 absolute top-0 bottom-0 right-0 left-0 bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900':
-                      true,
-              })} @blur=${this.onBlur}></input>`
-            : html`<span class="flex items-center justify-between">${this.value} ${deleteBtn}</span>`
+        if (this.blank) {
+            // an element to preserve the right-border
+            return html`
+                <div class="absolute top-0 bottom-0 right-0 left-0 border-r border-theme-border dark:border-theme-border-dark"></div>
+            `
+        } else {
+            const body = this.isEditing
+                ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
+                      'z-10 absolute top-0 bottom-0 right-0 left-0 bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900':
+                          true,
+                  })} @blur=${this.onBlur}></input>`
+                : html`<span class="flex items-center justify-between">${this.value} ${CaretDown(16)}</span>`
 
-        // TODO `delete` is appearing when SSR w/o hydration; it shouldn't since there's no JS available to click it
-        return this.withResizer
-            ? html`<slot></slot>
-                  ${body}
-                  <column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer>`
-            : html`<slot></slot>${body}`
+            // TODO `delete` is appearing when SSR w/o hydration; it shouldn't since there's no JS available to click it
+            return this.withResizer
+                ? html`<slot></slot>
+                      ${body}
+                      <column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer>`
+                : html`<slot></slot>${body}`
+        }
     }
 
     protected dispatchChangedEvent() {

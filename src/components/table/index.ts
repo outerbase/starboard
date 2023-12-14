@@ -228,6 +228,7 @@ export class Table extends ClassifiedElement {
                               table-height=${ifDefined(this._height)}
                               ?with-resizer=${this.columnResizerEnabled}
                               ?is-last=${0 < this.columns.length}
+                              ?blank=${true}
                           /></outerbase-th>`
                         : null}
 
