@@ -5,6 +5,6 @@ import { ClassifiedElement } from '../classified-element'
 @customElement('outerbase-thead')
 export class THead extends ClassifiedElement {
     protected override get classMap() {
-        return { 'table-header-group font-bold sticky top-0': true }
+        return { 'table-header-group font-bold sticky z-10 top-0': true }
     }
 }
