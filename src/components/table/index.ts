@@ -245,6 +245,7 @@ export class Table extends ClassifiedElement {
                                 table-height=${ifDefined(this._height)}
                                 ?with-resizer=${this.columnResizerEnabled}
                                 ?is-last=${idx === this.columns.length - 1}
+                                ?removable=${true}
                                 name="${k}"
                             >
                             </outerbase-th>`

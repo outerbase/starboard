@@ -1,5 +1,5 @@
-import { html } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
+import { html, type PropertyValueMap } from 'lit'
+import { customElement, property, state } from 'lit/decorators.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
 
 // import subcomponents
@@ -38,8 +38,20 @@ export class TH extends MutableElement {
     @property({ attribute: 'is-last', type: Boolean })
     protected isLastColumn = false
 
+    // defer `removable`ity initially to prevent it form being rendered during SSR
+    @property({ type: Boolean, attribute: 'removable' })
+    private _removableAttr = false
+
+    @state()
+    removable = false
+
+    protected override firstUpdated(_changedProperties: PropertyValueMap<this> | Map<PropertyKey, unknown>): void {
+        super.firstUpdated(_changedProperties)
+        if (this._removableAttr) this.removable = this._removableAttr
+    }
+
     protected override render() {
-        const deleteBtn = this.value
+        const deleteBtn = this.removable
             ? html`<span
                   class="h-5 w-5 pl-1.5 hover:bg-red-50 dark:hover:bg-red-950 rounded-full text-red-400 dark:text-red-900 hover:text-red-700 active:text-red-500 dark:active:text-red-600 cursor-pointer"
                   @click=${this.removeColumn}
