@@ -1,4 +1,4 @@
-import { html, type PropertyValueMap } from 'lit'
+import { html, type PropertyValueMap, type PropertyValues } from 'lit'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
@@ -6,9 +6,9 @@ import { customElement, property, state } from 'lit/decorators.js'
 import '../column-resizer'
 import { TWStyles } from '../../../tailwind'
 import { MutableElement } from '../mutable-element'
-import { CaretDown } from '../../lib/icons/caret-down'
 import { classMap } from 'lit/directives/class-map.js'
-import { ColumnRemovedEvent, ColumnRenameEvent } from '../../lib/events'
+import { ColumnRemovedEvent, ColumnRenameEvent, ColumnUpdatedEvent, MenuSelectionEvent } from '../../lib/events'
+import './column-menu' // <outerbase-th-menu />
 
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
@@ -21,6 +21,7 @@ export class TH extends MutableElement {
             'first:border-l border-b border-t border-theme-border dark:border-theme-border-dark': true,
             'px-cell-padding-x py-cell-padding-y pr-2': true,
             'bg-theme-column dark:bg-theme-column-dark': true,
+            'select-none': this.hasMenu,
             // prevent double borders
             'first:border-l': this.withResizer, // omit regular border
             'border-l': !this.withResizer, // use regular border
@@ -42,29 +43,51 @@ export class TH extends MutableElement {
     @property({ attribute: 'is-last', type: Boolean })
     protected isLastColumn = false
 
-    // defer `removable`ity initially to prevent it form being rendered during SSR
-    @property({ type: Boolean, attribute: 'removable' })
-    private _removableAttr = false
+    @state()
+    hasMenu = false
 
     @state()
-    removable = false
+    menuIsOpen = false
 
-    protected override firstUpdated(_changedProperties: PropertyValueMap<this> | Map<PropertyKey, unknown>): void {
-        super.firstUpdated(_changedProperties)
-        if (this._removableAttr) this.removable = this._removableAttr
+    protected firstUpdated(changedProperties: PropertyValues<this>): void {
+        super.firstUpdated(changedProperties)
+
+        // delay including menu for cases where JS isn't included / SSR-only
+        setTimeout(() => {
+            if (!this.hasMenu) this.hasMenu = true
+        }, 0)
     }
 
     protected override render() {
-        // const deleteBtn = this.removable
-        //     ? html`<span
-        //           class="h-5 w-5 pl-1.5 hover:bg-red-50 dark:hover:bg-red-950 rounded-full text-red-400 dark:text-red-900 hover:text-red-700 active:text-red-500 dark:active:text-red-600 cursor-pointer"
-        //           @click=${this.removeColumn}
-        //           >x</span
-        //       >`
-        //     : null
-        // if (this.blank) {
-        //     return html`<slot></slot>`
-        // }
+        const options = [
+            {
+                label: 'Sort A-Z',
+                value: 'sort:alphabetical:ascending',
+            },
+            {
+                label: 'Sort Z-A',
+                value: 'sort:alphabetical:descending',
+            },
+            // TODO @johnny implement nested menus to support this
+            // {
+            //     label: 'Plugins',
+            //     value: 'plugins',
+            //     // value: html`<div class="bg-yellow-50 w-8 h-8>submenu</div>`,
+            // },
+            {
+                label: 'Hide Column',
+                value: 'hide',
+            },
+            {
+                label: 'Rename Column',
+                value: 'rename',
+            },
+            {
+                label: 'Delete Column',
+                value: 'delete',
+                classes: 'text-red-700 dark:text-red-300 hover:text-red-500',
+            },
+        ]
 
         if (this.blank) {
             // an element to preserve the right-border
@@ -77,7 +100,11 @@ export class TH extends MutableElement {
                       'z-10 absolute top-0 bottom-0 right-0 left-0 bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900':
                           true,
                   })} @blur=${this.onBlur}></input>`
-                : html`<span class="flex items-center justify-between">${this.value} ${CaretDown(16)}</span>`
+                : this.hasMenu
+                  ? html`<outerbase-th-menu .options=${options} @menu-selection=${this.onMenuSelection} ?aria-expanded=${this.menuIsOpen}
+                        >${this.value}</outerbase-th-menu
+                    >`
+                  : html`<span>${this.value}</span>`
 
             // TODO `delete` is appearing when SSR w/o hydration; it shouldn't since there's no JS available to click it
             return this.withResizer
@@ -89,7 +116,8 @@ export class TH extends MutableElement {
     }
 
     protected dispatchChangedEvent() {
-        if (!this.originalValue) throw new Error('misisng OG value')
+        if (!this.originalValue) throw new Error('missing OG value')
+
         this.dispatchEvent(
             new ColumnRenameEvent({
                 name: this.originalValue,
@@ -99,12 +127,38 @@ export class TH extends MutableElement {
     }
 
     protected removeColumn() {
-        if (!this.originalValue) throw new Error('misisng OG value')
+        if (!this.originalValue) throw new Error('missing OG value')
 
         this.dispatchEvent(
             new ColumnRemovedEvent({
                 name: this.originalValue,
             })
         )
+    }
+
+    onMenuSelection(event: MenuSelectionEvent) {
+        event.stopPropagation()
+        let dispatchColumnUpdateEvent = false
+
+        switch (event.value) {
+            case 'hide':
+                return this.removeColumn()
+            case 'rename':
+                return (this.isEditing = true)
+            case 'delete':
+                return this.removeColumn()
+            default:
+                // intentionally let other (e.g. sorting) events pass-through to parent
+                dispatchColumnUpdateEvent = true
+        }
+
+        if (dispatchColumnUpdateEvent) {
+            this.dispatchEvent(
+                new ColumnUpdatedEvent({
+                    name: this.originalValue ?? this.value,
+                    data: { action: event.value },
+                })
+            )
+        }
     }
 }

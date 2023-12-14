@@ -22,6 +22,9 @@ export class MutableElement extends ClassifiedElement {
     @state()
     public originalValue?: string
 
+    private previousValue?: string
+    private valueBeforeEdit?: string
+
     @state()
     public isEditing = false
 
@@ -55,6 +58,18 @@ export class MutableElement extends ClassifiedElement {
         if (changedProperties.has('value') && this.originalValue === undefined) {
             this.originalValue = this.value
         }
+
+        // when editing starts, track it's initial value
+        if (changedProperties.has('isEditing') && this.isEditing) {
+            this.valueBeforeEdit = this.value
+        }
+
+        if (changedProperties.has('isEditing') && !this.isEditing && this.valueBeforeEdit) {
+            // console.log('valueBeforeEdit:', this.valueBeforeEdit)
+            // console.log('value:', this.value)
+            if (this.valueBeforeEdit !== this.value) this.dispatchChangedEvent()
+            delete this.valueBeforeEdit
+        }
     }
 
     protected onKeyDown(event: KeyboardEvent) {
@@ -65,17 +80,12 @@ export class MutableElement extends ClassifiedElement {
             this.isEditing = false
             this.dirty = false
             this.value = this.originalValue
-            delete this.originalValue
-
-            this.dispatchChangedEvent()
         }
 
         if (event.code === 'Enter' || event.code === 'Tab') {
             // commit changes [by doing nothing]
             this.isEditing = false
             this.dirty = this.value !== this.originalValue
-
-            this.dispatchChangedEvent()
         }
     }
 
@@ -86,6 +96,7 @@ export class MutableElement extends ClassifiedElement {
 
     protected onChange(event: Event) {
         const { value } = event.target as HTMLInputElement
+        this.previousValue = this.value
         this.value = value
         this.dirty = this.value !== this.originalValue
     }
@@ -94,8 +105,7 @@ export class MutableElement extends ClassifiedElement {
         this.dispatchEvent(
             new CellUpdateEvent({
                 position: this.position,
-                // TODO @johnny clarify whether this should be the OG value or previous keystroke
-                previousValue: this.originalValue,
+                previousValue: this.valueBeforeEdit ?? this.originalValue,
                 value: this.value,
                 label: this.label,
             })
@@ -104,6 +114,5 @@ export class MutableElement extends ClassifiedElement {
 
     protected onBlur() {
         this.isEditing = false
-        this.dispatchChangedEvent()
     }
 }

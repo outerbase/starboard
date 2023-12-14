@@ -283,6 +283,7 @@ export class Table extends ClassifiedElement {
                                                 type="checkbox"
                                                 ?checked="${this.selectedRowIndices.has(rowIdx)}"
                                                 @click="${() => this.toggleSelected(rowIdx)}"
+                                                tabindex="0"
                                             />
                                         </div>
                                     </outerbase-td>`
