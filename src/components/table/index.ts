@@ -235,7 +235,7 @@ export class Table extends ClassifiedElement {
                     <!-- TODO this isn't yielding anything when SSR w/o hydration -->
                     ${repeat(
                         this.columns,
-                        (name, idx) => name,
+                        (name, _idx) => name,
                         (k, idx) => {
                             // omit column resizer on the last column because it's sort-of awkward
                             return html`<outerbase-th
