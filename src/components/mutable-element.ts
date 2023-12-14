@@ -22,7 +22,6 @@ export class MutableElement extends ClassifiedElement {
     @state()
     public originalValue?: string
 
-    private previousValue?: string
     private valueBeforeEdit?: string
 
     @state()
@@ -96,7 +95,6 @@ export class MutableElement extends ClassifiedElement {
 
     protected onChange(event: Event) {
         const { value } = event.target as HTMLInputElement
-        this.previousValue = this.value
         this.value = value
         this.dirty = this.value !== this.originalValue
     }

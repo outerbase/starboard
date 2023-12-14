@@ -1,4 +1,4 @@
-import { html, type PropertyValueMap, type PropertyValues } from 'lit'
+import { html, type PropertyValues } from 'lit'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
