@@ -9,6 +9,7 @@ import { MutableElement } from '../mutable-element'
 import { classMap } from 'lit/directives/class-map.js'
 import { ColumnRemovedEvent, ColumnRenameEvent, ColumnUpdatedEvent, MenuSelectionEvent } from '../../lib/events'
 import './column-menu' // <outerbase-th-menu />
+import type { ColumnMenu } from './column-menu'
 
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
@@ -48,6 +49,16 @@ export class TH extends MutableElement {
 
     @state()
     menuIsOpen = false
+
+    public override connectedCallback(): void {
+        super.connectedCallback()
+        this.addEventListener('contextmenu', this.onContextMenu)
+    }
+
+    public override disconnectedCallback(): void {
+        super.disconnectedCallback
+        this.removeEventListener('contextmenu', this.onContextMenu)
+    }
 
     protected firstUpdated(changedProperties: PropertyValues<this>): void {
         super.firstUpdated(changedProperties)
@@ -136,7 +147,7 @@ export class TH extends MutableElement {
         )
     }
 
-    onMenuSelection(event: MenuSelectionEvent) {
+    protected onMenuSelection(event: MenuSelectionEvent) {
         event.stopPropagation()
         let dispatchColumnUpdateEvent = false
 
@@ -159,6 +170,15 @@ export class TH extends MutableElement {
                     data: { action: event.value },
                 })
             )
+        }
+    }
+
+    protected onContextMenu(event: MouseEvent) {
+        const menu = this.shadowRoot?.querySelector('outerbase-th-menu') as ColumnMenu | null
+        if (menu) {
+            event.preventDefault()
+            menu.focus()
+            menu.open = true
         }
     }
 }

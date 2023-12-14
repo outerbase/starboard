@@ -95,6 +95,11 @@ export class ColumnMenu extends ClassifiedElement {
         }
     }
 
+    public focus() {
+        const trigger = this.shadowRoot?.querySelector('#trigger') as HTMLElement | null
+        trigger?.focus()
+    }
+
     protected override render() {
         const menu = this.open
             ? html` <ul
@@ -123,19 +128,19 @@ export class ColumnMenu extends ClassifiedElement {
             : null
 
         // @dblclick here is to prevent the parent's dblclick from being triggered
-        const trigger = html`<span
-            @click=${this.onTrigger}
-            @dblclick=${(e: MouseEvent) => e.stopPropagation()}
-            @keydown=${this.onKeyDown}
-            class="relative hover:bg-blue-50 dark:hover:bg-blue-950 active:border-blue-100 dark:active:border-blue-900 p-0.5 rounded-full border border-transparent"
-            aria-haspopup="menu"
-            tabIndex="0"
-            >${CaretDown(16)}${menu}</span
-        >`
 
         return html`
             <slot></slot>
-            ${trigger}
+            <span
+                id="trigger"
+                @click=${this.onTrigger}
+                @dblclick=${(e: MouseEvent) => e.stopPropagation()}
+                @keydown=${this.onKeyDown}
+                class="relative hover:bg-blue-50 dark:hover:bg-blue-950 active:border-blue-100 dark:active:border-blue-900 p-0.5 rounded-full border border-transparent"
+                aria-haspopup="menu"
+                tabIndex="0"
+                >${CaretDown(16)}${menu}</span
+            >
         `
     }
 }
