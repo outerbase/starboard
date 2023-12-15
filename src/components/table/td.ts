@@ -26,7 +26,7 @@ export class TableData extends MutableElement {
             'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
             'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
-            'cursor-pointer': this.value !== undefined && !import.meta.env.SSR,
+            'cursor-pointer': this.isInteractive,
         }
     }
 
@@ -57,11 +57,11 @@ export class TableData extends MutableElement {
     @property({ type: Boolean, attribute: 'draw-right-border' })
     private _drawRightBorder = false
 
+    @property({ attribute: 'interactive', type: Boolean })
+    isInteractive = false
+
     @property({ type: Boolean, attribute: 'menu' })
     private hasMenu = false
-
-    @property({ attribute: 'selectable-text', type: Boolean })
-    selectableText = false
 
     @state()
     protected options = [
@@ -102,7 +102,7 @@ export class TableData extends MutableElement {
               : html`<!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
                     <outerbase-td-menu
                         ?menu=${this.hasMenu}
-                        ?selectable-text=${this.selectableText}
+                        ?selectable-text=${!this.isInteractive}
                         .options=${this.dirty
                             ? [
                                   ...this.options,

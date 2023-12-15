@@ -59,7 +59,7 @@ try {
             
             <h1 class="font-bold text-xl mt-8">SSR w/o Hydration</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
-            <OuterbaseTable data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN}></OuterbaseTable>
+            <OuterbaseTable data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} non-interactive></OuterbaseTable>
         </main>
     </body>
 </html>

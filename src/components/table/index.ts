@@ -250,6 +250,7 @@ export class Table extends ClassifiedElement {
                               ?dirty=${this.dirtyRowIndices.has(rowIdx)}
                               @on-selection=${this.onRowSelection}
                           >
+                              <!-- checkmark cell -->
                               ${this.selectableRows
                                   ? html`<outerbase-td
                                         ?separate-cells=${true}
@@ -286,6 +287,7 @@ export class Table extends ClassifiedElement {
                                           ?bottom-border=${true}
                                           ?menu=${!this.isNonInteractive}
                                           ?selectable-text=${this.isNonInteractive}
+                                          ?interactive=${!this.isNonInteractive}
                                           .value=${value}
                                           .position=${{ row: rowIdx, column: colIdx }}
                                           @cell-updated=${() => this.dispatchEvent(new RowUpdatedEvent({ index: rowIdx, row: rowValues }))}
