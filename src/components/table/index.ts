@@ -282,6 +282,7 @@ export class Table extends ClassifiedElement {
                                   rowValues,
                                   (_row, idx) => this.columns[idx], // use the column name as the unique identifier for each entry in this row
                                   (value, colIdx) => html`
+                                      <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
                                       <outerbase-td
                                           ?separate-cells=${true}
                                           ?draw-right-border=${true}
