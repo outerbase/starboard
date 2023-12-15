@@ -29,11 +29,11 @@ export class TableRow extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'header', reflect: true })
     protected isHeaderRow: boolean = false
 
-    @state()
-    private hasRenderedOnce = false
     protected override willUpdate(_changedProperties: PropertyValueMap<this>): void {
         super.willUpdate(_changedProperties)
-        if (_changedProperties.has('selected') && this.hasRenderedOnce) this.dispatchEvent(new Event('on-selection'))
-        if (!this.hasRenderedOnce) this.hasRenderedOnce = true
+
+        // dispatch event when row is selected/unselected
+        if (_changedProperties.has('selected') && _changedProperties.get('selected') !== undefined)
+            this.dispatchEvent(new Event('on-selection'))
     }
 }
