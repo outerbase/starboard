@@ -2,7 +2,8 @@
 
 import { LitElement, html, type PropertyValueMap } from 'lit'
 import { property } from 'lit/decorators.js'
-import classMapToClassName from '../lib/class-map-to-class-name'
+
+import classMapToClassName from '../lib/class-map-to-class-name.js'
 
 // is propogated to the DOM and therefore it's CSS is applied
 export class ClassifiedElement extends LitElement {

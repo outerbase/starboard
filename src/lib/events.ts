@@ -1,4 +1,5 @@
-import type { CellDetail, Data, Row } from '../types'
+import type { CellDetail, Data, Row } from '../types.js'
+
 type ColumnAttributes = { name: string; data?: Data }
 type RowAttributes = { index: number; row: Row }
 class BubblyEvent extends Event {

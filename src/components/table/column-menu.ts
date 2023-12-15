@@ -1,6 +1,6 @@
 import { customElement } from 'lit/decorators.js'
 
-import { Menu } from '../menu'
+import { Menu } from '../menu.js'
 
 @customElement('outerbase-th-menu')
 export class ColumnMenu extends Menu {

@@ -1,8 +1,9 @@
-import type { Position } from '../types'
 import type { PropertyValues } from 'lit'
-import { CellUpdateEvent } from '../lib/events'
+
+import type { Position } from '../types.js'
+import { CellUpdateEvent } from '../lib/events.js'
 import { property, state } from 'lit/decorators.js'
-import { ClassifiedElement } from './classified-element'
+import { ClassifiedElement } from './classified-element.js'
 
 export class MutableElement extends ClassifiedElement {
     // current value

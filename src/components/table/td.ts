@@ -2,12 +2,12 @@ import { html } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
-import { TWStyles } from '../../../tailwind'
-import { MutableElement } from '../mutable-element'
-import { CellUpdateEvent, type MenuSelectionEvent } from '../../lib/events'
+import { TWStyles } from '../../../tailwind/index.js'
+import { MutableElement } from '../mutable-element.js'
+import { CellUpdateEvent, type MenuSelectionEvent } from '../../lib/events.js'
 
-import './cell-menu' // <outerbase-td-menu />
-import type { CellMenu } from './cell-menu'
+import './cell-menu.js' // <outerbase-td-menu />
+import type { CellMenu } from './cell-menu.js'
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')

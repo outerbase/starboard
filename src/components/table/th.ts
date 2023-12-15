@@ -3,13 +3,13 @@ import { ifDefined } from 'lit/directives/if-defined.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
 // import subcomponents
-import '../column-resizer'
-import { TWStyles } from '../../../tailwind'
-import { MutableElement } from '../mutable-element'
+import '../column-resizer.js'
+import { TWStyles } from '../../../tailwind/index.js'
+import { MutableElement } from '../mutable-element.js'
 import { classMap } from 'lit/directives/class-map.js'
-import { ColumnRemovedEvent, ColumnRenameEvent, ColumnUpdatedEvent, MenuSelectionEvent } from '../../lib/events'
-import './column-menu' // <outerbase-th-menu />
-import type { ColumnMenu } from './column-menu'
+import { ColumnRemovedEvent, ColumnRenameEvent, ColumnUpdatedEvent, MenuSelectionEvent } from '../../lib/events.js'
+import './column-menu.js' // <outerbase-th-menu />
+import type { ColumnMenu } from './column-menu.js'
 
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')

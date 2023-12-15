@@ -4,19 +4,26 @@ import { html, type PropertyValueMap } from 'lit'
 import { repeat } from 'lit/directives/repeat.js'
 import { map } from 'lit/directives/map.js'
 
-import { ColumnAddedEvent, ColumnRemovedEvent, RowAddedEvent, RowRemovedEvent, RowSelectionEvent, RowUpdatedEvent } from '../../lib/events'
-import type { Queryd, Columns, Rows, Schema } from '../../types'
-import { heightOfElement } from '../../lib/height-of-element'
-import dbRowsForSource from '../../lib/rows-for-source-id'
-import { ClassifiedElement } from '../classified-element'
-import { TWStyles } from '../../../tailwind'
+import {
+    ColumnAddedEvent,
+    ColumnRemovedEvent,
+    RowAddedEvent,
+    RowRemovedEvent,
+    RowSelectionEvent,
+    RowUpdatedEvent,
+} from '../../lib/events.js'
+import type { Queryd, Columns, Rows, Schema } from '../../types.js'
+import { heightOfElement } from '../../lib/height-of-element.js'
+import dbRowsForSource from '../../lib/rows-for-source-id.js'
+import { ClassifiedElement } from '../classified-element.js'
+import { TWStyles } from '../../../tailwind/index.js'
 
 // import subcomponents
-import './tbody'
-import './td'
-import './th'
-import './thead'
-import './tr'
+import './tbody.js'
+import './td.js'
+import './th.js'
+import './thead.js'
+import './tr.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
