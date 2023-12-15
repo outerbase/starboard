@@ -18,11 +18,11 @@ export class TH extends MutableElement {
     protected override get classMap() {
         return {
             'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
-            'bg-yellow-100 dark:bg-yellow-900': this.dirty,
             'first:border-l border-b border-t border-theme-border dark:border-theme-border-dark': true,
             'px-cell-padding-x py-cell-padding-y': true,
             'bg-theme-column dark:bg-theme-column-dark': true,
-            'select-none': this.hasMenu,
+            'bg-yellow-100 dark:bg-yellow-900': this.dirty,
+            'select-none': this.hasMenu, // this is really about handling SSR without hydration; TODO use a better flag?
             // prevent double borders
             'border-r': !this.withResizer, // use regular border
             'cursor-pointer': this.value !== undefined && !import.meta.env.SSR,
