@@ -26,11 +26,33 @@ export class Menu extends ClassifiedElement {
     @state()
     protected focused?: string
 
+    // for closing menus when an ousside click occurs
+    private outsideClicker: ((event: MouseEvent) => void) | undefined
+    private activeEvent: MouseEvent | undefined
+
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
-        if (_changedProperties.has('open') && this.open) this.setAttribute('aria-expanded', '')
-        else if (_changedProperties.has('open') && !this.open) this.removeAttribute('aria-expanded')
+        // when the menu is being opened
+        if (_changedProperties.has('open') && this.open) {
+            this.setAttribute('aria-expanded', '')
+            this.outsideClicker = (event: MouseEvent) => {
+                if (event !== this.activeEvent) {
+                    this.open = false
+                    delete this.activeEvent
+                    if (this.outsideClicker) document.removeEventListener('click', this.outsideClicker)
+                }
+            }
+            document.addEventListener('click', this.outsideClicker)
+        }
+        // when the menu is being closed
+        else if (_changedProperties.has('open') && !this.open) {
+            this.removeAttribute('aria-expanded')
+            if (this.outsideClicker) {
+                delete this.activeEvent
+                document.removeEventListener('click', this.outsideClicker)
+            }
+        }
     }
 
     protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -42,8 +64,9 @@ export class Menu extends ClassifiedElement {
         }
     }
 
-    protected onTrigger(_event: MouseEvent) {
+    protected onTrigger(event: MouseEvent) {
         this.open = !this.open
+        this.activeEvent = event
     }
 
     protected onItemClick(event: MouseEvent) {
