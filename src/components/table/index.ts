@@ -146,8 +146,6 @@ export class Table extends ClassifiedElement {
 
     public override connectedCallback() {
         super.connectedCallback()
-        // without this `setTimeout`, then a client-side-only Table updates properly but SSR'd tables do NOT
-        setTimeout(() => (this.columnResizerEnabled = true), 0)
 
         this.resizeObserver = new ResizeObserver((_entries) => {
             this._height = heightOfElement(_entries[0]?.target)
@@ -219,7 +217,6 @@ export class Table extends ClassifiedElement {
                     ${this.selectableRows
                         ? html`<outerbase-th
                               table-height=${ifDefined(this._height)}
-                              ?with-resizer=${this.columnResizerEnabled}
                               ?is-last=${0 < this.columns.length}
                               ?blank=${true}
                           /></outerbase-th>`
@@ -235,11 +232,11 @@ export class Table extends ClassifiedElement {
                             return html`<outerbase-th
                                 @column-removed=${this.onColumnRemoved}
                                 table-height=${ifDefined(this._height)}
-                                ?with-resizer=${this.columnResizerEnabled}
+                                ?menu=${!this.isNonInteractive}
+                                ?with-resizer=${!this.isNonInteractive}
                                 ?is-last=${idx === this.columns.length - 1}
                                 ?removable=${true}
                                 name="${k}"
-                                ?menu=${!this.isNonInteractive}
                             >
                             </outerbase-th>`
                         }
