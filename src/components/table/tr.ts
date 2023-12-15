@@ -15,22 +15,16 @@ export class TableRow extends ClassifiedElement {
 
             // when not a header AND not selected
             'odd:bg-theme-row-odd dark:odd:bg-theme-row-odd-dark even:bg-theme-row-even dark:even:bg-theme-row-even-dark hover:bg-theme-row-hover dark:hover:bg-theme-row-hover-dark':
-                !this.isHeaderRow && !this.selected && !this.dirty,
+                !this.isHeaderRow && !this.selected,
 
             // when selected
             'bg-theme-row-selected dark:bg-theme-row-selected-dark hover:bg-theme-row-selected-hover dark:hover:bg-theme-row-selected-hover-dark':
                 this.selected,
-
-            // when dirty
-            'bg-yellow-50 dark:bg-yellow-950 hover:bg-yellow-100 hover:dark:bg-yellow-900': this.dirty,
         }
     }
 
     @property({ type: Boolean, attribute: 'selected' })
     public selected: boolean = false
-
-    @property({ type: Boolean, attribute: 'dirty' })
-    public dirty = false
 
     @property({ type: Boolean, attribute: 'header', reflect: true })
     protected isHeaderRow: boolean = false
