@@ -25,7 +25,7 @@ export class TH extends MutableElement {
             'select-none': this.hasMenu, // this is really about handling SSR without hydration; TODO use a better flag?
             // prevent double borders
             'border-r': !this.withResizer, // use regular border
-            'cursor-pointer': this.value !== undefined && !import.meta.env.SSR && !this.blank,
+            'cursor-pointer': this.isInteractive,
         }
     }
 
@@ -46,6 +46,9 @@ export class TH extends MutableElement {
 
     @property({ attribute: 'menu', type: Boolean })
     hasMenu = false
+
+    @property({ attribute: 'interactive', type: Boolean })
+    isInteractive = false
 
     @state()
     options: Array<{ label: string | TemplateResult<1>; value: string; classes?: string }> = [

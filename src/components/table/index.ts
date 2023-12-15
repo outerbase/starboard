@@ -233,6 +233,7 @@ export class Table extends ClassifiedElement {
                                 ?with-resizer=${!this.isNonInteractive}
                                 ?is-last=${idx === this.columns.length - 1}
                                 ?removable=${true}
+                                ?interactive=${!this.isNonInteractive}
                                 name="${k}"
                             >
                             </outerbase-th>`
