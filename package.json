@@ -11,7 +11,7 @@
     "scripts": {
         "dev": "pnpm print-welcome-msg; concurrently \"astro dev\" \"pnpm dev-tailwind --watch\"",
         "build": "pnpm print-welcome-msg; pnpm build-tailwind && astro check && astro build",
-        "build:lit": "pnpm build-tailwind && tsc -p tsconfig.distribute.json",
+        "build:lit": "rm -r ./lit-dist && pnpm build-tailwind && tsc -p tsconfig.distribute.json",
         "preview": "astro preview",
         "dev-tailwind": "concurrently \"tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css --watch\" \"node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.ts --watch\"",
         "build-tailwind": "tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css && node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.ts",
