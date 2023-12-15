@@ -25,7 +25,7 @@ export class TableData extends MutableElement {
             'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
             'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
-            'cursor-pointer': this.value !== undefined,
+            'cursor-pointer': this.value !== undefined && !import.meta.env.SSR,
         }
     }
 

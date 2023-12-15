@@ -1,5 +1,5 @@
-import { html } from 'lit'
-import { customElement } from 'lit/decorators.js'
+import { html, type PropertyValues } from 'lit'
+import { customElement, state } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
 
 import { Menu } from '../menu'
@@ -10,14 +10,27 @@ export class CellMenu extends Menu {
         return {
             'relative flex items-center justify-between': true,
             'px-cell-padding-x select-none': true,
+            'select-none': !import.meta.env.SSR,
         }
+    }
+
+    @state()
+    hasMenu = false
+
+    protected firstUpdated(changedProperties: PropertyValues<this>): void {
+        super.firstUpdated(changedProperties)
+
+        // delay including menu for cases where JS isn't included / SSR-only
+        setTimeout(() => {
+            if (!this.hasMenu) this.hasMenu = true
+        }, 0)
     }
 
     protected override render() {
         // @click shows/hides the menu
         // @dblclick prevents parent's dblclick
         // @keydown navigates the menu
-
+        const trigger = this.hasMenu ? html`<span class="font-bold hover:text-blue-500">{}</span>` : null
         return html`
             <span
                 class=${classMap({
@@ -34,8 +47,7 @@ export class CellMenu extends Menu {
                 @dblclick=${(e: MouseEvent) => e.stopPropagation()}
                 @keydown=${this.onKeyDown}
             >
-                <span class="font-bold hover:text-blue-500">{}</span>
-                ${this.listElement}</span
+                ${trigger} ${this.listElement}</span
             >
         `
     }
