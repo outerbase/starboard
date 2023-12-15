@@ -26,6 +26,7 @@ export class TH extends MutableElement {
             // prevent double borders
             'first:border-l': this.withResizer, // omit regular border
             'border-l': !this.withResizer, // use regular border
+            'cursor-pointer': this.value !== undefined && !import.meta.env.SSR,
         }
     }
 
