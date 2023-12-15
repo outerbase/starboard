@@ -60,6 +60,9 @@ export class TableData extends MutableElement {
     @property({ type: Boolean, attribute: 'menu' })
     private hasMenu = false
 
+    @property({ attribute: 'selectable-text', type: Boolean })
+    selectableText = false
+
     @state()
     protected options = [
         { label: 'Edit', value: 'edit' },
@@ -99,6 +102,7 @@ export class TableData extends MutableElement {
               : html`<!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
                     <outerbase-td-menu
                         ?menu=${this.hasMenu}
+                        ?selectable-text=${this.selectableText}
                         .options=${this.dirty
                             ? [
                                   ...this.options,

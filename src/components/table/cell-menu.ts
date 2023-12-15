@@ -9,12 +9,15 @@ export class CellMenu extends Menu {
     protected override get classMap() {
         return {
             'relative flex items-center justify-between px-cell-padding-x gap-2': true,
-            'select-none': !import.meta.env.SSR,
+            'select-none': !this.selectableText,
         }
     }
 
     @property({ attribute: 'menu', type: Boolean })
     hasMenu = false
+
+    @property({ attribute: 'selectable-text', type: Boolean })
+    selectableText = false
 
     protected override render() {
         // @click shows/hides the menu

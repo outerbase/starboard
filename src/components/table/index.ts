@@ -255,12 +255,12 @@ export class Table extends ClassifiedElement {
                                         ?separate-cells=${true}
                                         ?draw-right-border=${true}
                                         ?bottom-border=${true}
+                                        ?blank=${true}
                                         .position=${{
                                             row: -1,
                                             column: -1,
                                         }}
                                         .type=${null}
-                                        ?blank=${true}
                                     >
                                         <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
                                         <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
@@ -285,6 +285,7 @@ export class Table extends ClassifiedElement {
                                           ?draw-right-border=${true}
                                           ?bottom-border=${true}
                                           ?menu=${!this.isNonInteractive}
+                                          ?selectable-text=${this.isNonInteractive}
                                           .value=${value}
                                           .position=${{ row: rowIdx, column: colIdx }}
                                           @cell-updated=${() => this.dispatchEvent(new RowUpdatedEvent({ index: rowIdx, row: rowValues }))}
