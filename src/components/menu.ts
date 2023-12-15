@@ -9,7 +9,7 @@ import { ClassifiedElement } from './classified-element'
 import classMapToClassName from '../lib/class-map-to-class-name'
 
 export class Menu extends ClassifiedElement {
-    static styles = TWStyles
+    static override styles = TWStyles
     protected override get classMap() {
         return {}
     }
@@ -55,7 +55,7 @@ export class Menu extends ClassifiedElement {
         }
     }
 
-    protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.updated(_changedProperties)
 
         // when closing
@@ -83,21 +83,16 @@ export class Menu extends ClassifiedElement {
     }
 
     protected onKeyDown(event: KeyboardEvent) {
-        console.log(event)
         const { code } = event
 
         if (code === 'Escape') {
-            return (this.open = false)
-        }
-
-        if (code === 'Space' || code === 'Enter') {
+            this.open = false
+        } else if (code === 'Space' || code === 'Enter') {
             event.preventDefault()
             this.open = !this.open
 
             if (!this.open && this.focused) this.onSelection(this.focused)
-        }
-
-        if (code === 'ArrowDown' || code === 'ArrowRight') {
+        } else if (code === 'ArrowDown' || code === 'ArrowRight') {
             event.preventDefault()
             if (!this.focused) this.focused = this.options[0]?.value
             else {
@@ -105,9 +100,7 @@ export class Menu extends ClassifiedElement {
                 if (idx > -1 && idx < this.options.length - 1) this.focused = this.options[idx + 1].value
                 else if (idx === this.options.length - 1) this.focused = this.options[0].value
             }
-        }
-
-        if (code === 'ArrowUp' || code === 'ArrowLeft') {
+        } else if (code === 'ArrowUp' || code === 'ArrowLeft') {
             event.preventDefault()
             if (!this.focused) this.focused = this.options[this.options.length - 1]?.value
             else {
@@ -115,15 +108,13 @@ export class Menu extends ClassifiedElement {
                 if (idx > 0) this.focused = this.options[idx - 1].value
                 else if (idx === 0) this.focused = this.options[this.options.length - 1].value
             }
-        }
-
-        // prevent tabbing focus away from an open menu
-        if (code === 'Tab') {
+        } else if (code === 'Tab') {
+            // prevent tabbing focus away from an open menu
             if (this.open) event.preventDefault()
         }
     }
 
-    public focus() {
+    public override focus() {
         const trigger = this.shadowRoot?.querySelector('#trigger') as HTMLElement | null
         trigger?.focus()
     }

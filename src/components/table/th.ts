@@ -14,7 +14,7 @@ import type { ColumnMenu } from './column-menu'
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
 export class TH extends MutableElement {
-    static styles = TWStyles
+    static override styles = TWStyles
     protected override get classMap() {
         return {
             'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
@@ -123,7 +123,7 @@ export class TH extends MutableElement {
         }
     }
 
-    protected dispatchChangedEvent() {
+    protected override dispatchChangedEvent() {
         if (!this.originalValue) throw new Error('missing OG value')
 
         this.dispatchEvent(
