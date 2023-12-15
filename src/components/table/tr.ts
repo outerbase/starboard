@@ -1,4 +1,4 @@
-import { customElement, property, state } from 'lit/decorators.js'
+import { customElement, property } from 'lit/decorators.js'
 import type { PropertyValueMap } from 'lit'
 
 import { ClassifiedElement } from '../classified-element'

@@ -1,11 +1,12 @@
-import { customElement, property, state } from 'lit/decorators.js'
 import { html } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
+import { customElement, property, state } from 'lit/decorators.js'
 
 import { TWStyles } from '../../../tailwind'
 import { MutableElement } from '../mutable-element'
-import './cell-menu' // <outerbase-td-menu />
 import { CellUpdateEvent, type MenuSelectionEvent } from '../../lib/events'
+
+import './cell-menu' // <outerbase-td-menu />
 import type { CellMenu } from './cell-menu'
 
 // tl;dr <td/>, table-cell

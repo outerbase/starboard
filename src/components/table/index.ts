@@ -1,6 +1,7 @@
 import { customElement, property, state } from 'lit/decorators.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { html, type PropertyValueMap } from 'lit'
+import { repeat } from 'lit/directives/repeat.js'
 import { map } from 'lit/directives/map.js'
 
 import { ColumnAddedEvent, ColumnRemovedEvent, RowAddedEvent, RowRemovedEvent, RowSelectionEvent, RowUpdatedEvent } from '../../lib/events'
@@ -16,7 +17,6 @@ import './td'
 import './th'
 import './thead'
 import './tr'
-import { repeat } from 'lit/directives/repeat.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -46,9 +46,6 @@ export class Table extends ClassifiedElement {
 
     @state()
     private _height?: number
-
-    @state()
-    private columnResizerEnabled = false
 
     @state()
     private resizeObserver?: ResizeObserver

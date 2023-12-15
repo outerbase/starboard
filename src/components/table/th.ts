@@ -1,4 +1,4 @@
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { html, type TemplateResult } from 'lit'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
