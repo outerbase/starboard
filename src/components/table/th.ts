@@ -20,7 +20,7 @@ export class TH extends MutableElement {
             'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
             'bg-yellow-100 dark:bg-yellow-900': this.dirty,
             'first:border-l border-b border-t border-theme-border dark:border-theme-border-dark': true,
-            'px-cell-padding-x py-cell-padding-y pr-2': true,
+            'px-cell-padding-x py-cell-padding-y': true,
             'bg-theme-column dark:bg-theme-column-dark': true,
             'select-none': this.hasMenu,
             // prevent double borders
@@ -48,7 +48,35 @@ export class TH extends MutableElement {
     hasMenu = false
 
     @state()
-    menuIsOpen = false
+    options = [
+        {
+            label: 'Sort A-Z',
+            value: 'sort:alphabetical:ascending',
+        },
+        {
+            label: 'Sort Z-A',
+            value: 'sort:alphabetical:descending',
+        },
+        // TODO @johnny implement nested menus to support this
+        // {
+        //     label: 'Plugins',
+        //     value: 'plugins',
+        //     // value: html`<div class="bg-yellow-50 w-8 h-8>submenu</div>`,
+        // },
+        {
+            label: 'Hide Column',
+            value: 'hide',
+        },
+        {
+            label: 'Rename Column',
+            value: 'rename',
+        },
+        {
+            label: 'Delete Column',
+            value: 'delete',
+            classes: 'text-red-700 dark:text-red-300 hover:text-red-500',
+        },
+    ]
 
     public override connectedCallback(): void {
         super.connectedCallback()
@@ -70,36 +98,6 @@ export class TH extends MutableElement {
     }
 
     protected override render() {
-        const options = [
-            {
-                label: 'Sort A-Z',
-                value: 'sort:alphabetical:ascending',
-            },
-            {
-                label: 'Sort Z-A',
-                value: 'sort:alphabetical:descending',
-            },
-            // TODO @johnny implement nested menus to support this
-            // {
-            //     label: 'Plugins',
-            //     value: 'plugins',
-            //     // value: html`<div class="bg-yellow-50 w-8 h-8>submenu</div>`,
-            // },
-            {
-                label: 'Hide Column',
-                value: 'hide',
-            },
-            {
-                label: 'Rename Column',
-                value: 'rename',
-            },
-            {
-                label: 'Delete Column',
-                value: 'delete',
-                classes: 'text-red-700 dark:text-red-300 hover:text-red-500',
-            },
-        ]
-
         if (this.blank) {
             // an element to preserve the right-border
             return html`
@@ -112,12 +110,11 @@ export class TH extends MutableElement {
                           true,
                   })} @blur=${this.onBlur}></input>`
                 : this.hasMenu
-                  ? html`<outerbase-th-menu .options=${options} @menu-selection=${this.onMenuSelection} ?aria-expanded=${this.menuIsOpen}
+                  ? html`<outerbase-th-menu .options=${this.options} @menu-selection=${this.onMenuSelection}
                         >${this.value}</outerbase-th-menu
                     >`
                   : html`<span>${this.value}</span>`
 
-            // TODO `delete` is appearing when SSR w/o hydration; it shouldn't since there's no JS available to click it
             return this.withResizer
                 ? html`<slot></slot>
                       ${body}

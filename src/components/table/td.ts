@@ -1,9 +1,12 @@
-import { customElement, property } from 'lit/decorators.js'
+import { customElement, property, state } from 'lit/decorators.js'
 import { html } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
 
 import { TWStyles } from '../../../tailwind'
 import { MutableElement } from '../mutable-element'
+import './cell-menu' // <outerbase-td-menu />
+import { CellUpdateEvent, type MenuSelectionEvent } from '../../lib/events'
+import type { CellMenu } from './cell-menu'
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
@@ -44,14 +47,42 @@ export class TableData extends MutableElement {
     @property({ type: String, attribute: 'order-by' })
     public orderBy?: 'ascending' | 'descending'
 
+    @property({ type: Boolean, attribute: 'blank' })
+    public blank = false
+
     @property({ type: Boolean, attribute: 'odd' })
     protected isOdd?: boolean
 
-    @property({ type: Boolean, attribute: 'no-text' })
-    protected suppressNbsp = false
-
     @property({ type: Boolean, attribute: 'draw-right-border' })
     private _drawRightBorder = false
+
+    @state()
+    protected options = [
+        { label: 'Edit', value: 'edit' },
+        { label: 'Edit as JSON', value: 'edit:json' },
+        { label: 'Copy', value: 'copy' },
+        { label: 'Clear', value: 'clear' },
+        { label: 'Reset', value: 'reset' },
+    ]
+
+    protected onContextMenu(event: MouseEvent) {
+        const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
+        if (menu) {
+            event.preventDefault()
+            menu.focus()
+            menu.open = true
+        }
+    }
+
+    public override connectedCallback(): void {
+        super.connectedCallback()
+        this.addEventListener('contextmenu', this.onContextMenu)
+    }
+
+    public override disconnectedCallback(): void {
+        super.disconnectedCallback()
+        this.removeEventListener('contextmenu', this.onContextMenu)
+    }
 
     protected override render() {
         return this.isEditing
@@ -59,15 +90,42 @@ export class TableData extends MutableElement {
                   'z-10 absolute top-0 bottom-0 right-0 left-0 bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900':
                       true,
               })} @blur=${this.onBlur}></input>`
-            : html`<div
-                  class=${classMap({
-                      'whitespace-nowrap text-ellipsis overflow-hidden max-w-[400px]': true,
-                      'min-w-[200px]': (this.value?.length ?? 0) > 0,
-                  })}
-              >
-                  <!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
-                  <span class="px-cell-padding-x">${this.suppressNbsp ? null : this.value || html`&nbsp;`}</span>
-                  <slot></slot>
-              </div>`
+            : this.blank
+              ? html`<slot></slot>`
+              : html`<!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
+                    <outerbase-td-menu .options=${this.options} @menu-selection=${this.onMenuSelection}
+                        >${this.value || html`&nbsp;`}</outerbase-td-menu
+                    >`
+    }
+
+    protected onMenuSelection(event: MenuSelectionEvent) {
+        console.debug('onMenuSelection:', event.value)
+
+        switch (event.value) {
+            case 'edit':
+                return (this.isEditing = true)
+            case 'edit:json':
+                return console.warn('TODO @johnny implement JSON editor')
+            case 'copy':
+                return navigator.clipboard.writeText(this.value ?? '')
+            case 'clear':
+                this.dispatchEvent(
+                    new CellUpdateEvent({
+                        position: this.position,
+                        previousValue: this.value,
+                        value: '',
+                    })
+                )
+                return (this.value = '')
+            case 'reset':
+                this.dispatchEvent(
+                    new CellUpdateEvent({
+                        position: this.position,
+                        previousValue: this.value,
+                        value: this.originalValue,
+                    })
+                )
+                return (this.value = this.originalValue)
+        }
     }
 }

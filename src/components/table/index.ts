@@ -274,7 +274,7 @@ export class Table extends ClassifiedElement {
                                             column: -1,
                                         }}
                                         .type=${null}
-                                        ?no-text=${true}
+                                        ?blank=${true}
                                     >
                                         <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
                                         <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
