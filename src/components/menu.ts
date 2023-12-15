@@ -166,7 +166,7 @@ export class Menu extends ClassifiedElement {
             <slot></slot>
             <span
                 id="trigger"
-                class="relative hover:bg-blue-50 dark:hover:bg-blue-950 active:border-blue-100 dark:active:border-blue-900 p-0.5 rounded-full border border-transparent"
+                class="relative hover:bg-neutral-100 dark:hover:bg-neutral-900 active:border-neutral-200 dark:active:border-neutral-800 p-0.5 rounded-full border border-transparent"
                 aria-haspopup="menu"
                 tabIndex="0"
                 @click=${this.onTrigger}
