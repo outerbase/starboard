@@ -44,7 +44,7 @@ export class TH extends MutableElement {
     @property({ attribute: 'is-last', type: Boolean })
     protected isLastColumn = false
 
-    @state()
+    @property({ attribute: 'menu', type: Boolean })
     hasMenu = false
 
     @state()
@@ -86,15 +86,6 @@ export class TH extends MutableElement {
     public override disconnectedCallback(): void {
         super.disconnectedCallback
         this.removeEventListener('contextmenu', this.onContextMenu)
-    }
-
-    protected firstUpdated(changedProperties: PropertyValues<this>): void {
-        super.firstUpdated(changedProperties)
-
-        // delay including menu for cases where JS isn't included / SSR-only
-        setTimeout(() => {
-            if (!this.hasMenu) this.hasMenu = true
-        }, 0)
     }
 
     protected override render() {

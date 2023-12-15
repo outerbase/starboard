@@ -34,6 +34,9 @@ export class Table extends ClassifiedElement {
     @property({ type: Object, attribute: 'schema' })
     public schema?: Schema
 
+    @property({ type: Boolean, attribute: 'non-interactive' })
+    public isNonInteractive = false
+
     // fetch data from Outerbase when `sourceId` changes
     @property({ type: String, attribute: 'source-id' })
     protected sourceId?: string
@@ -248,6 +251,7 @@ export class Table extends ClassifiedElement {
                                 ?is-last=${idx === this.columns.length - 1}
                                 ?removable=${true}
                                 name="${k}"
+                                ?menu=${!this.isNonInteractive}
                             >
                             </outerbase-th>`
                         }
@@ -297,6 +301,7 @@ export class Table extends ClassifiedElement {
                                           ?separate-cells=${true}
                                           ?draw-right-border=${true}
                                           ?bottom-border=${true}
+                                          ?menu=${!this.isNonInteractive}
                                           .value=${value}
                                           .position=${{ row: rowIdx, column: colIdx }}
                                           @cell-updated=${() => this.dispatchEvent(new RowUpdatedEvent({ index: rowIdx, row: rowValues }))}

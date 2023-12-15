@@ -56,6 +56,9 @@ export class TableData extends MutableElement {
     @property({ type: Boolean, attribute: 'draw-right-border' })
     private _drawRightBorder = false
 
+    @property({ type: Boolean, attribute: 'menu' })
+    private hasMenu = false
+
     @state()
     protected options = [
         { label: 'Edit', value: 'edit' },
@@ -93,6 +96,7 @@ export class TableData extends MutableElement {
               ? html`<slot></slot>`
               : html`<!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
                     <outerbase-td-menu
+                        ?menu=${this.hasMenu}
                         .options=${this.dirty
                             ? [
                                   ...this.options,

@@ -1,5 +1,5 @@
 import { html, type PropertyValues } from 'lit'
-import { customElement, state } from 'lit/decorators.js'
+import { customElement, property, state } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
 
 import { Menu } from '../menu'
@@ -13,17 +13,8 @@ export class CellMenu extends Menu {
         }
     }
 
-    @state()
+    @property({ attribute: 'menu', type: Boolean })
     hasMenu = false
-
-    protected firstUpdated(changedProperties: PropertyValues<this>): void {
-        super.firstUpdated(changedProperties)
-
-        // delay including menu for cases where JS isn't included / SSR-only
-        setTimeout(() => {
-            if (!this.hasMenu) this.hasMenu = true
-        }, 0)
-    }
 
     protected override render() {
         // @click shows/hides the menu
