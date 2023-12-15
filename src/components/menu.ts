@@ -143,6 +143,7 @@ export class Menu extends ClassifiedElement {
                               data-value=${value}
                               class=${classMapToClassName({
                                   [classes]: !!classes,
+                                  'text-ellipsis overflow-hidden': true,
                                   'cursor-pointer py-2 px-3 border-b last:border-b-0 hover:bg-neutral-200 dark:hover:bg-neutral-800': true,
                                   'bg-neutral-200 dark:bg-neutral-800': this.focused === value,
                               })}
