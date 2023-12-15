@@ -1,4 +1,4 @@
-import { html } from 'lit'
+import { html, type PropertyValues } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
@@ -18,6 +18,7 @@ export class TableData extends MutableElement {
             'table-cell relative py-cell-padding-y': true,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
+            'focus:ring-4 focus:ring-green-400 focus:z-10 focus:outline-none': true,
 
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark':
                 this.originalValue !== undefined && this.value !== this.originalValue && !this.isEditing, // dirty cells
@@ -63,6 +64,9 @@ export class TableData extends MutableElement {
     @property({ type: Boolean, attribute: 'menu' })
     private hasMenu = false
 
+    @property({ type: Boolean, attribute: 'row-selector' })
+    isRowSelector = false
+
     @state()
     protected options = [
         { label: 'Edit', value: 'edit' },
@@ -70,6 +74,8 @@ export class TableData extends MutableElement {
         { label: 'Copy', value: 'copy' },
         { label: 'Clear', value: 'clear' },
     ]
+
+    override tabIndex = 0
 
     protected onContextMenu(event: MouseEvent) {
         const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
@@ -80,14 +86,20 @@ export class TableData extends MutableElement {
         }
     }
 
+    protected onClick(event: MouseEvent) {
+        this.focus()
+    }
+
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
+        this.addEventListener('click', this.onClick)
     }
 
     public override disconnectedCallback(): void {
         super.disconnectedCallback()
         this.removeEventListener('contextmenu', this.onContextMenu)
+        this.removeEventListener('click', this.onClick)
     }
 
     protected override render() {

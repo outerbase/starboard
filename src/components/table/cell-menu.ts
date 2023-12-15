@@ -23,11 +23,14 @@ export class CellMenu extends Menu {
         // @click shows/hides the menu
         // @dblclick prevents parent's dblclick
         // @keydown navigates the menu
-        const trigger = this.hasMenu ? html`<span class="font-bold hover:text-blue-500">{}</span>` : null
+        const trigger = this.hasMenu
+            ? html`<span class="font-bold hover:text-green-400 dark:hover:text-green-400 focus:z-10">{}</span>`
+            : null
         return html`
             <span
                 class=${classMap({
                     'whitespace-nowrap text-ellipsis overflow-hidden max-w-[300px]': true,
+                    'focus:ring-green-400 dark:focus:ring-green-400 focus:z-10': true,
                 })}
                 ><slot></slot
             ></span>
@@ -35,7 +38,6 @@ export class CellMenu extends Menu {
                 id="trigger"
                 class="relative"
                 aria-haspopup="menu"
-                tabIndex="0"
                 @click=${this.onTrigger}
                 @dblclick=${(e: MouseEvent) => e.stopPropagation()}
                 @keydown=${this.onKeyDown}

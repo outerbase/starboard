@@ -270,11 +270,12 @@ export class Table extends ClassifiedElement {
                                             column: -1,
                                         }}
                                         .type=${null}
+                                        ?row-selector="${true}"
                                     >
                                         <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
                                         <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
                                             <input
-                                                class="row-select-checkbox h-4 w-4 mr-[1px] block"
+                                                class="row-select-checkbox h-4 w-4 mr-[1px] block focus:z-10 "
                                                 type="checkbox"
                                                 ?checked="${this.selectedRowIndices.has(rowIdx)}"
                                                 @click="${() => this.toggleSelected(rowIdx)}"
