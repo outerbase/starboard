@@ -8,8 +8,7 @@ import { Menu } from '../menu'
 export class CellMenu extends Menu {
     protected override get classMap() {
         return {
-            'relative flex items-center justify-between': true,
-            'px-cell-padding-x select-none': true,
+            'relative flex items-center justify-between px-cell-padding-x gap-2': true,
             'select-none': !import.meta.env.SSR,
         }
     }
