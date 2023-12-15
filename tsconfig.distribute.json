@@ -12,6 +12,5 @@
         "useDefineForClassFields": false
         // , "esModuleInterop": true
     },
-    "include": ["src/tailwind/**/*.ts", "src/components/**/*.ts", "src/lib/**/*.ts"],
-    "exclude": ["node_modules", "dist", "lit-dist", ".vscode"]
+    "include": ["src/tailwind/**/*.ts", "src/components/**/*.ts", "src/lib/**/*.ts"]
 }
