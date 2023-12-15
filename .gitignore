@@ -1,6 +1,7 @@
 # build output
 dist/
 lit-dist/
+starboard-*.tgz
 
 # generated types
 .astro/
