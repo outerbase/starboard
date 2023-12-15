@@ -1,4 +1,4 @@
-import { html, type PropertyValues } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
@@ -48,7 +48,7 @@ export class TH extends MutableElement {
     hasMenu = false
 
     @state()
-    options = [
+    options: Array<{ label: string | TemplateResult<1>; value: string; classes?: string }> = [
         {
             label: 'Sort A-Z',
             value: 'sort:alphabetical:ascending',
@@ -98,6 +98,12 @@ export class TH extends MutableElement {
     }
 
     protected override render() {
+        const optionsWithRevert = [...this.options]
+        optionsWithRevert.splice(-1, 0, {
+            label: html`Revert to <span class="pointer-events-none italic whitespace-nowrap">${this.originalValue}</span>`,
+            value: 'reset',
+        })
+
         if (this.blank) {
             // an element to preserve the right-border
             return html`
@@ -110,7 +116,9 @@ export class TH extends MutableElement {
                           true,
                   })} @blur=${this.onBlur}></input>`
                 : this.hasMenu
-                  ? html`<outerbase-th-menu .options=${this.options} @menu-selection=${this.onMenuSelection}
+                  ? html`<outerbase-th-menu
+                        .options=${this.dirty ? optionsWithRevert : this.options}
+                        @menu-selection=${this.onMenuSelection}
                         >${this.value}</outerbase-th-menu
                     >`
                   : html`<span>${this.value}</span>`
@@ -155,6 +163,14 @@ export class TH extends MutableElement {
                 return (this.isEditing = true)
             case 'delete':
                 return this.removeColumn()
+            case 'reset':
+                this.dispatchEvent(
+                    new ColumnRenameEvent({
+                        name: this.label ?? '',
+                        data: { value: this.value },
+                    })
+                )
+                return (this.value = this.originalValue ?? '')
             default:
                 // intentionally let other (e.g. sorting) events pass-through to parent
                 dispatchColumnUpdateEvent = true
