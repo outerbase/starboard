@@ -62,7 +62,6 @@ export class TableData extends MutableElement {
         { label: 'Edit as JSON', value: 'edit:json' },
         { label: 'Copy', value: 'copy' },
         { label: 'Clear', value: 'clear' },
-        { label: 'Reset', value: 'reset' },
     ]
 
     protected onContextMenu(event: MouseEvent) {
@@ -93,7 +92,18 @@ export class TableData extends MutableElement {
             : this.blank
               ? html`<slot></slot>`
               : html`<!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
-                    <outerbase-td-menu .options=${this.options} @menu-selection=${this.onMenuSelection}
+                    <outerbase-td-menu
+                        .options=${this.dirty
+                            ? [
+                                  ...this.options,
+                                  {
+                                      label: html`Revert to
+                                          <span class="pointer-events-none italic whitespace-nowrap">${this.originalValue}</span>`,
+                                      value: 'reset',
+                                  },
+                              ]
+                            : this.options}
+                        @menu-selection=${this.onMenuSelection}
                         >${this.value || html`&nbsp;`}</outerbase-td-menu
                     >`
     }
