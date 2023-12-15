@@ -10,7 +10,9 @@ export class MutableElement extends ClassifiedElement {
     public value?: string
 
     @property({ type: String })
-    public dirty = false
+    public get dirty() {
+        return this.value !== this.originalValue
+    }
 
     // the cell's row & column index
     @property({ type: Object })
@@ -77,14 +79,12 @@ export class MutableElement extends ClassifiedElement {
         if (event.code === 'Escape') {
             // abort changes
             this.isEditing = false
-            this.dirty = false
             this.value = this.originalValue
         }
 
         if (event.code === 'Enter' || event.code === 'Tab') {
             // commit changes [by doing nothing]
             this.isEditing = false
-            this.dirty = this.value !== this.originalValue
         }
     }
 
@@ -96,7 +96,6 @@ export class MutableElement extends ClassifiedElement {
     protected onChange(event: Event) {
         const { value } = event.target as HTMLInputElement
         this.value = value
-        this.dirty = this.value !== this.originalValue
     }
 
     protected dispatchChangedEvent() {
