@@ -85,14 +85,6 @@ export class Table extends ClassifiedElement {
         })
     }
 
-    protected onColumnResizeStart(_event: Event) {
-        document.body.classList.add('select-none')
-    }
-
-    protected onColumnResizeEnd(_event: Event) {
-        document.body.classList.remove('select-none')
-    }
-
     private onColumnRemoved({ name }: ColumnRemovedEvent) {
         // TODO @johnny this event isn't propogating when using SSR w/Hydration
 
@@ -226,8 +218,6 @@ export class Table extends ClassifiedElement {
                     <!-- first column of (optional) checkboxes -->
                     ${this.selectableRows
                         ? html`<outerbase-th
-                              @resize-start=${this.onColumnResizeStart}
-                              @resize-end=${this.onColumnResizeEnd}
                               table-height=${ifDefined(this._height)}
                               ?with-resizer=${this.columnResizerEnabled}
                               ?is-last=${0 < this.columns.length}
@@ -244,8 +234,6 @@ export class Table extends ClassifiedElement {
                             // omit column resizer on the last column because it's sort-of awkward
                             return html`<outerbase-th
                                 @column-removed=${this.onColumnRemoved}
-                                @resize-start=${this.onColumnResizeStart}
-                                @resize-end=${this.onColumnResizeEnd}
                                 table-height=${ifDefined(this._height)}
                                 ?with-resizer=${this.columnResizerEnabled}
                                 ?is-last=${idx === this.columns.length - 1}
