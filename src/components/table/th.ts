@@ -74,7 +74,7 @@ export class TH extends MutableElement {
         {
             label: 'Delete Column',
             value: 'delete',
-            classes: 'text-red-700 dark:text-red-300 hover:text-red-500',
+            classes: 'text-red-600',
         },
     ]
 
