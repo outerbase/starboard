@@ -54,6 +54,13 @@ export class ColumnUpdatedEvent extends ColumnEvent {
     }
 }
 
+// TODO not implemented
+export class ColumnSelectedEvent extends ColumnEvent {
+    constructor(attr: ColumnAttributes) {
+        super('column-selected', attr)
+    }
+}
+
 // ROWS
 export class RowsEvent extends BubblyEvent {
     public rows: RowAttributes | Array<RowAttributes>
