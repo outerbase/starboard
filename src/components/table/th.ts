@@ -93,7 +93,7 @@ export class TH extends MutableElement {
     }
 
     protected override render() {
-        const optionsWithRevert = [...this.options]
+        const optionsWithRevert = this.options ? [...this.options] : []
         optionsWithRevert.splice(-1, 0, {
             label: html`Revert to <span class="pointer-events-none italic whitespace-nowrap">${this.originalValue}</span>`,
             value: 'reset',
