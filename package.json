@@ -1,10 +1,10 @@
 {
     "name": "starboard",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "type": "module",
-    "main": "src/components/table/index.js",
-    "module": "src/components/table/index.js",
-    "types": "src/components/table/index.d.ts",
+    "main": "lit-dist/src/components/table/index.js",
+    "module": "lit-dist/src/components/table/index.js",
+    "types": "lit-dist/src/components/table/index.d.ts",
     "files": [
         "lit-dist/*"
     ],
