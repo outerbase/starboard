@@ -52,6 +52,7 @@ try {
             <h1 class="font-bold text-xl">Static</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
             <OuterbaseTable client:only="lit" data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} keyboard-shortcuts selectable-rows></OuterbaseTable>
+            <!-- <OuterbaseTable client:only="lit" data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} keyboard-shortcuts selectable-rows column-options={JSON.stringify([{'label':'Custom Option', 'value': 'custom-value', 'classes': 'text-red-500'}])}></OuterbaseTable> -->
             
             <h1 class="font-bold text-xl mt-8">SSR w/ Hydration</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
