@@ -1,6 +1,6 @@
-import { html, type TemplateResult } from 'lit'
+import { html } from 'lit'
 import { ifDefined } from 'lit/directives/if-defined.js'
-import { customElement, property, state } from 'lit/decorators.js'
+import { customElement, property } from 'lit/decorators.js'
 
 // import subcomponents
 import '../column-resizer.js'

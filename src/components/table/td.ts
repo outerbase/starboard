@@ -1,4 +1,4 @@
-import { html, type PropertyValues } from 'lit'
+import { html } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
