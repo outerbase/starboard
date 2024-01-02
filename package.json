@@ -1,6 +1,6 @@
 {
     "name": "starboard",
-    "version": "0.0.5a",
+    "version": "0.0.6",
     "type": "module",
     "main": "src/components/table/index.js",
     "module": "src/components/table/index.js",
