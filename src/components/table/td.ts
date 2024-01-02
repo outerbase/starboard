@@ -86,20 +86,14 @@ export class TableData extends MutableElement {
         }
     }
 
-    protected onClick(event: MouseEvent) {
-        this.focus()
-    }
-
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
-        this.addEventListener('click', this.onClick)
     }
 
     public override disconnectedCallback(): void {
         super.disconnectedCallback()
         this.removeEventListener('contextmenu', this.onContextMenu)
-        this.removeEventListener('click', this.onClick)
     }
 
     protected override render() {
