@@ -10,6 +10,7 @@ import { classMap } from 'lit/directives/class-map.js'
 import { ColumnRemovedEvent, ColumnRenameEvent, ColumnUpdatedEvent, MenuSelectionEvent } from '../../lib/events.js'
 import './column-menu.js' // <outerbase-th-menu />
 import type { ColumnMenu } from './column-menu.js'
+import type { HeaderMenuOptions } from '../../types.js'
 
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
@@ -50,8 +51,8 @@ export class TH extends MutableElement {
     @property({ attribute: 'interactive', type: Boolean })
     isInteractive = false
 
-    @state()
-    options: Array<{ label: string | TemplateResult<1>; value: string; classes?: string }> = [
+    @property({ attribute: 'options', type: Array })
+    options?: HeaderMenuOptions = [
         {
             label: 'Sort A-Z',
             value: 'sort:alphabetical:ascending',

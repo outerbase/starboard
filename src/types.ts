@@ -1,3 +1,5 @@
+import { type TemplateResult } from 'lit'
+
 export type Schema = { types: Record<string, 'string' | 'number' | 'boolean' | 'array' | 'object' | 'null'> }
 export type Columns = Array<string>
 export type ColumnType = string | number | boolean | null
@@ -21,3 +23,11 @@ export type CellDetail = {
     previousValue?: ColumnType
     value?: ColumnType
 }
+
+// <th />
+export type HeaderMenuOptions = Array<{
+    label: string | TemplateResult<1>
+    value: string
+    classes?: string
+    icon?: string | null
+}>

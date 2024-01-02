@@ -1,6 +1,6 @@
 import { customElement, property, state } from 'lit/decorators.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
-import { html, type PropertyValueMap } from 'lit'
+import { html, nothing, type PropertyValueMap } from 'lit'
 import { repeat } from 'lit/directives/repeat.js'
 import { map } from 'lit/directives/map.js'
 
@@ -12,7 +12,7 @@ import {
     RowSelectionEvent,
     RowUpdatedEvent,
 } from '../../lib/events.js'
-import type { Queryd, Columns, Rows, Schema } from '../../types.js'
+import type { Queryd, Columns, Rows, Schema, HeaderMenuOptions } from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
 import dbRowsForSource from '../../lib/rows-for-source-id.js'
 import { ClassifiedElement } from '../classified-element.js'
@@ -50,6 +50,9 @@ export class Table extends ClassifiedElement {
 
     @property({ type: String, attribute: 'auth-token' })
     protected authToken?: string
+
+    @property({ type: Array, attribute: 'column-options' })
+    protected columnOptions?: Array<HeaderMenuOptions>
 
     @state()
     private _height?: number
@@ -242,6 +245,7 @@ export class Table extends ClassifiedElement {
                                 ?removable=${true}
                                 ?interactive=${!this.isNonInteractive}
                                 name="${k}"
+                                .options=${this.columnOptions || nothing}
                             >
                             </outerbase-th>`
                         }
