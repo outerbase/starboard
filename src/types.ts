@@ -8,10 +8,10 @@ export {
     ColumnRenameEvent,
     ColumnSelectedEvent,
     ColumnUpdatedEvent,
-    MenuSelectionEvent,
+    MenuSelectedEvent,
     RowAddedEvent,
     RowRemovedEvent,
-    RowSelectionEvent,
+    RowSelectedEvent,
     RowUpdatedEvent,
     RowsEvent,
 } from './lib/events'

@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js'
 
 import { TWStyles } from '../../../tailwind/index.js'
 import { MutableElement } from '../mutable-element.js'
-import { CellUpdateEvent, type MenuSelectionEvent } from '../../lib/events.js'
+import { CellUpdateEvent, type MenuSelectedEvent } from '../../lib/events.js'
 
 import './cell-menu.js' // <outerbase-td-menu />
 import type { CellMenu } from './cell-menu.js'
@@ -124,7 +124,7 @@ export class TableData extends MutableElement {
                     >`
     }
 
-    protected onMenuSelection(event: MenuSelectionEvent) {
+    protected onMenuSelection(event: MenuSelectedEvent) {
         switch (event.value) {
             case 'edit':
                 return (this.isEditing = true)

@@ -89,7 +89,7 @@ export class RowRemovedEvent extends RowsEvent {
     }
 }
 
-export class RowSelectionEvent extends RowsEvent {
+export class RowSelectedEvent extends RowsEvent {
     constructor(attrs: Array<RowAttributes>) {
         super('row-selected', attrs)
     }
@@ -97,7 +97,7 @@ export class RowSelectionEvent extends RowsEvent {
 
 //  MENUS
 
-export class MenuSelectionEvent extends BubblyEvent {
+export class MenuSelectedEvent extends BubblyEvent {
     value: string
 
     constructor(value: string) {

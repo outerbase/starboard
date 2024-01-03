@@ -3,7 +3,7 @@ import { repeat } from 'lit/directives/repeat.js'
 import { property, state } from 'lit/decorators.js'
 
 import { TWStyles } from '../../tailwind/index.js'
-import { MenuSelectionEvent } from '../lib/events.js'
+import { MenuSelectedEvent } from '../lib/events.js'
 import { CaretDown } from '../lib/icons/caret-down.js'
 import { ClassifiedElement } from './classified-element.js'
 import classMapToClassName from '../lib/class-map-to-class-name.js'
@@ -77,7 +77,7 @@ export class Menu extends ClassifiedElement {
     }
 
     protected onSelection(value: string) {
-        const selectionEvent = new MenuSelectionEvent(value)
+        const selectionEvent = new MenuSelectedEvent(value)
         this.selection = value
         this.dispatchEvent(selectionEvent)
     }

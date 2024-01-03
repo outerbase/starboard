@@ -9,7 +9,7 @@ import {
     ColumnRemovedEvent,
     RowAddedEvent,
     RowRemovedEvent,
-    RowSelectionEvent,
+    RowSelectedEvent,
     RowUpdatedEvent,
 } from '../../lib/events.js'
 import type { Queryd, Columns, Rows, Schema, HeaderMenuOptions } from '../../types.js'
@@ -156,7 +156,7 @@ export class Table extends ClassifiedElement {
 
     protected onRowSelection() {
         this.dispatchEvent(
-            new RowSelectionEvent(Array.from(this.selectedRowIndices).map((index) => ({ index, row: this.rows[index].values })))
+            new RowSelectedEvent(Array.from(this.selectedRowIndices).map((index) => ({ index, row: this.rows[index].values })))
         )
     }
 
