@@ -108,7 +108,7 @@ export class Table extends ClassifiedElement {
         if (index === -1) throw new Error(`Could not find/delete column named: ${name}`)
 
         // remove that index from every row as well
-        this.rows = this.rows.map((row) => row.filter((_value, idx) => index !== idx))
+        this.rows = this.rows.map((row) => ({ ...row, values: row.values.filter((_value, idx) => index !== idx) }))
     }
 
     protected onKeyDown_bound?: ({ shiftKey, key }: KeyboardEvent) => void
@@ -120,35 +120,44 @@ export class Table extends ClassifiedElement {
             const defaultName = `Column ${Date.now()}`
             const name = prompt('Choose a unique name for this column', defaultName) || defaultName
             this.columns = [...this.columns, name]
-            this.rows.map((row) => row.push(''))
+            // TODO @johnny this change isn't assigned to anything
+            this.rows.map((row) => {
+                const _row = { ...row }
+                _row.values.push('')
+                return _row
+            })
             this.dispatchEvent(new ColumnAddedEvent({ name }))
         }
 
         // create row
         if (key === 'R') {
-            const row = new Array(this.columns.length).fill('')
+            const row = { id: self.crypto.randomUUID(), values: new Array(this.columns.length).fill('') }
             this.rows = [...this.rows, row]
-            this.dispatchEvent(new RowAddedEvent({ index: this.rows.length, row }))
+            this.dispatchEvent(new RowAddedEvent({ index: this.rows.length, row: row.values }))
         }
 
         // TODO remove this; only added for illustration purposes
         if (key === '?') {
-            const row = new Array(this.columns.length).fill('')
+            const row = { id: self.crypto.randomUUID(), values: new Array(this.columns.length).fill('') }
             this.rows = [row, ...this.rows]
-            this.dispatchEvent(new RowAddedEvent({ index: 0, row }))
+            this.dispatchEvent(new RowAddedEvent({ index: 0, row: row.values }))
         }
 
         // delete selection
         if (key === 'D') {
             this.selectedRowIndices.forEach((index) => this.removedRowIndices.add(index))
-            this.dispatchEvent(new RowRemovedEvent(Array.from(this.selectedRowIndices).map((index) => ({ index, row: this.rows[index] }))))
+            this.dispatchEvent(
+                new RowRemovedEvent(Array.from(this.selectedRowIndices).map((index) => ({ index, row: this.rows[index].values })))
+            )
             this.selectedRowIndices = new Set()
             this.requestUpdate('removedRowIndices')
         }
     }
 
     protected onRowSelection() {
-        this.dispatchEvent(new RowSelectionEvent(Array.from(this.selectedRowIndices).map((index) => ({ index, row: this.rows[index] }))))
+        this.dispatchEvent(
+            new RowSelectionEvent(Array.from(this.selectedRowIndices).map((index) => ({ index, row: this.rows[index].values })))
+        )
     }
 
     public override connectedCallback() {
@@ -182,8 +191,8 @@ export class Table extends ClassifiedElement {
         // when `data` changes, update `rows` and `columns`
         if (_changedProperties.has('data')) {
             if (this.data && this.data.rows?.length > 0) {
-                this.columns = this.data.rows?.[0] ? Object.keys(this.data.rows?.[0]) : []
-                this.rows = this.data.rows.map((row) => Object.values(row))
+                this.columns = this.data.rows?.[0] ? Object.keys(this.data.rows?.[0].row) : []
+                this.rows = this.data.rows.map(({ id, row }) => ({ id, values: Object.values(row) }))
                 this.dirtyRowIndices = new Set()
                 this.selectedRowIndices = new Set()
                 this.removedRowIndices = new Set()
@@ -255,61 +264,66 @@ export class Table extends ClassifiedElement {
 
             <outerbase-rowgroup>
                 <!-- render a TableRow element for each row of data -->
-                ${map(this.rows, (rowValues, rowIdx) =>
-                    !this.removedRowIndices.has(rowIdx)
-                        ? html`<outerbase-tr
-                              .selected=${this.selectedRowIndices.has(rowIdx)}
-                              ?dirty=${this.dirtyRowIndices.has(rowIdx)}
-                              @on-selection=${this.onRowSelection}
-                          >
-                              <!-- checkmark cell -->
-                              ${this.selectableRows
-                                  ? html`<outerbase-td
-                                        ?separate-cells=${true}
-                                        ?draw-right-border=${true}
-                                        ?bottom-border=${true}
-                                        ?blank=${true}
-                                        .position=${{
-                                            row: -1,
-                                            column: -1,
-                                        }}
-                                        .type=${null}
-                                        ?row-selector="${true}"
-                                    >
-                                        <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
-                                        <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
-                                            <input
-                                                class="row-select-checkbox h-4 w-4 mr-[1px] block focus:z-10 "
-                                                type="checkbox"
-                                                ?checked="${this.selectedRowIndices.has(rowIdx)}"
-                                                @click="${() => this.toggleSelected(rowIdx)}"
-                                                tabindex="0"
-                                            />
-                                        </div>
-                                    </outerbase-td>`
-                                  : null}
-                              <!-- render a TableCell for each column of data in the current row -->
-                              ${repeat(
-                                  rowValues,
-                                  (_row, idx) => this.columns[idx], // use the column name as the unique identifier for each entry in this row
-                                  (value, colIdx) => html`
-                                      <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
-                                      <outerbase-td
-                                          ?separate-cells=${true}
-                                          ?draw-right-border=${true}
-                                          ?bottom-border=${true}
-                                          ?menu=${!this.isNonInteractive}
-                                          ?selectable-text=${this.isNonInteractive}
-                                          ?interactive=${!this.isNonInteractive}
-                                          .value=${value}
-                                          .position=${{ row: rowIdx, column: colIdx }}
-                                          @cell-updated=${() => this.dispatchEvent(new RowUpdatedEvent({ index: rowIdx, row: rowValues }))}
-                                      >
-                                      </outerbase-td>
-                                  `
-                              )}
-                          </outerbase-tr>`
-                        : null
+                ${repeat(
+                    this.rows,
+                    ({ id }) => id,
+                    ({ values }, rowIdx) => {
+                        return !this.removedRowIndices.has(rowIdx)
+                            ? html`<outerbase-tr
+                                  .selected=${this.selectedRowIndices.has(rowIdx)}
+                                  ?dirty=${this.dirtyRowIndices.has(rowIdx)}
+                                  @on-selection=${this.onRowSelection}
+                              >
+                                  <!-- checkmark cell -->
+                                  ${this.selectableRows
+                                      ? html`<outerbase-td
+                                            ?separate-cells=${true}
+                                            ?draw-right-border=${true}
+                                            ?bottom-border=${true}
+                                            ?blank=${true}
+                                            .position=${{
+                                                row: -1,
+                                                column: -1,
+                                            }}
+                                            .type=${null}
+                                            ?row-selector="${true}"
+                                        >
+                                            <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
+                                            <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
+                                                <input
+                                                    class="row-select-checkbox h-4 w-4 mr-[1px] block focus:z-10 "
+                                                    type="checkbox"
+                                                    ?checked="${this.selectedRowIndices.has(rowIdx)}"
+                                                    @click="${() => this.toggleSelected(rowIdx)}"
+                                                    tabindex="0"
+                                                />
+                                            </div>
+                                        </outerbase-td>`
+                                      : null}
+
+                                  <!-- render a TableCell for each column of data in the current row -->
+                                  ${repeat(
+                                      values,
+                                      (_, idx) => this.columns[idx], // use the column name as the unique identifier for each entry in this row
+                                      (value, colIdx) => html`
+                                          <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
+                                          <outerbase-td
+                                              ?separate-cells=${true}
+                                              ?draw-right-border=${true}
+                                              ?bottom-border=${true}
+                                              ?menu=${!this.isNonInteractive}
+                                              ?selectable-text=${this.isNonInteractive}
+                                              ?interactive=${!this.isNonInteractive}
+                                              .value=${value}
+                                              .position=${{ row: rowIdx, column: colIdx }}
+                                              @cell-updated=${() => this.dispatchEvent(new RowUpdatedEvent({ index: rowIdx, row: values }))}
+                                          >
+                                          </outerbase-td>
+                                      `
+                                  )}
+                              </outerbase-tr>`
+                            : null
+                    }
                 )}
             </outerbase-rowgroup>
         </div>`

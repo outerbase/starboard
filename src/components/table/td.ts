@@ -125,8 +125,6 @@ export class TableData extends MutableElement {
     }
 
     protected onMenuSelection(event: MenuSelectionEvent) {
-        console.debug('onMenuSelection:', event.value)
-
         switch (event.value) {
             case 'edit':
                 return (this.isEditing = true)

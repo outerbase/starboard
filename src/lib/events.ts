@@ -1,7 +1,7 @@
-import type { CellDetail, Data, Row } from '../types.js'
+import type { CellDetail, ColumnType, Data, Row } from '../types.js'
 
 type ColumnAttributes = { name: string; data?: Data }
-type RowAttributes = { index: number; row: Row }
+type RowAttributes = { index: number; row: Array<ColumnType> }
 class BubblyEvent extends Event {
     constructor(name: string) {
         super(name, { bubbles: true, composed: true })
