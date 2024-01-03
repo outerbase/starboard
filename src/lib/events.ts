@@ -105,3 +105,15 @@ export class MenuSelectionEvent extends BubblyEvent {
         this.value = value
     }
 }
+
+export class ResizeStartEvent extends BubblyEvent {
+    constructor() {
+        super('resize-start')
+    }
+}
+
+export class ResizeEndEvent extends BubblyEvent {
+    constructor() {
+        super('resize-end')
+    }
+}

@@ -4,6 +4,7 @@ import { html, type PropertyValueMap } from 'lit'
 import type { TH } from './table/th.js'
 import { TWStyles } from '../../tailwind/index.js'
 import { ClassifiedElement } from './classified-element.js'
+import { ResizeEndEvent, ResizeStartEvent } from '../lib/events.js'
 
 @customElement('column-resizer')
 export class ColumnResizer extends ClassifiedElement {
@@ -24,12 +25,7 @@ export class ColumnResizer extends ClassifiedElement {
     private _mouseDown(e: MouseEvent) {
         if (!this.column) throw new Error('`column` is unset; aborting')
 
-        this.dispatchEvent(
-            new Event('resize-start', {
-                bubbles: true,
-                composed: true,
-            })
-        )
+        this.dispatchEvent(new ResizeStartEvent())
 
         const _mouseMove = (e: MouseEvent) => {
             if (!this.column) throw new Error('`column` is unset; aborting')
@@ -46,12 +42,7 @@ export class ColumnResizer extends ClassifiedElement {
             document.removeEventListener('mouseup', _mouseUp)
             document.removeEventListener('mousemove', _mouseMove)
 
-            this.dispatchEvent(
-                new Event('resize-end', {
-                    bubbles: true,
-                    composed: true,
-                })
-            )
+            this.dispatchEvent(new ResizeEndEvent())
         }
 
         document.addEventListener('mousemove', _mouseMove)
