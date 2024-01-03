@@ -16,19 +16,39 @@ export {
     RowsEvent,
 } from './lib/events'
 
-export type Schema = { types: Record<string, 'string' | 'number' | 'boolean' | 'array' | 'object' | 'null'> }
-export type Columns = Array<string>
+// copied from dashboard
+export type TableColumnType = 'string' | 'integer' | 'enum' | 'uuid' | 'date' | 'dateonly'
+export type TableColumn = {
+    model?: 'column'
+    // typeOfChange: TableColumnChangeType
+    type: TableColumnType
+    name: string
+    position: number
+    default?: string // has `::type` appended / casting quirks
+    defaultValue?: string
+    comment?: string
+    // plugins: Array<PluginInstallationModel>
+    is_nullable: boolean
+    unique: boolean
+    primaryKey: boolean
+    autoIncrement: boolean
+}
+
+export type Schema = {
+    columns: Columns
+}
+export type Columns = Array<TableColumn>
 export type ColumnType = string | number | boolean | null
-export type Row = { id: string; values: Array<ColumnType> }
-export type Rows = Array<Row>
+export type RowAsArray = { id: string; values: Array<ColumnType> }
+export type Rows = Array<RowAsArray>
+export type RowAsRecord = { id: string; row: Record<string, ColumnType> }
 export type Data = { [key: string]: ColumnType | Data }
-export type DecoratedRow = { id: string; row: Record<string, ColumnType> }
 // API Response:
 export type Queryd = {
     name: string
     query: string
     count: number
-    rows: Array<DecoratedRow>
+    rows: Array<RowAsRecord>
 }
 
 // <td />:

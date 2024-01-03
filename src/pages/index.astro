@@ -1,19 +1,10 @@
 ---
 import { Table as OuterbaseTable } from '../components/table'
 
-// local, fallback data
+// test data
 import spaceballs from '../lib/sample-data.json'
-
-// api, real data
-import dbRowsForSource from '../lib/rows-for-source-id';
-try {
-    // attempt to use the Movies DB
-    const movieData = await dbRowsForSource('placeholder', import.meta.env.PUBLIC_AUTH_TOKEN)
-    data =  { rows: movieData.items }
-} catch (err) {
-    console.error(err)
-}
-let data = {rows: spaceballs.map((d) => ({...d, traits: JSON.stringify(d.traits)})).map((row) => ({id: crypto.randomUUID(), row }))}
+const rows = spaceballs.map((d) => ({...d, traits: JSON.stringify(d.traits)})).map((row) => ({id: crypto.randomUUID(), row }))
+const columns = Object.keys(rows[0].row).map((name) => ({name}))
 ---
 <html lang="en" class="h-full">
     <head>
@@ -23,10 +14,7 @@ let data = {rows: spaceballs.map((d) => ({...d, traits: JSON.stringify(d.traits)
         <style>
             :root {
                 /* consider this as a placeholder for a theme */
-                /* --primary-color: white; */
-                /* --secondary-color: gray; */
             }
-
         </style>
         <script>
             /* themes may also be set dynamically/programatically */
@@ -51,16 +39,16 @@ let data = {rows: spaceballs.map((d) => ({...d, traits: JSON.stringify(d.traits)
         <main class="m-12 pb-24">
             <h1 class="font-bold text-xl">Static</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
-            <OuterbaseTable client:only="lit" data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} keyboard-shortcuts selectable-rows></OuterbaseTable>
+            <OuterbaseTable client:only="lit" schema={{columns}} rows={rows} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} keyboard-shortcuts selectable-rows></OuterbaseTable>
             <!-- <OuterbaseTable client:only="lit" data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} keyboard-shortcuts selectable-rows column-options={JSON.stringify([{'label':'Custom Option', 'value': 'custom-value', 'classes': 'text-red-500'}])}></OuterbaseTable> -->
             
             <h1 class="font-bold text-xl mt-8">SSR w/ Hydration</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
-            <OuterbaseTable client:load data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} selectable-rows></OuterbaseTable>
+            <OuterbaseTable client:load schema={{columns}} rows={rows} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} selectable-rows></OuterbaseTable>
             
             <h1 class="font-bold text-xl mt-8">SSR w/o Hydration</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
-            <OuterbaseTable data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} non-interactive></OuterbaseTable>
+            <OuterbaseTable schema={{columns}} rows={rows} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} non-interactive></OuterbaseTable>
         </main>
     </body>
 </html>

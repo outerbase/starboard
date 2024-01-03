@@ -2,7 +2,6 @@ import { customElement, property, state } from 'lit/decorators.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { html, nothing, type PropertyValueMap } from 'lit'
 import { repeat } from 'lit/directives/repeat.js'
-import { map } from 'lit/directives/map.js'
 
 import {
     ColumnAddedEvent,
@@ -12,7 +11,7 @@ import {
     RowSelectedEvent,
     RowUpdatedEvent,
 } from '../../lib/events.js'
-import type { Queryd, Columns, Rows, Schema, HeaderMenuOptions } from '../../types.js'
+import type { Queryd, Columns, Schema, HeaderMenuOptions, RowAsRecord } from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
 import dbRowsForSource from '../../lib/rows-for-source-id.js'
 import { ClassifiedElement } from '../classified-element.js'
@@ -63,28 +62,28 @@ export class Table extends ClassifiedElement {
     @state()
     protected columns: Columns = []
 
-    @state()
-    protected rows: Rows = []
+    @property({ attribute: 'rows', type: Array })
+    public rows: Array<RowAsRecord> = []
 
     @state()
-    protected selectedRowIndices: Set<number> = new Set<number>()
+    protected selectedRowUUIDs: Set<string> = new Set()
 
     @state()
-    protected removedRowIndices: Set<number> = new Set<number>()
+    protected removedRowUUIDs: Set<string> = new Set()
 
     @state()
-    protected dirtyRowIndices: Set<number> = new Set()
+    protected dirtyRowUUIDs: Set<string> = new Set()
 
-    public toggleSelected(idx: number) {
-        const _set = this.selectedRowIndices
-        if (_set.has(idx)) _set.delete(idx)
-        else _set.add(idx)
-        this.requestUpdate('selectedRowIndices')
+    public toggleSelected(uuid: string) {
+        const _set = this.selectedRowUUIDs
+        if (_set.has(uuid)) _set.delete(uuid)
+        else _set.add(uuid)
+        this.requestUpdate('selectedRowUUIDs')
     }
 
     public clearSelection() {
-        this.selectedRowIndices = new Set()
-        this.removedRowIndices = new Set()
+        this.selectedRowUUIDs = new Set()
+        this.removedRowUUIDs = new Set()
 
         this.shadowRoot?.querySelectorAll<HTMLInputElement>('.row-select-checkbox').forEach((checkbox) => {
             checkbox.checked = false
@@ -97,7 +96,7 @@ export class Table extends ClassifiedElement {
 
         // find the index of the column and remove it
         let index: number = -1
-        this.columns = this.columns.filter((_name, idx) => {
+        this.columns = this.columns.filter(({ name: _name }, idx) => {
             if (name === _name) {
                 index = idx
                 return false
@@ -108,7 +107,8 @@ export class Table extends ClassifiedElement {
         if (index === -1) throw new Error(`Could not find/delete column named: ${name}`)
 
         // remove that index from every row as well
-        this.rows = this.rows.map((row) => ({ ...row, values: row.values.filter((_value, idx) => index !== idx) }))
+        // this.rows = this.rows.map((row) => ({ ...row, values: row.values.filter((_value, idx) => index !== idx) }))
+        this.rows = this.rows.map((row) => ({ ...row, [name]: undefined }))
     }
 
     protected onKeyDown_bound?: ({ shiftKey, key }: KeyboardEvent) => void
@@ -119,45 +119,58 @@ export class Table extends ClassifiedElement {
         if (key === 'C') {
             const defaultName = `Column ${Date.now()}`
             const name = prompt('Choose a unique name for this column', defaultName) || defaultName
-            this.columns = [...this.columns, name]
-            // TODO @johnny this change isn't assigned to anything
-            this.rows.map((row) => {
-                const _row = { ...row }
-                _row.values.push('')
-                return _row
-            })
+            this.columns = [
+                ...this.columns,
+                {
+                    is_nullable: false,
+                    name,
+                    position: this.columns.length,
+                    model: 'column',
+                    type: 'string',
+                    unique: false,
+                    primaryKey: false,
+                    autoIncrement: false,
+                },
+            ]
+            this.rows = this.rows.map((row) => ({ ...row, row: { ...row.row, [name]: '' } }))
             this.dispatchEvent(new ColumnAddedEvent({ name }))
         }
 
         // create row
         if (key === 'R') {
-            const row = { id: self.crypto.randomUUID(), values: new Array(this.columns.length).fill('') }
+            const row: RowAsRecord = { id: self.crypto.randomUUID(), row: {} }
             this.rows = [...this.rows, row]
-            this.dispatchEvent(new RowAddedEvent({ index: this.rows.length, row: row.values }))
-        }
-
-        // TODO remove this; only added for illustration purposes
-        if (key === '?') {
-            const row = { id: self.crypto.randomUUID(), values: new Array(this.columns.length).fill('') }
-            this.rows = [row, ...this.rows]
-            this.dispatchEvent(new RowAddedEvent({ index: 0, row: row.values }))
+            this.dispatchEvent(new RowAddedEvent(row))
         }
 
         // delete selection
         if (key === 'D') {
-            this.selectedRowIndices.forEach((index) => this.removedRowIndices.add(index))
-            this.dispatchEvent(
-                new RowRemovedEvent(Array.from(this.selectedRowIndices).map((index) => ({ index, row: this.rows[index].values })))
-            )
-            this.selectedRowIndices = new Set()
-            this.requestUpdate('removedRowIndices')
+            this.selectedRowUUIDs.forEach((uuid) => this.removedRowUUIDs.add(uuid))
+
+            const removedRows: Array<RowAsRecord> = []
+            Array.from(this.selectedRowUUIDs).forEach((_id) => {
+                const row = this.rows.find(({ id, row }) => _id === id)
+                if (row) {
+                    removedRows.push(row)
+                }
+            })
+
+            this.dispatchEvent(new RowRemovedEvent(removedRows))
+            this.selectedRowUUIDs = new Set()
+            this.requestUpdate('removedRowUUIDs')
         }
     }
 
     protected onRowSelection() {
-        this.dispatchEvent(
-            new RowSelectedEvent(Array.from(this.selectedRowIndices).map((index) => ({ index, row: this.rows[index].values })))
-        )
+        const selectedUUIDs = Array.from(this.selectedRowUUIDs)
+        const selectedRows: Array<RowAsRecord> = []
+
+        selectedUUIDs.forEach((id) => {
+            const row = this.rows.find((value) => value.id === id)
+            if (row) selectedRows.push(row)
+        })
+
+        this.dispatchEvent(new RowSelectedEvent(selectedRows))
     }
 
     public override connectedCallback() {
@@ -188,15 +201,19 @@ export class Table extends ClassifiedElement {
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
-        // when `data` changes, update `rows` and `columns`
-        if (_changedProperties.has('data')) {
-            if (this.data && this.data.rows?.length > 0) {
-                this.columns = this.data.rows?.[0] ? Object.keys(this.data.rows?.[0].row) : []
-                this.rows = this.data.rows.map(({ id, row }) => ({ id, values: Object.values(row) }))
-                this.dirtyRowIndices = new Set()
-                this.selectedRowIndices = new Set()
-                this.removedRowIndices = new Set()
+        // when the row collection changes, reset dirty/selected/removed
+        // WARNING @johnny we probably don't want this to happen but instead to remove ones that are missing from the rows collection
+        if (_changedProperties.has('rows')) {
+            if (this.rows && this.rows.length > 0) {
+                this.dirtyRowUUIDs = new Set()
+                this.selectedRowUUIDs = new Set()
+                this.removedRowUUIDs = new Set()
             }
+        }
+
+        // identify columns from the schema
+        if (_changedProperties.has('schema')) {
+            if (this.schema) this.columns = this.schema.columns
         }
 
         // Note: if both `data` and `source-id` are passed to `<outerbase-component />`
@@ -242,8 +259,8 @@ export class Table extends ClassifiedElement {
                     <!-- TODO this isn't yielding anything when SSR w/o hydration -->
                     ${repeat(
                         this.columns,
-                        (name, _idx) => name,
-                        (k, idx) => {
+                        ({ name }, _idx) => name,
+                        ({ name }, idx) => {
                             // omit column resizer on the last column because it's sort-of awkward
                             return html`<outerbase-th
                                 @column-removed=${this.onColumnRemoved}
@@ -253,7 +270,7 @@ export class Table extends ClassifiedElement {
                                 ?is-last=${idx === this.columns.length - 1}
                                 ?removable=${true}
                                 ?interactive=${!this.isNonInteractive}
-                                name="${k}"
+                                name="${name}"
                                 .options=${this.columnOptions || nothing}
                             >
                             </outerbase-th>`
@@ -267,11 +284,11 @@ export class Table extends ClassifiedElement {
                 ${repeat(
                     this.rows,
                     ({ id }) => id,
-                    ({ values }, rowIdx) => {
-                        return !this.removedRowIndices.has(rowIdx)
+                    ({ id, row }) => {
+                        return !this.removedRowUUIDs.has(id)
                             ? html`<outerbase-tr
-                                  .selected=${this.selectedRowIndices.has(rowIdx)}
-                                  ?dirty=${this.dirtyRowIndices.has(rowIdx)}
+                                  .selected=${this.selectedRowUUIDs.has(id)}
+                                  ?dirty=${this.dirtyRowUUIDs.has(id)}
                                   @on-selection=${this.onRowSelection}
                               >
                                   <!-- checkmark cell -->
@@ -293,8 +310,8 @@ export class Table extends ClassifiedElement {
                                                 <input
                                                     class="row-select-checkbox h-4 w-4 mr-[1px] block focus:z-10 "
                                                     type="checkbox"
-                                                    ?checked="${this.selectedRowIndices.has(rowIdx)}"
-                                                    @click="${() => this.toggleSelected(rowIdx)}"
+                                                    ?checked="${this.selectedRowUUIDs.has(id)}"
+                                                    @click="${() => this.toggleSelected(id)}"
                                                     tabindex="0"
                                                 />
                                             </div>
@@ -303,9 +320,9 @@ export class Table extends ClassifiedElement {
 
                                   <!-- render a TableCell for each column of data in the current row -->
                                   ${repeat(
-                                      values,
-                                      (_, idx) => this.columns[idx], // use the column name as the unique identifier for each entry in this row
-                                      (value, colIdx) => html`
+                                      this.columns,
+                                      ({ name }) => name, // use the column name as the unique identifier for each entry in this row
+                                      ({ name }) => html`
                                           <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
                                           <outerbase-td
                                               ?separate-cells=${true}
@@ -314,9 +331,9 @@ export class Table extends ClassifiedElement {
                                               ?menu=${!this.isNonInteractive}
                                               ?selectable-text=${this.isNonInteractive}
                                               ?interactive=${!this.isNonInteractive}
-                                              .value=${value}
-                                              .position=${{ row: rowIdx, column: colIdx }}
-                                              @cell-updated=${() => this.dispatchEvent(new RowUpdatedEvent({ index: rowIdx, row: values }))}
+                                              .value=${row[name]}
+                                              .position=${{ row, column: name }}
+                                              @cell-updated=${() => this.dispatchEvent(new RowUpdatedEvent({ id, row }))}
                                           >
                                           </outerbase-td>
                                       `

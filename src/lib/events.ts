@@ -1,7 +1,6 @@
-import type { CellDetail, ColumnType, Data, Row } from '../types.js'
+import type { CellDetail, ColumnType, Data, RowAsRecord } from '../types.js'
 
 type ColumnAttributes = { name: string; data?: Data }
-type RowAttributes = { index: number; row: Array<ColumnType> }
 class BubblyEvent extends Event {
     constructor(name: string) {
         super(name, { bubbles: true, composed: true })
@@ -63,34 +62,34 @@ export class ColumnSelectedEvent extends ColumnEvent {
 
 // ROWS
 export class RowsEvent extends BubblyEvent {
-    public rows: RowAttributes | Array<RowAttributes>
+    public rows: RowAsRecord | Array<RowAsRecord>
 
-    constructor(type: string, rows: RowAttributes | Array<RowAttributes>) {
+    constructor(type: string, rows: RowAsRecord | Array<RowAsRecord>) {
         super(type)
         this.rows = rows
     }
 }
 
 export class RowAddedEvent extends RowsEvent {
-    constructor(attr: RowAttributes) {
+    constructor(attr: RowAsRecord) {
         super('row-added', attr)
     }
 }
 
 export class RowUpdatedEvent extends RowsEvent {
-    constructor(attrs: RowAttributes) {
+    constructor(attrs: RowAsRecord) {
         super('row-updated', attrs)
     }
 }
 
 export class RowRemovedEvent extends RowsEvent {
-    constructor(attrs: Array<RowAttributes>) {
+    constructor(attrs: Array<RowAsRecord>) {
         super('row-removed', attrs)
     }
 }
 
 export class RowSelectedEvent extends RowsEvent {
-    constructor(attrs: Array<RowAttributes>) {
+    constructor(attrs: Array<RowAsRecord>) {
         super('row-selected', attrs)
     }
 }
