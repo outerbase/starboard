@@ -38,9 +38,7 @@ export type Schema = {
     columns: Columns
 }
 export type Columns = Array<TableColumn>
-export type ColumnType = string | number | boolean | null
-export type RowAsArray = { id: string; values: Array<ColumnType> }
-export type Rows = Array<RowAsArray>
+export type ColumnType = string | number | boolean | null | undefined
 export type RowAsRecord = { id: string; row: Record<string, ColumnType> }
 export type Data = { [key: string]: ColumnType | Data }
 // API Response:
@@ -52,12 +50,12 @@ export type Queryd = {
 }
 
 // <td />:
-export type Position = Record<'column' | 'row', number>
+export type Position = { column: string; row: string } // column name, row uuid
 export type CellDetail = {
+    position: Position
     label?: string
-    position?: Position
-    previousValue?: ColumnType
-    value?: ColumnType
+    previousValue: ColumnType
+    value: ColumnType
 }
 
 // <th />

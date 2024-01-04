@@ -1,4 +1,4 @@
-import type { CellDetail, ColumnType, Data, RowAsRecord } from '../types.js'
+import type { CellDetail, Data, RowAsRecord } from '../types.js'
 
 type ColumnAttributes = { name: string; data?: Data }
 class BubblyEvent extends Event {
@@ -88,6 +88,7 @@ export class RowRemovedEvent extends RowsEvent {
     }
 }
 
+// when a row is selected, emits an array of all currently selected rows
 export class RowSelectedEvent extends RowsEvent {
     constructor(attrs: Array<RowAsRecord>) {
         super('row-selected', attrs)

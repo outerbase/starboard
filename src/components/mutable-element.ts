@@ -15,9 +15,9 @@ export class MutableElement extends ClassifiedElement {
         return this.originalValue !== undefined && this.value !== this.originalValue
     }
 
-    // the cell's row & column index
-    @property({ type: Object })
-    public position?: Position
+    // the cell's row's uuid and column name
+    @property({ type: Object, attribute: 'position' })
+    public position: Position = { column: '', row: '' } // TODO let this be undefined?
 
     @property({ type: String })
     public label?: string

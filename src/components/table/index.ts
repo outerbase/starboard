@@ -92,22 +92,10 @@ export class Table extends ClassifiedElement {
     }
 
     private onColumnRemoved({ name }: ColumnRemovedEvent) {
-        // TODO @johnny this event isn't propogating when using SSR w/Hydration
+        // remove the column named `name` from columns collection
+        this.columns = this.columns.filter(({ name: _name }) => name !== _name)
 
-        // find the index of the column and remove it
-        let index: number = -1
-        this.columns = this.columns.filter(({ name: _name }, idx) => {
-            if (name === _name) {
-                index = idx
-                return false
-            }
-            return true
-        })
-
-        if (index === -1) throw new Error(`Could not find/delete column named: ${name}`)
-
-        // remove that index from every row as well
-        // this.rows = this.rows.map((row) => ({ ...row, values: row.values.filter((_value, idx) => index !== idx) }))
+        // remove the entry for this column from every row
         this.rows = this.rows.map((row) => ({ ...row, [name]: undefined }))
     }
 
@@ -162,10 +150,8 @@ export class Table extends ClassifiedElement {
     }
 
     protected onRowSelection() {
-        const selectedUUIDs = Array.from(this.selectedRowUUIDs)
         const selectedRows: Array<RowAsRecord> = []
-
-        selectedUUIDs.forEach((id) => {
+        this.selectedRowUUIDs.forEach((id) => {
             const row = this.rows.find((value) => value.id === id)
             if (row) selectedRows.push(row)
         })
@@ -299,8 +285,8 @@ export class Table extends ClassifiedElement {
                                             ?bottom-border=${true}
                                             ?blank=${true}
                                             .position=${{
-                                                row: -1,
-                                                column: -1,
+                                                row: id,
+                                                column: '__selected', // our own; not expected to exist in DB
                                             }}
                                             .type=${null}
                                             ?row-selector="${true}"
@@ -331,9 +317,11 @@ export class Table extends ClassifiedElement {
                                               ?menu=${!this.isNonInteractive}
                                               ?selectable-text=${this.isNonInteractive}
                                               ?interactive=${!this.isNonInteractive}
-                                              .value=${row[name]}
-                                              .position=${{ row, column: name }}
-                                              @cell-updated=${() => this.dispatchEvent(new RowUpdatedEvent({ id, row }))}
+                                              value=${row[name] ?? ''}
+                                              .position=${{ row: id, column: name }}
+                                              @cell-updated=${() => {
+                                                  this.dispatchEvent(new RowUpdatedEvent({ id, row }))
+                                              }}
                                           >
                                           </outerbase-td>
                                       `
