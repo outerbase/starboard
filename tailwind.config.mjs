@@ -55,10 +55,12 @@ export default {
                     'row-odd-dark': 'var(--table-row-odd-background-color-dark, rgba(255,255,255,0.02))',
                     'row-hover': 'var(--hover-background-color, rgba(0,0,0,0.03))',
                     'row-hover-dark': 'var(--hover-background-color-dark, rgba(255,255,255,0.03))',
-                    'row-selected': 'var(--table-row-seleted-background-color, rgba(254,253,232,0.7))',
-                    'row-selected-dark': 'var(--table-row-seleted-background-color-dark, rgba(66, 32, 6, 0.8))',
-                    'row-selected-hover': 'var(--table-row-seleted-hover-background-color, rgba(254,253,232,1))',
-                    'row-selected-hover-dark': 'var(--table-row-seleted-hover-background-color-dark, rgb(66, 32, 6, 1))',
+                    'row-selected': 'var(--table-row-selected-background-color, rgba(254,253,232,0.7))',
+                    'row-selected-dark': 'var(--table-row-selected-background-color-dark, rgba(66, 32, 6, 0.8))',
+                    'row-selected-hover': 'var(--table-row-selected-hover-background-color, rgba(254,253,232,1))',
+                    'row-selected-hover-dark': 'var(--table-row-selected-hover-background-color-dark, rgb(66, 32, 6, 1))',
+                    'row-dirty': 'var(--table-row-dirty, rgba(254, 252, 232, 1))',
+                    'row-dirty-dark': 'var(--table-row-dirty-dark, rgba(66, 32, 6, 1))',
 
                     // unused
                     // active: 'var(--active-background-color-dark, #fefefe)',

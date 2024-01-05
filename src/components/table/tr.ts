@@ -9,13 +9,14 @@ export class TableRow extends ClassifiedElement {
     protected override get classMap() {
         return {
             'table-row': true,
+            'bg-theme-row-dirty dark:bg-theme-row-dirty-dark': this.dirty && !this.selected,
 
             // when a header
             'text-theme-column-text dark:text-theme-column-text-dark': this.isHeaderRow,
 
             // when not a header AND not selected
             'odd:bg-theme-row-odd dark:odd:bg-theme-row-odd-dark even:bg-theme-row-even dark:even:bg-theme-row-even-dark hover:bg-theme-row-hover dark:hover:bg-theme-row-hover-dark':
-                !this.isHeaderRow && !this.selected,
+                !this.dirty && !this.isHeaderRow && !this.selected,
 
             // when selected
             'bg-theme-row-selected dark:bg-theme-row-selected-dark hover:bg-theme-row-selected-hover dark:hover:bg-theme-row-selected-hover-dark':
@@ -28,6 +29,9 @@ export class TableRow extends ClassifiedElement {
 
     @property({ type: Boolean, attribute: 'header', reflect: true })
     protected isHeaderRow: boolean = false
+
+    @property({ type: Boolean, attribute: 'dirty' })
+    public dirty = false
 
     protected override willUpdate(_changedProperties: PropertyValueMap<this>): void {
         super.willUpdate(_changedProperties)

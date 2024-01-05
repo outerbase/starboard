@@ -3,8 +3,8 @@ import { Table as OuterbaseTable } from '../components/table'
 
 // test data
 import spaceballs from '../lib/sample-data.json'
-const rows = spaceballs.map((d) => ({...d, traits: JSON.stringify(d.traits)})).map((row) => ({id: crypto.randomUUID(), row }))
-const columns = Object.keys(rows[0].row).map((name) => ({name}))
+const rows = spaceballs.map((d) => ({...d, traits: JSON.stringify(d.traits)})).map((values) => ({id: crypto.randomUUID(), values, originalValues: values }))
+const columns = Object.keys(rows[0].values).map((name) => ({name}))
 ---
 <html lang="en" class="h-full">
     <head>

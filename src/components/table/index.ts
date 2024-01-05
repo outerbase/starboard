@@ -71,9 +71,6 @@ export class Table extends ClassifiedElement {
     @state()
     protected removedRowUUIDs: Set<string> = new Set()
 
-    @state()
-    protected dirtyRowUUIDs: Set<string> = new Set()
-
     public toggleSelected(uuid: string) {
         const _set = this.selectedRowUUIDs
         if (_set.has(uuid)) _set.delete(uuid)
@@ -120,13 +117,14 @@ export class Table extends ClassifiedElement {
                     autoIncrement: false,
                 },
             ]
-            this.rows = this.rows.map((row) => ({ ...row, row: { ...row.row, [name]: '' } }))
+            this.rows = this.rows.map((row) => ({ ...row, values: { ...row.values, [name]: '' } }))
             this.dispatchEvent(new ColumnAddedEvent({ name }))
         }
 
         // create row
         if (key === 'R') {
-            const row: RowAsRecord = { id: self.crypto.randomUUID(), row: {} }
+            const id = self.crypto.randomUUID()
+            const row: RowAsRecord = { id, values: {}, originalValues: {}, isNew: true }
             this.rows = [...this.rows, row]
             this.dispatchEvent(new RowAddedEvent(row))
         }
@@ -136,11 +134,9 @@ export class Table extends ClassifiedElement {
             this.selectedRowUUIDs.forEach((uuid) => this.removedRowUUIDs.add(uuid))
 
             const removedRows: Array<RowAsRecord> = []
-            Array.from(this.selectedRowUUIDs).forEach((_id) => {
-                const row = this.rows.find(({ id, row }) => _id === id)
-                if (row) {
-                    removedRows.push(row)
-                }
+            this.selectedRowUUIDs.forEach((_id) => {
+                const row = this.rows.find(({ id }) => _id === id)
+                if (row) removedRows.push(row)
             })
 
             this.dispatchEvent(new RowRemovedEvent(removedRows))
@@ -151,8 +147,8 @@ export class Table extends ClassifiedElement {
 
     protected onRowSelection() {
         const selectedRows: Array<RowAsRecord> = []
-        this.selectedRowUUIDs.forEach((id) => {
-            const row = this.rows.find((value) => value.id === id)
+        this.selectedRowUUIDs.forEach((_id) => {
+            const row = this.rows.find(({ id }) => _id === id)
             if (row) selectedRows.push(row)
         })
 
@@ -191,7 +187,6 @@ export class Table extends ClassifiedElement {
         // WARNING @johnny we probably don't want this to happen but instead to remove ones that are missing from the rows collection
         if (_changedProperties.has('rows')) {
             if (this.rows && this.rows.length > 0) {
-                this.dirtyRowUUIDs = new Set()
                 this.selectedRowUUIDs = new Set()
                 this.removedRowUUIDs = new Set()
             }
@@ -270,11 +265,11 @@ export class Table extends ClassifiedElement {
                 ${repeat(
                     this.rows,
                     ({ id }) => id,
-                    ({ id, row }) => {
+                    ({ id, values, originalValues, isNew }) => {
                         return !this.removedRowUUIDs.has(id)
                             ? html`<outerbase-tr
                                   .selected=${this.selectedRowUUIDs.has(id)}
-                                  ?dirty=${this.dirtyRowUUIDs.has(id)}
+                                  ?dirty=${isNew}
                                   @on-selection=${this.onRowSelection}
                               >
                                   <!-- checkmark cell -->
@@ -317,10 +312,11 @@ export class Table extends ClassifiedElement {
                                               ?menu=${!this.isNonInteractive}
                                               ?selectable-text=${this.isNonInteractive}
                                               ?interactive=${!this.isNonInteractive}
-                                              value=${row[name] ?? ''}
+                                              value=${values[name] ?? ''}
+                                              originalValue=${originalValues[name]}
                                               .position=${{ row: id, column: name }}
                                               @cell-updated=${() => {
-                                                  this.dispatchEvent(new RowUpdatedEvent({ id, row }))
+                                                  this.dispatchEvent(new RowUpdatedEvent({ id, values, originalValues, isNew }))
                                               }}
                                           >
                                           </outerbase-td>

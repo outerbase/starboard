@@ -22,7 +22,7 @@ export class MutableElement extends ClassifiedElement {
     @property({ type: String })
     public label?: string
 
-    @state()
+    @property()
     public originalValue?: string
 
     private valueBeforeEdit?: string
@@ -66,10 +66,12 @@ export class MutableElement extends ClassifiedElement {
             this.valueBeforeEdit = this.value
         }
 
-        if (changedProperties.has('isEditing') && !this.isEditing && this.valueBeforeEdit) {
-            // console.log('valueBeforeEdit:', this.valueBeforeEdit)
-            // console.log('value:', this.value)
-            if (this.valueBeforeEdit !== this.value) this.dispatchChangedEvent()
+        // after initial load, after editing, when the value has been changed
+        // isEditing is `undefined` on the initial run -> therefore we ignore that round
+        if (changedProperties.get('isEditing') && !this.isEditing && this.value !== this.valueBeforeEdit) {
+            if (this.valueBeforeEdit !== this.value) {
+                this.dispatchChangedEvent()
+            }
             delete this.valueBeforeEdit
         }
     }

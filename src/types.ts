@@ -39,7 +39,12 @@ export type Schema = {
 }
 export type Columns = Array<TableColumn>
 export type ColumnType = string | number | boolean | null | undefined
-export type RowAsRecord = { id: string; row: Record<string, ColumnType> }
+export type RowAsRecord = {
+    id: string
+    values: Record<string, ColumnType>
+    originalValues: Record<string, ColumnType>
+    isNew: boolean
+}
 export type Data = { [key: string]: ColumnType | Data }
 // API Response:
 export type Queryd = {
