@@ -47,6 +47,12 @@ export class ColumnRemovedEvent extends ColumnEvent {
     }
 }
 
+export class ColumnHiddenEvent extends ColumnEvent {
+    constructor(attr: ColumnAttributes) {
+        super('column-hidden', attr)
+    }
+}
+
 export class ColumnUpdatedEvent extends ColumnEvent {
     constructor(attr: ColumnAttributes) {
         super('column-updated', attr)
