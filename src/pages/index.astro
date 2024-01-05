@@ -20,6 +20,7 @@ const columns = Object.keys(rows[0].values).map((name) => ({name}))
             /* themes may also be set dynamically/programatically */
             // document.documentElement.style.setProperty("--success-color", "lime");
             
+            addEventListener('menu-selection', console.info)
             addEventListener('cell-updated', console.info)
             addEventListener('row-selected', console.info)
             addEventListener('row-added', console.info)
@@ -28,10 +29,9 @@ const columns = Object.keys(rows[0].values).map((name) => ({name}))
             addEventListener('column-added', console.info)
             addEventListener('column-updated', console.info)
             addEventListener('column-removed', console.info)
-            addEventListener('menu-selection', console.info)
             addEventListener('column-renamed', console.info)
             addEventListener('column-updated', console.info)
-            addEventListener('column-removed', console.info)
+            addEventListener('column-hidden', console.info)
         </script>
     </head>
 
