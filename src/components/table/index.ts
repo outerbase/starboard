@@ -5,6 +5,7 @@ import { repeat } from 'lit/directives/repeat.js'
 
 import {
     ColumnAddedEvent,
+    ColumnHiddenEvent,
     ColumnRemovedEvent,
     RowAddedEvent,
     RowRemovedEvent,
@@ -62,8 +63,18 @@ export class Table extends ClassifiedElement {
     @state()
     protected columns: Columns = []
 
+    @state()
+    protected get visibleColumns() {
+        // remove columns whom's name are present in the hidden collection
+        return this.columns.filter(({ name }) => (this._hiddenColumnNames ? this._hiddenColumnNames.indexOf(name) === -1 : true))
+    }
+
     @property({ attribute: 'rows', type: Array })
     public rows: Array<RowAsRecord> = []
+
+    // TODO @johnny make this a Set
+    @property({ attribute: 'hidden-columns', type: Array })
+    public _hiddenColumnNames: Array<string> = []
 
     @state()
     protected selectedRowUUIDs: Set<string> = new Set()
@@ -88,12 +99,27 @@ export class Table extends ClassifiedElement {
         })
     }
 
-    private onColumnRemoved({ name }: ColumnRemovedEvent) {
+    private _onColumnRemoved({ name }: ColumnRemovedEvent) {
         // remove the column named `name` from columns collection
         this.columns = this.columns.filter(({ name: _name }) => name !== _name)
 
         // remove the entry for this column from every row
-        this.rows = this.rows.map((row) => ({ ...row, [name]: undefined }))
+        // this.rows = this.rows.map((row) => ({ ...row, [name]: undefined }))
+    }
+
+    private _onColumnHidden({ name }: ColumnHiddenEvent) {
+        this._hiddenColumnNames.push(name)
+        this.requestUpdate('columns')
+    }
+
+    protected _onRowSelection() {
+        const selectedRows: Array<RowAsRecord> = []
+        this.selectedRowUUIDs.forEach((_id) => {
+            const row = this.rows.find(({ id }) => _id === id)
+            if (row) selectedRows.push(row)
+        })
+
+        this.dispatchEvent(new RowSelectedEvent(selectedRows))
     }
 
     protected onKeyDown_bound?: ({ shiftKey, key }: KeyboardEvent) => void
@@ -145,16 +171,6 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    protected onRowSelection() {
-        const selectedRows: Array<RowAsRecord> = []
-        this.selectedRowUUIDs.forEach((_id) => {
-            const row = this.rows.find(({ id }) => _id === id)
-            if (row) selectedRows.push(row)
-        })
-
-        this.dispatchEvent(new RowSelectedEvent(selectedRows))
-    }
-
     public override connectedCallback() {
         super.connectedCallback()
 
@@ -183,7 +199,7 @@ export class Table extends ClassifiedElement {
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
-        // when the row collection changes, reset dirty/selected/removed
+        // when the row collection changes, reset selected/removed
         // WARNING @johnny we probably don't want this to happen but instead to remove ones that are missing from the rows collection
         if (_changedProperties.has('rows')) {
             if (this.rows && this.rows.length > 0) {
@@ -194,7 +210,9 @@ export class Table extends ClassifiedElement {
 
         // identify columns from the schema
         if (_changedProperties.has('schema')) {
-            if (this.schema) this.columns = this.schema.columns
+            if (this.schema) {
+                this.columns = this.schema.columns
+            }
         }
 
         // Note: if both `data` and `source-id` are passed to `<outerbase-component />`
@@ -231,7 +249,7 @@ export class Table extends ClassifiedElement {
                     ${this.selectableRows
                         ? html`<outerbase-th
                               table-height=${ifDefined(this._height)}
-                              ?is-last=${0 < this.columns.length}
+                              ?is-last=${0 < this.visibleColumns.length}
                               ?blank=${true}
                           /></outerbase-th>`
                         : null}
@@ -239,16 +257,16 @@ export class Table extends ClassifiedElement {
                     <!-- render an TableHeader for each column -->
                     <!-- TODO this isn't yielding anything when SSR w/o hydration -->
                     ${repeat(
-                        this.columns,
+                        this.visibleColumns,
                         ({ name }, _idx) => name,
                         ({ name }, idx) => {
                             // omit column resizer on the last column because it's sort-of awkward
                             return html`<outerbase-th
-                                @column-removed=${this.onColumnRemoved}
+                                @column-hidden=${this._onColumnHidden}
                                 table-height=${ifDefined(this._height)}
                                 ?menu=${!this.isNonInteractive}
                                 ?with-resizer=${!this.isNonInteractive}
-                                ?is-last=${idx === this.columns.length - 1}
+                                ?is-last=${idx === this.visibleColumns.length - 1}
                                 ?removable=${true}
                                 ?interactive=${!this.isNonInteractive}
                                 name="${name}"
@@ -270,7 +288,7 @@ export class Table extends ClassifiedElement {
                             ? html`<outerbase-tr
                                   .selected=${this.selectedRowUUIDs.has(id)}
                                   ?dirty=${isNew}
-                                  @on-selection=${this.onRowSelection}
+                                  @on-selection=${this._onRowSelection}
                               >
                                   <!-- checkmark cell -->
                                   ${this.selectableRows
@@ -301,7 +319,7 @@ export class Table extends ClassifiedElement {
 
                                   <!-- render a TableCell for each column of data in the current row -->
                                   ${repeat(
-                                      this.columns,
+                                      this.visibleColumns,
                                       ({ name }) => name, // use the column name as the unique identifier for each entry in this row
                                       ({ name }) => html`
                                           <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->

@@ -7,7 +7,7 @@ import '../column-resizer.js'
 import { TWStyles } from '../../../tailwind/index.js'
 import { MutableElement } from '../mutable-element.js'
 import { classMap } from 'lit/directives/class-map.js'
-import { ColumnRemovedEvent, ColumnRenameEvent, ColumnUpdatedEvent, MenuSelectedEvent } from '../../lib/events.js'
+import { ColumnHiddenEvent, ColumnRemovedEvent, ColumnRenameEvent, ColumnUpdatedEvent, MenuSelectedEvent } from '../../lib/events.js'
 import './column-menu.js' // <outerbase-th-menu />
 import type { ColumnMenu } from './column-menu.js'
 import type { HeaderMenuOptions } from '../../types.js'
@@ -145,13 +145,23 @@ export class TH extends MutableElement {
         )
     }
 
+    protected hideColumn() {
+        if (!this.originalValue) throw new Error('missing OG value')
+
+        this.dispatchEvent(
+            new ColumnHiddenEvent({
+                name: this.originalValue,
+            })
+        )
+    }
+
     protected onMenuSelection(event: MenuSelectedEvent) {
         event.stopPropagation()
         let dispatchColumnUpdateEvent = false
 
         switch (event.value) {
             case 'hide':
-                return this.removeColumn()
+                return this.hideColumn()
             case 'rename':
                 return (this.isEditing = true)
             case 'delete':
