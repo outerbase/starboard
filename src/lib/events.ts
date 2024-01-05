@@ -62,36 +62,36 @@ export class ColumnSelectedEvent extends ColumnEvent {
 
 // ROWS
 export class RowsEvent extends BubblyEvent {
-    public rows: RowAsRecord | Array<RowAsRecord>
+    public rows: Array<RowAsRecord>
 
-    constructor(type: string, rows: RowAsRecord | Array<RowAsRecord>) {
+    constructor(type: string, rows: Array<RowAsRecord>) {
         super(type)
         this.rows = rows
     }
 }
 
 export class RowAddedEvent extends RowsEvent {
-    constructor(attr: RowAsRecord) {
-        super('row-added', attr)
+    constructor(row: RowAsRecord) {
+        super('row-added', [row])
     }
 }
 
 export class RowUpdatedEvent extends RowsEvent {
-    constructor(attrs: RowAsRecord) {
-        super('row-updated', attrs)
+    constructor(row: RowAsRecord) {
+        super('row-updated', [row])
     }
 }
 
 export class RowRemovedEvent extends RowsEvent {
-    constructor(attrs: Array<RowAsRecord>) {
-        super('row-removed', attrs)
+    constructor(rows: Array<RowAsRecord>) {
+        super('row-removed', rows)
     }
 }
 
 // when a row is selected, emits an array of all currently selected rows
 export class RowSelectedEvent extends RowsEvent {
-    constructor(attrs: Array<RowAsRecord>) {
-        super('row-selected', attrs)
+    constructor(rows: Array<RowAsRecord>) {
+        super('row-selected', rows)
     }
 }
 
