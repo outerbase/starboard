@@ -63,18 +63,23 @@ export class Table extends ClassifiedElement {
     @state()
     protected columns: Columns = []
 
+    // TODO @johnny make this a Set
+    @property({ attribute: 'hidden-columns', type: Array })
+    private _hiddenColumnNames: Array<string> = []
+
+    @property({ attribute: 'deleted-columns', type: Array })
+    public _deletedColumnNames: Array<string> = []
+
     @state()
     protected get visibleColumns() {
         // remove columns whom's name are present in the hidden collection
-        return this.columns.filter(({ name }) => (this._hiddenColumnNames ? this._hiddenColumnNames.indexOf(name) === -1 : true))
+        return this.columns.filter(
+            ({ name }) => this._hiddenColumnNames.indexOf(name) === -1 && this._deletedColumnNames.indexOf(name) === -1
+        )
     }
 
     @property({ attribute: 'rows', type: Array })
     public rows: Array<RowAsRecord> = []
-
-    // TODO @johnny make this a Set
-    @property({ attribute: 'hidden-columns', type: Array })
-    public _hiddenColumnNames: Array<string> = []
 
     @state()
     protected selectedRowUUIDs: Set<string> = new Set()
@@ -101,10 +106,8 @@ export class Table extends ClassifiedElement {
 
     private _onColumnRemoved({ name }: ColumnRemovedEvent) {
         // remove the column named `name` from columns collection
-        this.columns = this.columns.filter(({ name: _name }) => name !== _name)
-
-        // remove the entry for this column from every row
-        // this.rows = this.rows.map((row) => ({ ...row, [name]: undefined }))
+        this._deletedColumnNames.push(name)
+        this.requestUpdate('columns')
     }
 
     private _onColumnHidden({ name }: ColumnHiddenEvent) {
@@ -263,6 +266,7 @@ export class Table extends ClassifiedElement {
                             // omit column resizer on the last column because it's sort-of awkward
                             return html`<outerbase-th
                                 @column-hidden=${this._onColumnHidden}
+                                @column-removed=${this._onColumnRemoved}
                                 table-height=${ifDefined(this._height)}
                                 ?menu=${!this.isNonInteractive}
                                 ?with-resizer=${!this.isNonInteractive}
