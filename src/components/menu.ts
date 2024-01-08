@@ -120,8 +120,9 @@ export class Menu extends ClassifiedElement {
     }
 
     protected get listElement() {
-        let classes = 'top-6 -left-2' // defaults to left-half
+        if (!this.open) return null
 
+        let classes = 'top-6 -left-2' // defaults to left-half
         const isRenderingInBrowser = typeof window !== 'undefined'
         if (isRenderingInBrowser) {
             const position = this.getBoundingClientRect?.()
@@ -134,29 +135,27 @@ export class Menu extends ClassifiedElement {
             }
         }
 
-        return this.open
-            ? html` <ul class="absolute ${classes} z-20 bg-white dark:bg-black shadow-lg border rounded-lg overflow-hidden" role="menu">
-                  ${repeat(
-                      this.options,
-                      ({ label }) => label,
-                      ({ label, value, classes }) =>
-                          html`<li
-                              @click=${this.onItemClick}
-                              data-value=${value}
-                              class=${classMapToClassName({
-                                  [classes]: !!classes,
-                                  'text-ellipsis overflow-hidden': true,
-                                  'cursor-pointer py-2 px-3 border-b last:border-b-0 hover:bg-neutral-200 dark:hover:bg-neutral-800': true,
-                                  'bg-neutral-200 dark:bg-neutral-800': this.focused === value,
-                              })}
-                              role="menuitem"
-                              ?selected=${this.selection === value}
-                          >
-                              ${label}
-                          </li>`
-                  )}
-              </ul>`
-            : null
+        return html` <ul class="absolute ${classes} z-20 bg-white dark:bg-black shadow-lg border rounded-lg overflow-hidden" role="menu">
+            ${repeat(
+                this.options,
+                ({ label }) => label,
+                ({ label, value, classes }) =>
+                    html`<li
+                        @click=${this.onItemClick}
+                        data-value=${value}
+                        class=${classMapToClassName({
+                            [classes]: !!classes,
+                            'text-ellipsis overflow-hidden': true,
+                            'cursor-pointer py-2 px-3 border-b last:border-b-0 hover:bg-neutral-200 dark:hover:bg-neutral-800': true,
+                            'bg-neutral-200 dark:bg-neutral-800': this.focused === value,
+                        })}
+                        role="menuitem"
+                        ?selected=${this.selection === value}
+                    >
+                        ${label}
+                    </li>`
+            )}
+        </ul>`
     }
 
     protected override render() {
