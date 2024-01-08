@@ -71,9 +71,9 @@ export class Table extends ClassifiedElement {
     public _deletedColumnNames: Array<string> = []
 
     @state()
-    protected get visibleColumns() {
-        // remove columns whom's name are present in the hidden collection
-        return this.columns.filter(
+    protected visibleColumns: Columns = []
+    protected updateVisibleColumns() {
+        this.visibleColumns = this.columns.filter(
             ({ name }) => this._hiddenColumnNames.indexOf(name) === -1 && this._deletedColumnNames.indexOf(name) === -1
         )
     }
@@ -104,15 +104,29 @@ export class Table extends ClassifiedElement {
         })
     }
 
+    // remove data changes
+    public discardChanges() {
+        this.clearSelection() // rows
+        this._deletedColumnNames = []
+    }
+
+    // remove param settings
+    public resetParams() {
+        this.clearSelection()
+        this._hiddenColumnNames = []
+    }
+
     private _onColumnRemoved({ name }: ColumnRemovedEvent) {
         // remove the column named `name` from columns collection
         this._deletedColumnNames.push(name)
         this.requestUpdate('columns')
+        this.updateVisibleColumns()
     }
 
     private _onColumnHidden({ name }: ColumnHiddenEvent) {
         this._hiddenColumnNames.push(name)
         this.requestUpdate('columns')
+        this.updateVisibleColumns()
     }
 
     protected _onRowSelection() {
@@ -215,6 +229,7 @@ export class Table extends ClassifiedElement {
         if (_changedProperties.has('schema')) {
             if (this.schema) {
                 this.columns = this.schema.columns
+                this.updateVisibleColumns()
             }
         }
 
