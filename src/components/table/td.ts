@@ -24,9 +24,13 @@ export class TableData extends MutableElement {
                 this.originalValue !== undefined && this.value !== this.originalValue && !this.isEditing, // dirty cells
             // 'max-w-xs': !this.maxWidth, // default max width, unless specified
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
-            'border-r': this._drawRightBorder, // to avoid both a resize handler + a border
-            'first:border-l': this.separateCells, // left/right borders when the `separate-cells` attribute is set
-            'border-b': this.withBottomBorder, // bottom border when the `with-bototm-border` attribute is set
+            'border-r':
+                this.isInteractive ||
+                (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outterBorder) || // include last column when outterBorder
+                (this._drawRightBorder && this.separateCells && !this.isLastColumn), // internal cell walls
+            'first:border-l': this.separateCells && this.outterBorder, // left/right borders when the `separate-cells` attribute is set
+            'border-b': this.withBottomBorder && ((this.isLastRow && this.outterBorder) || !this.isLastRow), // bottom border when the `with-bottom-border` attribute is set
+            // 'border-b-none': !this.outterBorder && this.isLastColumn,
             'cursor-pointer': this.isInteractive,
         }
     }
@@ -66,6 +70,15 @@ export class TableData extends MutableElement {
 
     @property({ type: Boolean, attribute: 'row-selector' })
     isRowSelector = false
+
+    @property({ attribute: 'outter-border', type: Boolean })
+    public outterBorder = false
+
+    @property({ attribute: 'is-last-column', type: Boolean })
+    protected isLastColumn = false
+
+    @property({ attribute: 'is-last-row', type: Boolean })
+    protected isLastRow = false
 
     @state()
     protected options = [

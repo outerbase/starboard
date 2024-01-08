@@ -54,6 +54,9 @@ export class Table extends ClassifiedElement {
     @property({ type: Array, attribute: 'column-options' })
     protected columnOptions?: Array<HeaderMenuOptions>
 
+    @property({ attribute: 'outter-border', type: Boolean })
+    public outterBorder = false
+
     @state()
     private _height?: number
 
@@ -267,13 +270,12 @@ export class Table extends ClassifiedElement {
                     ${this.selectableRows
                         ? html`<outerbase-th
                               table-height=${ifDefined(this._height)}
-                              ?is-last=${0 < this.visibleColumns.length}
+                              ?separate-cells=${true}
+                              ?outter-border=${this.outterBorder}
+                              ?is-last=${0 === this.visibleColumns.length}
                               ?blank=${true}
                           /></outerbase-th>`
                         : null}
-
-                    <!-- render an TableHeader for each column -->
-                    <!-- TODO this isn't yielding anything when SSR w/o hydration -->
                     ${repeat(
                         this.visibleColumns,
                         ({ name }, _idx) => name,
@@ -283,6 +285,8 @@ export class Table extends ClassifiedElement {
                                 @column-hidden=${this._onColumnHidden}
                                 @column-removed=${this._onColumnRemoved}
                                 table-height=${ifDefined(this._height)}
+                                ?separate-cells=${true}
+                                ?outter-border=${this.outterBorder}
                                 ?menu=${!this.isNonInteractive}
                                 ?with-resizer=${!this.isNonInteractive}
                                 ?is-last=${idx === this.visibleColumns.length - 1}
@@ -302,7 +306,7 @@ export class Table extends ClassifiedElement {
                 ${repeat(
                     this.rows,
                     ({ id }) => id,
-                    ({ id, values, originalValues, isNew }) => {
+                    ({ id, values, originalValues, isNew }, rowIndex) => {
                         return !this.removedRowUUIDs.has(id)
                             ? html`<outerbase-tr
                                   .selected=${this.selectedRowUUIDs.has(id)}
@@ -315,7 +319,11 @@ export class Table extends ClassifiedElement {
                                             ?separate-cells=${true}
                                             ?draw-right-border=${true}
                                             ?bottom-border=${true}
+                                            ?outter-border=${this.outterBorder}
                                             ?blank=${true}
+                                            ?is-last-row=${rowIndex === this.rows.length - 1}
+                                            ?is-last-column=${false}
+                                            ?interactive=${!this.isNonInteractive}
                                             .position=${{
                                                 row: id,
                                                 column: '__selected', // our own; not expected to exist in DB
@@ -340,12 +348,15 @@ export class Table extends ClassifiedElement {
                                   ${repeat(
                                       this.visibleColumns,
                                       ({ name }) => name, // use the column name as the unique identifier for each entry in this row
-                                      ({ name }) => html`
+                                      ({ name }, idx) => html`
                                           <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
                                           <outerbase-td
                                               ?separate-cells=${true}
                                               ?draw-right-border=${true}
                                               ?bottom-border=${true}
+                                              ?outter-border=${this.outterBorder}
+                                              ?is-last-row=${rowIndex === this.rows.length - 1}
+                                              ?is-last-column=${idx === this.visibleColumns.length - 1}
                                               ?menu=${!this.isNonInteractive}
                                               ?selectable-text=${this.isNonInteractive}
                                               ?interactive=${!this.isNonInteractive}

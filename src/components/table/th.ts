@@ -19,13 +19,16 @@ export class TH extends MutableElement {
     protected override get classMap() {
         return {
             'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
-            'first:border-l border-b border-t border-theme-border dark:border-theme-border-dark': true,
+            'border-b border-theme-border dark:border-theme-border-dark': true,
+            'first:border-l border-t': this.outterBorder,
             'px-cell-padding-x py-cell-padding-y': true,
             'bg-theme-column dark:bg-theme-column-dark': true,
             'bg-yellow-100 dark:bg-yellow-900': this.dirty,
             'select-none': this.hasMenu, // this is really about handling SSR without hydration; TODO use a better flag?
             // prevent double borders
-            'border-r': !this.withResizer, // use regular border
+            'border-r':
+                (!this.withResizer && this.isLastColumn && this.outterBorder) ||
+                (!this.withResizer && this.separateCells && !this.isLastColumn),
             'cursor-pointer': this.isInteractive,
         }
     }
@@ -36,6 +39,9 @@ export class TH extends MutableElement {
     @property({ attribute: 'with-resizer', type: Boolean })
     public withResizer = false
 
+    @property({ attribute: 'outter-border', type: Boolean })
+    public outterBorder = false
+
     @property({ attribute: 'name', type: String })
     public override value = ''
 
@@ -44,6 +50,10 @@ export class TH extends MutableElement {
 
     @property({ attribute: 'is-last', type: Boolean })
     protected isLastColumn = false
+
+    // allows, for example, <outerbase-td separate-cells="true" />
+    @property({ type: Boolean, attribute: 'separate-cells' })
+    public separateCells: boolean = false
 
     @property({ attribute: 'menu', type: Boolean })
     hasMenu = false
