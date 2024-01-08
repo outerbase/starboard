@@ -104,13 +104,13 @@ export class Table extends ClassifiedElement {
         })
     }
 
-    // remove data changes
+    // clear data changes
     public discardChanges() {
         this.clearSelection() // rows
         this._deletedColumnNames = []
     }
 
-    // remove param settings
+    // clear param settings
     public resetParams() {
         this.clearSelection()
         this._hiddenColumnNames = []
