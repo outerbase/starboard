@@ -120,11 +120,22 @@ export class Menu extends ClassifiedElement {
     }
 
     protected get listElement() {
+        let classes = 'top-6 -left-2' // defaults to left-half
+
+        const isRenderingInBrowser = typeof window !== 'undefined'
+        if (isRenderingInBrowser) {
+            const position = this.getBoundingClientRect?.()
+            const right = position?.right ?? -1
+            const pageWidth = window?.innerWidth
+
+            // when on the right-half of the page
+            if (right > pageWidth / 2) {
+                classes = 'top-6 -left-44 -right-2'
+            }
+        }
+
         return this.open
-            ? html` <ul
-                  class="absolute top-6 -left-44 -right-2 z-20 bg-white dark:bg-black shadow-lg border rounded-lg overflow-hidden"
-                  role="menu"
-              >
+            ? html` <ul class="absolute ${classes} z-20 bg-white dark:bg-black shadow-lg border rounded-lg overflow-hidden" role="menu">
                   ${repeat(
                       this.options,
                       ({ label }) => label,
