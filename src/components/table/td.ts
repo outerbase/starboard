@@ -18,7 +18,7 @@ export class TableData extends MutableElement {
             'table-cell relative py-cell-padding-y': true,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
-            'focus:ring-4 focus:ring-green-400 focus:z-10 focus:outline-none': true,
+            'focus:ring-4 focus:ring-black dark:focus:ring-white focus:z-10 focus:outline-none': true,
 
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark':
                 this.originalValue !== undefined && this.value !== this.originalValue && !this.isEditing, // dirty cells
@@ -30,7 +30,6 @@ export class TableData extends MutableElement {
                 (this._drawRightBorder && this.separateCells && !this.isLastColumn), // internal cell walls
             'first:border-l': this.separateCells && this.outterBorder, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder && ((this.isLastRow && this.outterBorder) || !this.isLastRow), // bottom border when the `with-bottom-border` attribute is set
-            // 'border-b-none': !this.outterBorder && this.isLastColumn,
             'cursor-pointer': this.isInteractive,
         }
     }
