@@ -18,7 +18,7 @@ export class TableData extends MutableElement {
             'table-cell relative py-cell-padding-y': true,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
-            'focus:ring-4 focus:ring-black dark:focus:ring-white focus:z-10 focus:outline-none': true,
+            'focus:ring-4 focus:ring-black dark:focus:ring-white focus:z-10 focus:outline-none': !this.isEditing,
 
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark':
                 this.originalValue !== undefined && this.value !== this.originalValue && !this.isEditing, // dirty cells
