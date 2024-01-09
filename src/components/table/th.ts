@@ -179,7 +179,7 @@ export class TH extends MutableElement {
             case 'reset':
                 this.dispatchEvent(
                     new ColumnRenameEvent({
-                        name: this.label ?? '',
+                        name: this.originalValue ?? '',
                         data: { value: this.value },
                     })
                 )
