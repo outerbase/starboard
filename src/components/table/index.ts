@@ -73,6 +73,9 @@ export class Table extends ClassifiedElement {
     @property({ attribute: 'deleted-columns', type: Array })
     public _deletedColumnNames: Array<string> = []
 
+    @property({ attribute: 'renamed-columns', type: Object })
+    public _renamedColumns: Record<string, string> = {}
+
     @state()
     protected visibleColumns: Columns = []
     protected updateVisibleColumns() {
@@ -292,7 +295,8 @@ export class Table extends ClassifiedElement {
                                 ?is-last=${idx === this.visibleColumns.length - 1}
                                 ?removable=${true}
                                 ?interactive=${!this.isNonInteractive}
-                                name="${name}"
+                                name="${this._renamedColumns[name] ?? name}"
+                                original-value="${name}"
                                 .options=${this.columnOptions || nothing}
                             >
                             </outerbase-th>`

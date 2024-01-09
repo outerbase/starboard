@@ -22,7 +22,7 @@ export class MutableElement extends ClassifiedElement {
     @property({ type: String })
     public label?: string
 
-    @property()
+    @property({ attribute: 'original-value', type: String })
     public originalValue?: string
 
     private valueBeforeEdit?: string
