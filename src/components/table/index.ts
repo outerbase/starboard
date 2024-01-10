@@ -7,6 +7,8 @@ import {
     ColumnAddedEvent,
     ColumnHiddenEvent,
     ColumnRemovedEvent,
+    ResizeEvent,
+    ResizeStartEvent,
     RowAddedEvent,
     RowRemovedEvent,
     RowSelectedEvent,
@@ -254,6 +256,22 @@ export class Table extends ClassifiedElement {
         }
     }
 
+    private _previousWidth = 0
+
+    private _onColumnResizeStart(_event: ResizeStartEvent) {
+        const table = this.shadowRoot?.getElementById('table')
+        if (!table) throw new Error('Unexpectedly missing a table')
+
+        this._previousWidth = table.clientWidth
+    }
+
+    private _onColumnResized({ delta }: ResizeEvent) {
+        const table = this.shadowRoot?.getElementById('table')
+        if (!table) throw new Error('Unexpectedly missing a table')
+
+        table.style.width = `${this._previousWidth + delta}px`
+    }
+
     protected override render() {
         // WARNING `overflow-hidden` breaks the stickyness of the header
         // 'overflow-hidden' is necessary to prevent the ColumnResizer from going beyond the table.
@@ -265,7 +283,8 @@ export class Table extends ClassifiedElement {
         // this commented out version "resolves" the cells changing width with toggling between editing and viewing
         // return html`<div class="table table-fixed w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
         return html`<div
-            class="table table-fixed bg-theme-table dark:bg-theme-table-dark text-theme-text dark:text-theme-text-dark font-mono text-sm"
+            id="table"
+            class="table bg-theme-table dark:bg-theme-table-dark text-theme-text dark:text-theme-text-dark font-mono text-sm"
         >
             <outerbase-thead>
                 <outerbase-tr header>
@@ -287,6 +306,8 @@ export class Table extends ClassifiedElement {
                             return html`<outerbase-th
                                 @column-hidden=${this._onColumnHidden}
                                 @column-removed=${this._onColumnRemoved}
+                                @resize-start=${this._onColumnResizeStart}
+                                @resize=${this._onColumnResized}
                                 table-height=${ifDefined(this._height)}
                                 ?separate-cells=${true}
                                 ?outter-border=${this.outterBorder}

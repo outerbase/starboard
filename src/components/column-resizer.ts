@@ -4,7 +4,7 @@ import { html, type PropertyValueMap } from 'lit'
 import type { TH } from './table/th.js'
 import { TWStyles } from '../../tailwind/index.js'
 import { ClassifiedElement } from './classified-element.js'
-import { ResizeEndEvent, ResizeStartEvent } from '../lib/events.js'
+import { ResizeEndEvent, ResizeEvent, ResizeStartEvent } from '../lib/events.js'
 
 @customElement('column-resizer')
 export class ColumnResizer extends ClassifiedElement {
@@ -27,22 +27,24 @@ export class ColumnResizer extends ClassifiedElement {
 
         this.dispatchEvent(new ResizeStartEvent())
 
+        let dx: number
+
         const _mouseMove = (e: MouseEvent) => {
             if (!this.column) throw new Error('`column` is unset; aborting')
             if (!this.xPosition) throw new Error('`xPosition` is unset; aborting')
             if (!this.width) throw new Error('`width` is unset; aborting')
 
-            const dx = e.clientX - this.xPosition
+            dx = e.clientX - this.xPosition
             this.column.style.width = `${this.width + dx}px`
 
-            // TODO make the table wider?
+            this.dispatchEvent(new ResizeEvent(dx))
         }
 
         const _mouseUp = (_e: Event) => {
             document.removeEventListener('mouseup', _mouseUp)
             document.removeEventListener('mousemove', _mouseMove)
 
-            this.dispatchEvent(new ResizeEndEvent())
+            this.dispatchEvent(new ResizeEndEvent(dx))
         }
 
         document.addEventListener('mousemove', _mouseMove)
