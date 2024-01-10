@@ -8,7 +8,7 @@ import { Menu } from '../menu.js'
 export class CellMenu extends Menu {
     protected override get classMap() {
         return {
-            'relative flex items-center justify-between px-cell-padding-x gap-2': true,
+            'relative flex items-center justify-between px-cell-padding-x gap-2 font-mono font-bold': true,
             'select-none': !this.selectableText,
         }
     }
@@ -27,7 +27,8 @@ export class CellMenu extends Menu {
         return html`
             <span
                 class=${classMap({
-                    'whitespace-nowrap text-ellipsis overflow-hidden max-w-[300px]': true,
+                    'overflow-hidden max-w-[300px] ': true,
+                    'whitespace-nowrap text-ellipsis font-mono': true,
                     'focus:z-10': true,
                 })}
                 ><slot></slot

@@ -6,7 +6,7 @@ import { Menu } from '../menu.js'
 export class ColumnMenu extends Menu {
     protected override get classMap() {
         return {
-            'relative flex items-center justify-between': true,
+            'relative flex items-center justify-between font-mono': true,
         }
     }
 }
