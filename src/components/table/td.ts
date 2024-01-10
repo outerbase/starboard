@@ -82,7 +82,7 @@ export class TableData extends MutableElement {
     @state()
     protected options = [
         { label: 'Edit', value: 'edit' },
-        { label: 'Edit as JSON', value: 'edit:json' },
+        // { label: 'Edit as JSON', value: 'edit:json' },
         { label: 'Copy', value: 'copy' },
         { label: 'Clear', value: 'clear' },
     ]
