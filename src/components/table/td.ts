@@ -15,7 +15,7 @@ export class TableData extends MutableElement {
     static override styles = TWStyles
     protected override get classMap() {
         return {
-            'table-cell relative py-cell-padding-y font-mono': true,
+            'table-cell relative py-cell-padding-y ': true,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
             'focus:ring-4 focus:ring-black dark:focus:ring-white focus:z-10 focus:outline-none': !this.isEditing,
@@ -132,7 +132,7 @@ export class TableData extends MutableElement {
                               ]
                             : this.options}
                         @menu-selection=${this.onMenuSelection}
-                        >${this.value || html`&nbsp;`}</outerbase-td-menu
+                        ><span class="font-normal">${this.value || html`&nbsp;`}</span></outerbase-td-menu
                     >`
     }
 
