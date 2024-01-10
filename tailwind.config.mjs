@@ -35,8 +35,8 @@ export default {
                     text: 'var(--text-color, #000000)',
                     'text-dark': 'var(--text-color-dark, #ffffff)',
 
-                    table: 'var(--table-background-color, rgb(255,255,255))',
-                    'table-dark': 'var(--table-background-color, rgb(10,10,10))',
+                    table: 'var(--table-background-color, rgba(255,255,255, 0))',
+                    'table-dark': 'var(--table-background-color, rgba(10,10,10, 0))',
 
                     // borders
                     border: 'var(--border-color, #e5e7eb)',
