@@ -1,6 +1,6 @@
 {
     "name": "starboard",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "type": "module",
     "main": "lit-dist/src/components/table/index.js",
     "module": "lit-dist/src/components/table/index.js",
@@ -20,19 +20,19 @@
     },
     "dependencies": {
         "lit": "^2.8.0",
-        "tailwindcss": "^3.3.6",
+        "tailwindcss": "^3.4.1",
         "typescript": "^5.3.3"
     },
     "devDependencies": {
-        "@astrojs/check": "^0.3.2",
+        "@astrojs/check": "^0.3.4",
         "@astrojs/lit": "^3.0.3",
-        "@astrojs/tailwind": "^5.0.3",
+        "@astrojs/tailwind": "^5.1.0",
         "@types/yargs": "^17.0.32",
         "@webcomponents/template-shadowroot": "^0.2.1",
-        "astro": "^4.0.4",
+        "astro": "^4.1.1",
         "concurrently": "^8.2.2",
         "prettier": "^3.1.1",
-        "prettier-plugin-astro": "^0.12.2",
+        "prettier-plugin-astro": "^0.12.3",
         "yargs": "^17.7.2"
     }
 }
