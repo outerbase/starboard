@@ -23,7 +23,7 @@ export class CellMenu extends Menu {
         // @click shows/hides the menu
         // @dblclick prevents parent's dblclick
         // @keydown navigates the menu
-        const trigger = this.hasMenu ? html`<span class="font-bold focus:z-10">{}</span>` : null
+        // const trigger = this.hasMenu ? html`<span class="font-bold focus:z-10">{}</span>` : null
         return html`
             <span
                 class=${classMap({
@@ -40,7 +40,7 @@ export class CellMenu extends Menu {
                 @dblclick=${(e: MouseEvent) => e.stopPropagation()}
                 @keydown=${this.onKeyDown}
             >
-                ${trigger} ${this.listElement}</span
+                ${this.listElement}</span
             >
         `
     }
