@@ -12,6 +12,13 @@ Before some arbitrary other module can import these LitElement component(s), the
 pnpm dev
 ```
 
+### Developing for Dashboard
+
+```
+# pnpm build:lit
+pnpm build:lit:watch
+```
+
 ## Importing into another project
 
 From this repo
@@ -23,7 +30,7 @@ pnpm --global link
 From the other repo
 
 ```
-pnpm --global starboard
+pnpm --global link ../path/to/starboard
 ```
 
 This will allow you to, for example, transform it into a React component:
