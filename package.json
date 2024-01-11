@@ -29,7 +29,7 @@
         "@astrojs/tailwind": "^5.1.0",
         "@types/yargs": "^17.0.32",
         "@webcomponents/template-shadowroot": "^0.2.1",
-        "astro": "^4.1.1",
+        "astro": "^4.1.2",
         "concurrently": "^8.2.2",
         "prettier": "^3.1.1",
         "prettier-plugin-astro": "^0.12.3",
