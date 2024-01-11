@@ -133,7 +133,9 @@ export class TableData extends MutableElement {
                               ]
                             : this.options}
                         @menu-selection=${this.onMenuSelection}
-                        ><span class="font-normal">${this.value || html`&nbsp;`}</span></outerbase-td-menu
+                        ><span class="font-normal"
+                            >${this.value || html`<span class="italic text-neutral-400 dark:text-neutral-600">NULL</span>`}</span
+                        ></outerbase-td-menu
                     >`
     }
 
