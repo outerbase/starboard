@@ -31,6 +31,13 @@ import './tr.js'
 export class Table extends ClassifiedElement {
     static override styles = TWStyles // necessary, or *nothing* is styled
 
+    // TODO @johnny determine if we need this for third-party usage (because Dashboard doesn't)
+    // protected override get classMap() {
+    //     return {
+    //         'overflow-scroll overscroll-contain': true,
+    //     }
+    // }
+
     // STATE
     @property({ type: Boolean, attribute: 'selectable-rows' })
     public selectableRows = false
