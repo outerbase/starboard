@@ -1,6 +1,6 @@
 import { customElement, property, state } from 'lit/decorators.js'
-import { ifDefined } from 'lit/directives/if-defined.js'
 import { html, nothing, type PropertyValueMap } from 'lit'
+import { ifDefined } from 'lit/directives/if-defined.js'
 import { repeat } from 'lit/directives/repeat.js'
 
 import {
@@ -14,7 +14,7 @@ import {
     RowSelectedEvent,
     RowUpdatedEvent,
 } from '../../lib/events.js'
-import type { Queryd, Columns, Schema, HeaderMenuOptions, RowAsRecord } from '../../types.js'
+import type { Columns, Schema, HeaderMenuOptions, RowAsRecord } from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
 import dbRowsForSource from '../../lib/rows-for-source-id.js'
 import { ClassifiedElement } from '../classified-element.js'
@@ -31,33 +31,44 @@ import './tr.js'
 export class Table extends ClassifiedElement {
     static override styles = TWStyles // necessary, or *nothing* is styled
 
-    @property({ type: Object, attribute: 'data' })
-    public data?: Queryd
-
+    // STATE
     @property({ type: Boolean, attribute: 'selectable-rows' })
     public selectableRows = false
 
     @property({ type: String, attribute: 'keyboard-shortcuts' })
     public keyboardShortcuts: boolean = false
 
+    // TODO use or remove this property
+    @property({ type: String, attribute: 'source-id' })
+    public sourceId?: string
+
     @property({ type: Object, attribute: 'schema' })
     public schema?: Schema
+
+    @property({ attribute: 'rows', type: Array })
+    public rows: Array<RowAsRecord> = []
 
     @property({ type: Boolean, attribute: 'non-interactive' })
     public isNonInteractive = false
 
-    // fetch data from Outerbase when `sourceId` changes
-    @property({ type: String, attribute: 'source-id' })
-    protected sourceId?: string
-
     @property({ type: String, attribute: 'auth-token' })
-    protected authToken?: string
+    public authToken?: string
 
     @property({ type: Array, attribute: 'column-options' })
-    protected columnOptions?: Array<HeaderMenuOptions>
+    public columnOptions?: Array<HeaderMenuOptions>
 
     @property({ attribute: 'outter-border', type: Boolean })
     public outterBorder = false
+
+    // TODO @johnny make this a Set
+    @property({ attribute: 'hidden-columns', type: Array })
+    public hiddenColumnNames: Array<string> = []
+
+    @property({ attribute: 'deleted-columns', type: Array })
+    public deletedColumnNames: Array<string> = []
+
+    @property({ attribute: 'renamed-columns', type: Object })
+    public renamedColumns: Record<string, string> = {}
 
     @state()
     private _height?: number
@@ -68,34 +79,34 @@ export class Table extends ClassifiedElement {
     @state()
     protected columns: Columns = []
 
-    // TODO @johnny make this a Set
-    @property({ attribute: 'hidden-columns', type: Array })
-    private _hiddenColumnNames: Array<string> = []
-
-    @property({ attribute: 'deleted-columns', type: Array })
-    public _deletedColumnNames: Array<string> = []
-
-    @property({ attribute: 'renamed-columns', type: Object })
-    public _renamedColumns: Record<string, string> = {}
-
     @state()
     protected visibleColumns: Columns = []
     protected updateVisibleColumns() {
         this.visibleColumns = this.columns.filter(
-            ({ name }) => this._hiddenColumnNames.indexOf(name) === -1 && this._deletedColumnNames.indexOf(name) === -1
+            ({ name }) => this.hiddenColumnNames.indexOf(name) === -1 && this.deletedColumnNames.indexOf(name) === -1
         )
     }
-
-    @property({ attribute: 'rows', type: Array })
-    public rows: Array<RowAsRecord> = []
-
     @state()
     protected selectedRowUUIDs: Set<string> = new Set()
 
     @state()
     protected removedRowUUIDs: Set<string> = new Set()
 
-    public toggleSelected(uuid: string) {
+    // METHODS (public)
+    public addNewRow(row?: Partial<RowAsRecord>) {
+        const _row: RowAsRecord = {
+            id: row?.id ?? self.crypto.randomUUID(),
+            values: row?.values ?? {},
+            originalValues: row?.originalValues ?? {},
+            isNew: row?.isNew ?? true,
+        }
+
+        this.rows.push(_row)
+        this.requestUpdate('rows')
+        this.dispatchEvent(new RowAddedEvent(_row))
+    }
+
+    public toggleSelectedRow(uuid: string) {
         const _set = this.selectedRowUUIDs
         if (_set.has(uuid)) _set.delete(uuid)
         else _set.add(uuid)
@@ -115,24 +126,25 @@ export class Table extends ClassifiedElement {
     // clear data changes
     public discardChanges() {
         this.clearSelection() // rows
-        this._deletedColumnNames = []
+        this.deletedColumnNames = []
     }
 
     // clear param settings
     public resetParams() {
         this.clearSelection()
-        this._hiddenColumnNames = []
+        this.hiddenColumnNames = []
     }
 
-    private _onColumnRemoved({ name }: ColumnRemovedEvent) {
+    // METHODS (private)
+    protected _onColumnRemoved({ name }: ColumnRemovedEvent) {
         // remove the column named `name` from columns collection
-        this._deletedColumnNames.push(name)
+        this.deletedColumnNames.push(name)
         this.requestUpdate('columns')
         this.updateVisibleColumns()
     }
 
-    private _onColumnHidden({ name }: ColumnHiddenEvent) {
-        this._hiddenColumnNames.push(name)
+    protected _onColumnHidden({ name }: ColumnHiddenEvent) {
+        this.hiddenColumnNames.push(name)
         this.requestUpdate('columns')
         this.updateVisibleColumns()
     }
@@ -147,6 +159,7 @@ export class Table extends ClassifiedElement {
         this.dispatchEvent(new RowSelectedEvent(selectedRows))
     }
 
+    // KEYBOARD SHORTCUTS
     protected onKeyDown_bound?: ({ shiftKey, key }: KeyboardEvent) => void
     protected onKeyDown({ shiftKey, key }: KeyboardEvent) {
         if (!shiftKey) return
@@ -174,10 +187,7 @@ export class Table extends ClassifiedElement {
 
         // create row
         if (key === 'R') {
-            const id = self.crypto.randomUUID()
-            const row: RowAsRecord = { id, values: {}, originalValues: {}, isNew: true }
-            this.rows = [...this.rows, row]
-            this.dispatchEvent(new RowAddedEvent(row))
+            this.addNewRow()
         }
 
         // delete selection
@@ -196,6 +206,7 @@ export class Table extends ClassifiedElement {
         }
     }
 
+    // LIFECYCLE HOOKS
     public override connectedCallback() {
         super.connectedCallback()
 
@@ -225,7 +236,6 @@ export class Table extends ClassifiedElement {
     // it's purpose is to force all of the fields to be reset, i.e. on discard changes we want to forget changes to `value`
     // this is accomplished by involving it in the `key` property of the `repeat` call in `render()`
     private _version = 0
-
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
@@ -255,14 +265,14 @@ export class Table extends ClassifiedElement {
             if (this.sourceId && this.sourceId !== previousSourceId) {
                 console.debug(`sourceId changed from ${previousSourceId} to ${this.sourceId}; fetching new data`)
                 dbRowsForSource(this.sourceId, this.authToken).then((data) => {
-                    this.data = data
+                    //
                 })
             }
         }
     }
 
     private _previousWidth = 0
-
+    // this variable is utilized while updating widths on('mousemove')
     private _onColumnResizeStart(_event: ResizeStartEvent) {
         const table = this.shadowRoot?.getElementById('table')
         if (!table) throw new Error('Unexpectedly missing a table')
@@ -283,10 +293,6 @@ export class Table extends ClassifiedElement {
         // because the Resizer stays in place as you scroll down the page
         // while the rest of the table scrolls out of view
 
-        // WARNING!!! `table-auto` breaks the column resizer, while `table-fixed w-full` sort-of allows it but the table is stuck
-
-        // this commented out version "resolves" the cells changing width with toggling between editing and viewing
-        // return html`<div class="table table-fixed w-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
         return html`<div
             id="table"
             class="table bg-theme-table dark:bg-theme-table-dark text-theme-text dark:text-theme-text-dark font-mono text-sm"
@@ -321,7 +327,7 @@ export class Table extends ClassifiedElement {
                                 ?is-last=${idx === this.visibleColumns.length - 1}
                                 ?removable=${true}
                                 ?interactive=${!this.isNonInteractive}
-                                name="${this._renamedColumns[name] ?? name}"
+                                name="${this.renamedColumns[name] ?? name}"
                                 original-value="${name}"
                                 .options=${this.columnOptions || nothing}
                             >
@@ -367,7 +373,7 @@ export class Table extends ClassifiedElement {
                                                     class="row-select-checkbox h-4 w-4 mr-[1px] block focus:z-10 "
                                                     type="checkbox"
                                                     ?checked="${this.selectedRowUUIDs.has(id)}"
-                                                    @click="${() => this.toggleSelected(id)}"
+                                                    @click="${() => this.toggleSelectedRow(id)}"
                                                     tabindex="0"
                                                 />
                                             </div>
