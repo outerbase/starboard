@@ -22,8 +22,8 @@ export class TableData extends MutableElement {
 
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark':
                 this.originalValue !== undefined && this.value !== this.originalValue && !this.isEditing, // dirty cells
-            // 'max-w-xs': !this.maxWidth, // default max width, unless specified
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
+            'max-w-64': !this.maxWidth, // default max width, unless specified
             'border-r':
                 this.isInteractive ||
                 (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outterBorder) || // include last column when outterBorder
