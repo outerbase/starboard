@@ -59,8 +59,8 @@ export default {
                     'row-selected-dark': 'var(--table-row-selected-background-color-dark, rgb(23 23 23))',
                     'row-selected-hover': 'var(--table-row-selected-hover-background-color, rgba(229, 229, 229, 1))',
                     'row-selected-hover-dark': 'var(--table-row-selected-hover-background-color-dark, rgb(38 38 38))',
-                    'row-dirty': 'var(--table-row-dirty, rgba(22, 163, 74, 0.33))',
-                    'row-dirty-dark': 'var(--table-row-dirty-dark, rgba(21, 128, 61, 0.5))',
+                    'row-new': 'var(--table-row-new, rgba(22, 163, 74, 0.33))',
+                    'row-new-dark': 'var(--table-row-new-dark, rgba(21, 128, 61, 0.5))',
 
                     // unused
                     // active: 'var(--active-background-color-dark, #fefefe)',

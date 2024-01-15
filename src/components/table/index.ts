@@ -353,7 +353,7 @@ export class Table extends ClassifiedElement {
                         return !this.removedRowUUIDs.has(id)
                             ? html`<outerbase-tr
                                   .selected=${this.selectedRowUUIDs.has(id)}
-                                  ?dirty=${isNew}
+                                  ?new=${isNew}
                                   @on-selection=${this._onRowSelection}
                               >
                                   <!-- checkmark cell -->

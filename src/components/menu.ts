@@ -144,7 +144,10 @@ export class Menu extends ClassifiedElement {
             }
         }
 
-        return html` <ul class="absolute ${classes} z-20 bg-white dark:bg-black shadow-lg border rounded-lg overflow-hidden" role="menu">
+        return html` <ul
+            class="absolute ${classes} z-20 bg-white dark:bg-black shadow-lg rounded-2xl p-1 duration-150 ease-bounce overflow-hidden"
+            role="menu"
+        >
             ${repeat(
                 this.options,
                 ({ label }) => label,
@@ -155,7 +158,8 @@ export class Menu extends ClassifiedElement {
                         class=${classMapToClassName({
                             [classes]: !!classes,
                             'text-ellipsis overflow-hidden': true,
-                            'cursor-pointer py-2 px-3 border-b last:border-b-0 hover:bg-neutral-200 dark:hover:bg-neutral-800': true,
+                            'rounded-xl px-4 py-3': true,
+                            'cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-800': true,
                             'bg-neutral-200 dark:bg-neutral-800': this.focused === value,
                         })}
                         role="menuitem"
@@ -176,7 +180,7 @@ export class Menu extends ClassifiedElement {
             <slot></slot>
             <span
                 id="trigger"
-                class="relative hover:bg-neutral-100 dark:hover:bg-neutral-900 active:border-neutral-200 dark:active:border-neutral-800 p-0.5 rounded-full border border-transparent"
+                class="relative hover:bg-neutral-100 dark:hover:bg-neutral-900 active:border-neutral-200 dark:active:border-neutral-800 p-0.5 rounded-md border border-transparent"
                 aria-haspopup="menu"
                 tabIndex="0"
                 @click=${this.onTrigger}
