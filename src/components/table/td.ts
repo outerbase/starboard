@@ -18,7 +18,7 @@ export class TableData extends MutableElement {
             'table-cell relative py-cell-padding-y ': true,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
-            'focus:ring-4 focus:ring-black dark:focus:ring-white focus:z-10 focus:outline-none': !this.isEditing,
+            'focus:ring-2 focus:ring-black dark:focus:ring-white focus:z-10 focus:outline-none': !this.isEditing,
 
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark':
                 this.originalValue !== undefined && this.value !== this.originalValue && !this.isEditing, // dirty cells
@@ -113,8 +113,8 @@ export class TableData extends MutableElement {
             ? // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
               html`&nbsp;<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
                   'z-10 absolute top-0 bottom-0 right-0 left-0': true,
-                  'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-700': true,
-                  'font-mono': true,
+                  'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-1 focus:ring-blue-300 dark:focus:ring-blue-700': true,
+                  'font-mono px-2': true,
               })} @blur=${this.onBlur}></input>`
             : this.blank
               ? html`<slot></slot>`
@@ -134,7 +134,7 @@ export class TableData extends MutableElement {
                             : this.options}
                         @menu-selection=${this.onMenuSelection}
                         ><span class="font-normal"
-                            >${this.value || html`<span class="italic text-neutral-400 dark:text-neutral-600">NULL</span>`}</span
+                            >${this.value || html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}</span
                         ></outerbase-td-menu
                     >`
     }

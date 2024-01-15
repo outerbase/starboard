@@ -16,7 +16,7 @@ export default {
                 '3xl': ['30px', '40px'],
             },
             spacing: {
-                'cell-padding-x': 'var(--cell-padding-x, 16px)',
+                'cell-padding-x': 'var(--cell-padding-x, 12px)',
                 'cell-padding-y': 'var(--cell-padding-y, 8px)',
                 // 'cell-padding-x-sm': 'var(--cell-padding-x, 0.1rem)',
                 // 'cell-padding-y-sm': 'var(--cell-padding-y, 0.1rem)',
@@ -49,18 +49,18 @@ export default {
                     'column-text-dark': 'var(--column-header-text-color-dark, #ffffff)',
 
                     // rows
-                    'row-even': 'var(--table-row-even-background-color, rgba(0,0,0,0.01))',
-                    'row-even-dark': 'var(--table-row-even-background-color-dark, rgba(255,255,255,0.01))',
-                    'row-odd': 'var(--table-row-odd-background-color, rgba(0,0,0,0.02))',
-                    'row-odd-dark': 'var(--table-row-odd-background-color-dark, rgba(255,255,255,0.02))',
+                    'row-even': 'var(--table-row-even-background-color, rgba(250,250,250))',
+                    'row-even-dark': 'var(--table-row-even-background-color-dark, rgba(10,10,10))',
+                    'row-odd': 'var(--table-row-even-background-color, rgba(250,250,250))',
+                    'row-odd-dark': 'var(--table-row-even-background-color-dark, rgba(10,10,10))',
                     'row-hover': 'var(--hover-background-color, rgba(0,0,0,0.03))',
                     'row-hover-dark': 'var(--hover-background-color-dark, rgba(255,255,255,0.03))',
-                    'row-selected': 'var(--table-row-selected-background-color, rgba(254,253,232,0.7))',
-                    'row-selected-dark': 'var(--table-row-selected-background-color-dark, rgba(66, 32, 6, 0.8))',
-                    'row-selected-hover': 'var(--table-row-selected-hover-background-color, rgba(254,253,232,1))',
-                    'row-selected-hover-dark': 'var(--table-row-selected-hover-background-color-dark, rgb(66, 32, 6, 1))',
-                    'row-dirty': 'var(--table-row-dirty, rgba(254, 252, 232, 1))',
-                    'row-dirty-dark': 'var(--table-row-dirty-dark, rgba(66, 32, 6, 1))',
+                    'row-selected': 'var(--table-row-selected-background-color, rgba(245, 245, 245, 1))',
+                    'row-selected-dark': 'var(--table-row-selected-background-color-dark, rgb(23 23 23))',
+                    'row-selected-hover': 'var(--table-row-selected-hover-background-color, rgba(229, 229, 229, 1))',
+                    'row-selected-hover-dark': 'var(--table-row-selected-hover-background-color-dark, rgb(38 38 38))',
+                    'row-dirty': 'var(--table-row-dirty, rgba(22, 163, 74, 0.33))',
+                    'row-dirty-dark': 'var(--table-row-dirty-dark, rgba(21, 128, 61, 0.5))',
 
                     // unused
                     // active: 'var(--active-background-color-dark, #fefefe)',
@@ -76,8 +76,8 @@ export default {
                     // 'cell-text-dark': 'var(--cell-text-color)',
 
                     // dirty cells
-                    'cell-dirty': 'var(--cell-dirty-background-color, #fef9c3)',
-                    'cell-dirty-dark': 'var(--cell-dirty-background-color, #713f12)',
+                    'cell-dirty': 'var(--cell-dirty-background-color, rgb(253 230 138))',
+                    'cell-dirty-dark': 'var(--cell-dirty-background-color, rgba(234, 179, 8, .6))',
                 },
 
                 light: {
