@@ -18,9 +18,13 @@ export {
 
 // copied from dashboard
 export type TableColumnType = 'string' | 'integer' | 'enum' | 'uuid' | 'date' | 'dateonly'
+export enum ColumnStatus {
+    created,
+    updated,
+    deleted,
+}
 export type TableColumn = {
     model?: 'column'
-    // typeOfChange: TableColumnChangeType
     type: TableColumnType
     name: string
     position: number
@@ -32,6 +36,8 @@ export type TableColumn = {
     unique: boolean
     primaryKey: boolean
     autoIncrement: boolean
+
+    status: ColumnStatus | undefined
 }
 
 export type Schema = {

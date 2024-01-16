@@ -14,7 +14,7 @@ import {
     RowSelectedEvent,
     RowUpdatedEvent,
 } from '../../lib/events.js'
-import type { Columns, Schema, HeaderMenuOptions, RowAsRecord } from '../../types.js'
+import { type Columns, type Schema, type HeaderMenuOptions, type RowAsRecord, ColumnStatus } from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
 import dbRowsForSource from '../../lib/rows-for-source-id.js'
 import { ClassifiedElement } from '../classified-element.js'
@@ -90,7 +90,10 @@ export class Table extends ClassifiedElement {
     protected visibleColumns: Columns = []
     protected updateVisibleColumns() {
         this.visibleColumns = this.columns.filter(
-            ({ name }) => this.hiddenColumnNames.indexOf(name) === -1 && this.deletedColumnNames.indexOf(name) === -1
+            ({ name, status }) =>
+                status !== ColumnStatus.deleted &&
+                this.hiddenColumnNames.indexOf(name) === -1 &&
+                this.deletedColumnNames.indexOf(name) === -1
         )
     }
     @state()
