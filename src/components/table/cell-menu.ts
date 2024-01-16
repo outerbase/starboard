@@ -23,8 +23,9 @@ export class CellMenu extends Menu {
         const isRenderingInBrowser = typeof window !== 'undefined'
         if (!isRenderingInBrowser) return ''
 
-        const HEIGHT_OF_MENU = 135
-        const WIDTH_OF_MENU = 255
+        // TODO @johnny dynamically determine the size of the menu instead
+        const HEIGHT_OF_MENU = 134
+        const WIDTH_OF_MENU = 72
         const { left, bottom } = this.getBoundingClientRect()
         const distanceToViewportBottom = window.innerHeight - bottom
         const hasLeftRoom = left - this.leftDistanceToViewport + this.clientWidth >= WIDTH_OF_MENU
@@ -61,7 +62,6 @@ export class CellMenu extends Menu {
             ></span>
             <span
                 id="trigger"
-                class="relative"
                 aria-haspopup="menu"
                 @click=${this.onTrigger}
                 @dblclick=${(e: MouseEvent) => e.stopPropagation()}
