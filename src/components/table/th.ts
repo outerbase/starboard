@@ -92,6 +92,9 @@ export class TH extends MutableElement {
         },
     ]
 
+    @property({ attribute: 'left-distance-to-viewport', type: Number })
+    protected distanceToLeftViewport = -1
+
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
@@ -123,6 +126,7 @@ export class TH extends MutableElement {
                   ? html`<outerbase-th-menu
                         .options=${this.dirty ? optionsWithRevert : this.options}
                         @menu-selection=${this.onMenuSelection}
+                        left-distance-to-viewport=${this.distanceToLeftViewport}
                         >${this.value}</outerbase-th-menu
                     >`
                   : html`<span>${this.value}</span>`

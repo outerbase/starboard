@@ -294,6 +294,11 @@ export class Table extends ClassifiedElement {
         table.style.width = `${this._previousWidth + delta}px`
     }
 
+    // TODO @johnny this does not get update if the page containing the table changes
+    // This is problematic when deciding which direction to render a column menu
+    // An example is toggling the navigaiton menu (where there's a list of tables, queries, etc)
+    // Only once you switch tabs does the reference to `distanceToLeftViewport` get recomputed.
+
     get distanceToLeftViewport() {
         if (typeof window === 'undefined') return -1
         return this.getBoundingClientRect().left
@@ -343,6 +348,7 @@ export class Table extends ClassifiedElement {
                                 name="${this.renamedColumns[name] ?? name}"
                                 original-value="${name}"
                                 .options=${this.columnOptions || nothing}
+                                left-distance-to-viewport=${this.distanceToLeftViewport}
                             >
                             </outerbase-th>`
                         }
