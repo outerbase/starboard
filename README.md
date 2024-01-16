@@ -23,17 +23,22 @@ pnpm build:lit:watch
 
 From this repo
 
-```
-pnpm --global link
-```
-
 From the other repo
 
 ```
-pnpm --global link ../path/to/starboard
+pnpm link ../path/to/starboard
 ```
 
-This will allow you to, for example, transform it into a React component:
+## `pnpm link` quirks
+
+This feature has been unreliable. Follow the following steps for the best chance of success. The following commands are in the context of Dashboard.
+
+-   `pnpm remove starboard` // to ensure any other version is unreferenced
+-   `pnpm link ../path/to/starboard/repo` // to ensure Dashboard is seeing local changes
+
+If you suspect that your changes aren't being applied, throw in an `alert` or `debugger` and verify they are before spinning your wheels further.
+
+## Usage in React
 
 ```ts
 import * as React from 'react'
