@@ -294,7 +294,13 @@ export class Table extends ClassifiedElement {
         table.style.width = `${this._previousWidth + delta}px`
     }
 
+    get distanceToLeftViewport() {
+        if (typeof window === 'undefined') return -1
+        return this.getBoundingClientRect().left
+    }
+
     protected override render() {
+        const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null
         // WARNING `overflow-hidden` breaks the stickyness of the header
         // 'overflow-hidden' is necessary to prevent the ColumnResizer from going beyond the table.
         // because the Resizer stays in place as you scroll down the page
@@ -406,6 +412,8 @@ export class Table extends ClassifiedElement {
                                               value=${values[name] ?? ''}
                                               originalValue=${originalValues[name]}
                                               .position=${{ row: id, column: name }}
+                                              left-distance-to-viewport=${this.distanceToLeftViewport}
+                                              table-bounding-rect="${tableBoundingRect}"
                                               @cell-updated=${() => {
                                                   this.dispatchEvent(new RowUpdatedEvent({ id, values, originalValues, isNew }))
                                               }}

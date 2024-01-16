@@ -26,6 +26,12 @@ export class Menu extends ClassifiedElement {
     @state()
     protected focused?: string
 
+    // this function is intended to be overriden in a subclass
+    // and not accessed otherwise
+    protected get menuPositionClasses() {
+        return ''
+    }
+
     // for closing menus when an ousside click occurs
     private outsideClicker: ((event: MouseEvent) => void) | undefined
     private activeEvent: MouseEvent | undefined
@@ -122,30 +128,9 @@ export class Menu extends ClassifiedElement {
     protected get listElement() {
         if (!this.open) return null
 
-        let classes = 'top-6 -left-2 -right-44' // defaults to left-half
-        const isRenderingInBrowser = typeof window !== 'undefined'
-        if (isRenderingInBrowser) {
-            const position = this.getBoundingClientRect?.()
-            const right = position?.right ?? -1
-            const top = position?.top ?? -1
-            const isRightSide = right > window?.innerWidth / 2
-            const isTopSide = top < window?.innerHeight / 2
-            const isLeftSide = !isRightSide
-            const isBottomSide = !isTopSide
-
-            if (isRightSide && isTopSide) {
-                classes = 'top-6 -left-44 -right-2'
-            } else if (isRightSide && isBottomSide) {
-                classes = 'bottom-6 -left-44 -right-2'
-            } else if (isLeftSide && isTopSide) {
-                classes = 'top-6 -right-44 -left-2'
-            } else {
-                classes = 'bottom-6 -right-44 -left-2'
-            }
-        }
-
         return html` <ul
-            class="absolute ${classes} z-20 bg-white dark:bg-black shadow-lg rounded-2xl p-1 duration-150 ease-bounce overflow-hidden"
+            class="absolute ${this
+                .menuPositionClasses} z-20 bg-white dark:bg-black shadow-lg rounded-2xl p-1 duration-150 ease-bounce overflow-hidden"
             role="menu"
         >
             ${repeat(

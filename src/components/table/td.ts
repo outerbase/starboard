@@ -79,6 +79,12 @@ export class TableData extends MutableElement {
     @property({ attribute: 'is-last-row', type: Boolean })
     protected isLastRow = false
 
+    @property({ attribute: 'left-distance-to-viewport', type: Number })
+    protected leftDistanceToViewport = -1
+
+    @property({ attribute: 'table-bounding-rect', type: String })
+    protected tableBoundingRect: string | undefined // we skip having `JSON.parse` run by treating it as a string
+
     @state()
     protected options = [
         { label: 'Edit', value: 'edit' },
@@ -133,6 +139,8 @@ export class TableData extends MutableElement {
                               ]
                             : this.options}
                         @menu-selection=${this.onMenuSelection}
+                        left-distance-to-viewport=${this.leftDistanceToViewport}
+                        table-bounding-rect=${this.tableBoundingRect}
                         ><span class="font-normal"
                             >${this.value || html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}</span
                         ></outerbase-td-menu
