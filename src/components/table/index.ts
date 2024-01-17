@@ -52,8 +52,13 @@ export class Table extends ClassifiedElement {
     @property({ type: Object, attribute: 'schema' })
     public schema?: Schema
 
-    @property({ attribute: 'rows', type: Array })
-    public rows: Array<RowAsRecord> = []
+    @property({ attribute: 'data', type: Array })
+    set data(rows: Array<RowAsRecord>) {
+        this.rows = rows
+    }
+
+    @state()
+    protected rows: Array<RowAsRecord> = []
 
     @property({ type: Boolean, attribute: 'non-interactive' })
     public isNonInteractive = false
@@ -111,8 +116,7 @@ export class Table extends ClassifiedElement {
             isNew: row?.isNew ?? true,
         }
 
-        this.rows.push(_row)
-        this.requestUpdate('rows')
+        this.rows = [...this.rows, _row]
         this.dispatchEvent(new RowAddedEvent(_row))
     }
 
@@ -131,12 +135,6 @@ export class Table extends ClassifiedElement {
             checkbox.checked = false
             checkbox.dispatchEvent(new Event('change'))
         })
-    }
-
-    // clear data changes
-    public discardChanges() {
-        this.clearSelection() // rows
-        this.deletedColumnNames = []
     }
 
     // clear param settings
@@ -246,18 +244,8 @@ export class Table extends ClassifiedElement {
     // this variable is incremented in `willUpdate` when our parent provies a new `rows` array
     // it's purpose is to force all of the fields to be reset, i.e. on discard changes we want to forget changes to `value`
     // this is accomplished by involving it in the `key` property of the `repeat` call in `render()`
-    private _version = 0
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
-
-        // when the row collection changes, reset selected/removed
-        if (_changedProperties.has('rows')) {
-            this._version += 1
-            if (this.rows && this.rows.length > 0) {
-                this.selectedRowUUIDs = new Set()
-                this.removedRowUUIDs = new Set()
-            }
-        }
 
         // identify columns from the schema
         if (_changedProperties.has('schema')) {
@@ -333,7 +321,7 @@ export class Table extends ClassifiedElement {
                         : null}
                     ${repeat(
                         this.visibleColumns,
-                        ({ name }, _idx) => `${this._version}:${name}`,
+                        ({ name }, _idx) => name,
                         ({ name }, idx) => {
                             // omit column resizer on the last column because it's sort-of awkward
                             return html`<outerbase-th
@@ -364,7 +352,7 @@ export class Table extends ClassifiedElement {
                 <!-- render a TableRow element for each row of data -->
                 ${repeat(
                     this.rows,
-                    ({ id }) => `${this._version}:${id}`,
+                    ({ id }) => id,
                     ({ id, values, originalValues, isNew }, rowIndex) => {
                         return !this.removedRowUUIDs.has(id)
                             ? html`<outerbase-tr
@@ -406,7 +394,7 @@ export class Table extends ClassifiedElement {
                                   <!-- render a TableCell for each column of data in the current row -->
                                   ${repeat(
                                       this.visibleColumns,
-                                      ({ name }) => `${this._version}:${name}`, // use the column name as the unique identifier for each entry in this row
+                                      ({ name }) => name, // use the column name as the unique identifier for each entry in this row
                                       ({ name }, idx) => html`
                                           <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
                                           <outerbase-td
