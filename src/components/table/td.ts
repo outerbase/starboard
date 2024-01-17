@@ -20,8 +20,7 @@ export class TableData extends MutableElement {
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
             'focus:ring-2 focus:ring-black dark:focus:ring-white focus:z-10 focus:outline-none': !this.isEditing,
 
-            'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark':
-                this.originalValue !== undefined && this.value !== this.originalValue && !this.isEditing, // dirty cells
+            'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty, // dirty cells
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
             'max-w-64': !this.maxWidth, // default max width, unless specified
             'border-r':

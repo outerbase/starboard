@@ -22,8 +22,8 @@ export class TH extends MutableElement {
             'border-b border-theme-border dark:border-theme-border-dark': true,
             'first:border-l border-t': this.outterBorder,
             'px-cell-padding-x py-cell-padding-y': true,
-            'bg-theme-column dark:bg-theme-column-dark': true,
-            'bg-yellow-100 dark:bg-yellow-900': this.dirty,
+            'bg-theme-column dark:bg-theme-column-dark': !this.dirty,
+            'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty,
             'select-none': this.hasMenu, // this is really about handling SSR without hydration; TODO use a better flag?
             // prevent double borders
             'border-r':
