@@ -18,8 +18,6 @@ export default {
             spacing: {
                 'cell-padding-x': 'var(--cell-padding-x, 12px)',
                 'cell-padding-y': 'var(--cell-padding-y, 8px)',
-                // 'cell-padding-x-sm': 'var(--cell-padding-x, 0.1rem)',
-                // 'cell-padding-y-sm': 'var(--cell-padding-y, 0.1rem)',
             },
             colors: {
                 theme: {
