@@ -130,7 +130,7 @@ export class TH extends MutableElement {
                         left-distance-to-viewport=${this.distanceToLeftViewport}
                         ><span class="font-mono">${this.value}</span></outerbase-th-menu
                     >`
-                  : html`<span class="font-mono>${this.value}</span>`
+                  : html`<span class="font-mono">${this.value}</span>`
 
             return this.withResizer
                 ? html`<slot></slot>
