@@ -61,6 +61,7 @@ export class CellMenu extends Menu {
             <span
                 id="trigger"
                 aria-haspopup="menu"
+                tabIndex="0"
                 @click=${this.onTrigger}
                 @dblclick=${(e: MouseEvent) => e.stopPropagation()}
                 @keydown=${this.onKeyDown}
