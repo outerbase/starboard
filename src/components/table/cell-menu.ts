@@ -7,9 +7,7 @@ import { Menu } from '../menu.js'
 export class CellMenu extends Menu {
     protected override get classMap() {
         return {
-            'relative flex items-center justify-between px-cell-padding-x gap-2 font-mono font-bold': true,
-            'whitespace-nowrap w-full': true,
-            'select-none': !this.selectableText,
+            ...super.classMap,
         }
     }
 
@@ -35,9 +33,9 @@ export class CellMenu extends Menu {
         // possibly using table-bounding-rect ?
 
         // position based on available space
-        if (hasLeftRoom && hasBottomRoom) return 'right-0 top-7'
+        if (hasLeftRoom && hasBottomRoom) return 'right-0 top-8'
         else if (hasLeftRoom && !hasBottomRoom) return 'right-0 bottom-7'
-        else if (!hasLeftRoom && hasBottomRoom) return 'left-0 top-7'
+        else if (!hasLeftRoom && hasBottomRoom) return 'left-0 top-8'
         else return 'left-0 bottom-7'
     }
 
@@ -55,8 +53,8 @@ export class CellMenu extends Menu {
         return html`
             <span
                 class=${classMap({
-                    'whitespace-nowrap text-ellipsis overflow-hidden font-mono w-full': true,
-                    'focus:z-10': true,
+                    'whitespace-nowrap text-ellipsis': true,
+                    'overflow-hidden w-full focus:z-10 ': true,
                 })}
                 ><slot></slot
             ></span>

@@ -15,7 +15,7 @@ export class TableData extends MutableElement {
     static override styles = TWStyles
     protected override get classMap() {
         return {
-            'table-cell relative py-cell-padding-y ': true,
+            'table-cell relative px-cell-padding-x py-cell-padding-y ': true,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
             'focus:ring-2 focus:ring-black dark:focus:ring-white focus:z-10 focus:outline-none': !this.isEditing,
@@ -120,7 +120,7 @@ export class TableData extends MutableElement {
               html`&nbsp;<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
                   'z-10 absolute top-0 bottom-0 right-0 left-0': true,
                   'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
-                  'font-mono px-3': true,
+                  'px-3 font-mono': true,
               })} @blur=${this.onBlur}></input>`
             : this.blank
               ? html`<slot></slot>`
@@ -141,7 +141,7 @@ export class TableData extends MutableElement {
                         @menu-selection=${this.onMenuSelection}
                         left-distance-to-viewport=${this.leftDistanceToViewport}
                         table-bounding-rect=${this.tableBoundingRect}
-                        ><span class="font-normal"
+                        ><span class="font-mono"
                             >${this.value || html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}</span
                         ></outerbase-td-menu
                     >`

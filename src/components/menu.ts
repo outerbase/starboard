@@ -11,7 +11,10 @@ import classMapToClassName from '../lib/class-map-to-class-name.js'
 export class Menu extends ClassifiedElement {
     static override styles = TWStyles
     protected override get classMap() {
-        return {}
+        return {
+            'relative flex items-center justify-between gap-2': true,
+            'font-medium select-none whitespace-nowrap': true,
+        }
     }
 
     @property({ type: Boolean, attribute: 'open' })
@@ -130,7 +133,7 @@ export class Menu extends ClassifiedElement {
 
         return html` <ul
             class="absolute ${this
-                .menuPositionClasses} z-20 bg-white dark:bg-black shadow-lg rounded-2xl p-1 duration-150 ease-bounce overflow-hidden"
+                .menuPositionClasses} z-20 text-base bg-white dark:bg-black shadow-lg rounded-2xl p-1 duration-150 ease-bounce overflow-hidden"
             role="menu"
         >
             ${repeat(
@@ -144,8 +147,8 @@ export class Menu extends ClassifiedElement {
                             [classes]: !!classes,
                             'text-ellipsis overflow-hidden': true,
                             'rounded-xl px-4 py-3': true,
-                            'cursor-pointer hover:bg-neutral-200 dark:hover:bg-neutral-800': true,
-                            'bg-neutral-200 dark:bg-neutral-800': this.focused === value,
+                            'cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700': true,
+                            'bg-neutral-100 dark:bg-neutral-700': this.focused === value,
                         })}
                         role="menuitem"
                         ?selected=${this.selection === value}

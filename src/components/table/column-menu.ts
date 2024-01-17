@@ -9,7 +9,7 @@ export class ColumnMenu extends Menu {
 
     protected override get classMap() {
         return {
-            'relative flex items-center justify-between font-mono': true,
+            ...super.classMap,
         }
     }
 

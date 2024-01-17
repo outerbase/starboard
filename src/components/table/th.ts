@@ -120,16 +120,17 @@ export class TH extends MutableElement {
                 ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
                       'z-10 absolute top-0 bottom-0 right-0 left-0': true,
                       'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900': true,
-                      'font-mono px-cell-padding-x': true,
+                      'px-cell-padding-x font-mono': true,
                   })} @blur=${this.onBlur}></input>`
                 : this.hasMenu
                   ? html`<outerbase-th-menu
+                        class="font-mono"
                         .options=${this.dirty ? optionsWithRevert : this.options}
                         @menu-selection=${this.onMenuSelection}
                         left-distance-to-viewport=${this.distanceToLeftViewport}
-                        >${this.value}</outerbase-th-menu
+                        ><span class="font-mono">${this.value}</span></outerbase-th-menu
                     >`
-                  : html`<span>${this.value}</span>`
+                  : html`<span class="font-mono>${this.value}</span>`
 
             return this.withResizer
                 ? html`<slot></slot>

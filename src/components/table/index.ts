@@ -189,6 +189,7 @@ export class Table extends ClassifiedElement {
                     unique: false,
                     primaryKey: false,
                     autoIncrement: false,
+                    status: ColumnStatus.created,
                 },
             ]
             this.rows = this.rows.map((row) => ({ ...row, values: { ...row.values, [name]: '' } }))
@@ -316,7 +317,7 @@ export class Table extends ClassifiedElement {
 
         return html`<div
             id="table"
-            class="table bg-theme-table dark:bg-theme-table-dark text-theme-text dark:text-theme-text-dark font-mono text-sm"
+            class="table bg-theme-table dark:bg-theme-table-dark text-theme-text dark:text-theme-text-dark text-sm font-mono"
         >
             <outerbase-thead>
                 <outerbase-tr header>
