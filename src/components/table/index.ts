@@ -173,7 +173,12 @@ export class Table extends ClassifiedElement {
 
     // KEYBOARD SHORTCUTS
     protected onKeyDown_bound?: ({ shiftKey, key }: KeyboardEvent) => void
-    protected onKeyDown({ shiftKey, key }: KeyboardEvent) {
+    protected onKeyDown(event: KeyboardEvent) {
+        const actualTarget = event.composedPath()[0]
+        const validTrigger = actualTarget instanceof HTMLElement && actualTarget.tagName !== 'INPUT' && actualTarget.tagName !== 'TEXTAREA'
+        if (!validTrigger) return
+
+        const { shiftKey, key } = event
         if (!shiftKey) return
 
         // create column
