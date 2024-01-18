@@ -2,20 +2,18 @@ import { html } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
 import { customElement, property } from 'lit/decorators.js'
 import { Menu } from '../menu.js'
+import { Theme } from '../../types.js'
 
 @customElement('outerbase-td-menu')
 export class CellMenu extends Menu {
-    protected override get classMap() {
-        return {
-            ...super.classMap,
-        }
-    }
-
     @property({ attribute: 'left-distance-to-viewport', type: Number })
-    protected leftDistanceToViewport = -1
+    public leftDistanceToViewport = -1
 
-    // @property({ attribute: 'table-bounding-rect', type: Object })
-    // protected tableBoundingRect: DOMRect | undefined
+    @property({ attribute: 'menu', type: Boolean })
+    public hasMenu = false
+
+    @property({ attribute: 'selectable-text', type: Boolean })
+    public = false
 
     protected override get menuPositionClasses() {
         const isRenderingInBrowser = typeof window !== 'undefined'
@@ -39,13 +37,9 @@ export class CellMenu extends Menu {
         else return 'left-0 bottom-7'
     }
 
-    @property({ attribute: 'menu', type: Boolean })
-    hasMenu = false
-
-    @property({ attribute: 'selectable-text', type: Boolean })
-    selectableText = false
-
     protected override render() {
+        const darkClass = classMap({ dark: this.theme == Theme.dark })
+
         // @click shows/hides the menu
         // @dblclick prevents parent's dblclick
         // @keydown navigates the menu
@@ -62,6 +56,7 @@ export class CellMenu extends Menu {
                 id="trigger"
                 aria-haspopup="menu"
                 tabIndex="0"
+                class=${darkClass}
                 @click=${this.onTrigger}
                 @dblclick=${(e: MouseEvent) => e.stopPropagation()}
                 @keydown=${this.onKeyDown}

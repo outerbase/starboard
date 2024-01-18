@@ -76,3 +76,8 @@ export type HeaderMenuOptions = Array<{
     classes?: string
     icon?: string | null
 }>
+
+export enum Theme {
+    'light',
+    'dark',
+}

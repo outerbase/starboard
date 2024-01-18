@@ -7,6 +7,8 @@ import { MenuSelectedEvent } from '../lib/events.js'
 import { CaretDown } from '../lib/icons/caret-down.js'
 import { ClassifiedElement } from './classified-element.js'
 import classMapToClassName from '../lib/class-map-to-class-name.js'
+import { Theme } from '../types.js'
+import { classMap } from 'lit/directives/class-map.js'
 
 export class Menu extends ClassifiedElement {
     static override styles = TWStyles
@@ -14,6 +16,7 @@ export class Menu extends ClassifiedElement {
         return {
             'relative flex items-center justify-between gap-2': true,
             'font-medium select-none whitespace-nowrap': true,
+            dark: this.theme == Theme.dark,
         }
     }
 
@@ -25,6 +28,9 @@ export class Menu extends ClassifiedElement {
 
     @property({ type: Array, attribute: 'options' })
     public options: Array<Record<'label' | 'value' | 'classes', string>> = []
+
+    @property({ attribute: 'theme', type: String })
+    public theme = Theme.light
 
     @state()
     protected focused?: string
@@ -131,11 +137,16 @@ export class Menu extends ClassifiedElement {
     protected get listElement() {
         if (!this.open) return null
 
-        return html` <ul
-            class="absolute max-w-56 ${this
-                .menuPositionClasses} z-20 text-base bg-white dark:bg-black shadow-lg rounded-2xl p-1 duration-150 ease-bounce overflow-hidden"
-            role="menu"
-        >
+        const classes = {
+            [this.menuPositionClasses]: true,
+            'absolute z-20 max-w-56 overflow-hidden': true,
+            'text-base': true,
+            'bg-white dark:bg-black shadow-lg': true,
+            'rounded-2xl p-1': true,
+            'duration-150 ease-bounce': true,
+        }
+
+        return html`<ul class=${classMap(classes)} role="menu">
             ${repeat(
                 this.options,
                 ({ label }) => label,
@@ -160,22 +171,36 @@ export class Menu extends ClassifiedElement {
     }
 
     protected override render() {
+        console.log('menu:theme', this.theme)
         // @click shows/hides the menu
         // @dblclick prevents parent's dblclick
         // @keydown navigates the menu
 
+        const outerClasses = {
+            'relative -mr-1': true,
+            dark: this.theme == Theme.dark,
+        }
+
+        const innerClasses = {
+            'border border-transparent': true,
+            'hover:bg-neutral-100 dark:hover:bg-neutral-900 active:border-neutral-200 dark:active:border-neutral-800': true,
+            'p-0.5 rounded-md': true,
+        }
+
         return html`
             <slot></slot>
-            <span
+            <div
                 id="trigger"
-                class="-mr-1 relative hover:bg-neutral-100 dark:hover:bg-neutral-900 active:border-neutral-200 dark:active:border-neutral-800 p-0.5 rounded-md border border-transparent"
+                class=${classMap(outerClasses)}
                 aria-haspopup="menu"
-                tabIndex="0"
+                tabindex="0"
                 @click=${this.onTrigger}
                 @dblclick=${(e: MouseEvent) => e.stopPropagation()}
                 @keydown=${this.onKeyDown}
-                >${CaretDown(16)}${this.listElement}</span
             >
+                <div class=${classMap(innerClasses)}>${CaretDown(16)}</div>
+                ${this.listElement}
+            </div>
         `
     }
 }

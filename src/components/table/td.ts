@@ -8,6 +8,7 @@ import { CellUpdateEvent, type MenuSelectedEvent } from '../../lib/events.js'
 
 import './cell-menu.js' // <outerbase-td-menu />
 import type { CellMenu } from './cell-menu.js'
+import { Theme } from '../../types.js'
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
@@ -87,6 +88,9 @@ export class TableData extends MutableElement {
     @property({ attribute: 'hide-dirt', type: Boolean })
     public hideDirt = false
 
+    @property({ attribute: 'theme', type: String })
+    public theme = Theme.light
+
     @state()
     protected options = [
         { label: 'Edit', value: 'edit' },
@@ -117,19 +121,24 @@ export class TableData extends MutableElement {
     }
 
     protected override render() {
+        const darkClass = classMap({ 'font-mono': true, dark: this.theme == Theme.dark })
+
         return this.isEditing
             ? // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
-              html`&nbsp;<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
+              html`<span class=${darkClass}>&nbsp;<input .value=${this.value} @input=${this.onChange} @keydown=${
+                  this.onKeyDown
+              } class=${classMap({
                   'z-10 absolute top-0 bottom-0 right-0 left-0': true,
                   'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
                   'px-3 font-mono': true,
-              })} @blur=${this.onBlur}></input>`
+              })} @blur=${this.onBlur}></input></span>`
             : this.blank
               ? html`<slot></slot>`
               : html`<!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
                     <outerbase-td-menu
-                        ?menu=${this.hasMenu}
-                        ?selectable-text=${!this.isInteractive}
+                        theme=${this.theme}
+                        left-distance-to-viewport=${this.leftDistanceToViewport}
+                        table-bounding-rect=${this.tableBoundingRect}
                         .options=${this.dirty
                             ? [
                                   ...this.options,
@@ -140,10 +149,10 @@ export class TableData extends MutableElement {
                                   },
                               ]
                             : this.options}
+                        ?menu=${this.hasMenu}
+                        ?selectable-text=${!this.isInteractive}
                         @menu-selection=${this.onMenuSelection}
-                        left-distance-to-viewport=${this.leftDistanceToViewport}
-                        table-bounding-rect=${this.tableBoundingRect}
-                        ><span class="font-mono"
+                        ><span class=${darkClass}
                             >${this.value || html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}</span
                         ></outerbase-td-menu
                     >`

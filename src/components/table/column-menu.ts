@@ -7,12 +7,6 @@ export class ColumnMenu extends Menu {
     @property({ attribute: 'left-distance-to-viewport', type: Number })
     protected leftDistanceToViewport = -1
 
-    protected override get classMap() {
-        return {
-            ...super.classMap,
-        }
-    }
-
     protected override get menuPositionClasses() {
         const isRenderingInBrowser = typeof window !== 'undefined'
         if (!isRenderingInBrowser) return ''

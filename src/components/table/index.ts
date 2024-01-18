@@ -14,7 +14,7 @@ import {
     RowSelectedEvent,
     RowUpdatedEvent,
 } from '../../lib/events.js'
-import { type Columns, type Schema, type HeaderMenuOptions, type RowAsRecord, ColumnStatus } from '../../types.js'
+import { type Columns, type Schema, type HeaderMenuOptions, type RowAsRecord, ColumnStatus, Theme } from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
 import dbRowsForSource from '../../lib/rows-for-source-id.js'
 import { ClassifiedElement } from '../classified-element.js'
@@ -26,6 +26,7 @@ import './td.js'
 import './th.js'
 import './thead.js'
 import './tr.js'
+import { classMap } from 'lit/directives/class-map.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -81,6 +82,9 @@ export class Table extends ClassifiedElement {
 
     @property({ attribute: 'renamed-columns', type: Object })
     public renamedColumns: Record<string, string> = {}
+
+    @property({ attribute: 'theme', type: String })
+    public theme = Theme.light
 
     @state()
     private _height?: number
@@ -299,135 +303,145 @@ export class Table extends ClassifiedElement {
     }
 
     protected override render() {
+        console.log('table-index:theme', this.theme)
         const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null
         // WARNING `overflow-hidden` breaks the stickyness of the header
         // 'overflow-hidden' is necessary to prevent the ColumnResizer from going beyond the table.
         // because the Resizer stays in place as you scroll down the page
         // while the rest of the table scrolls out of view
 
-        return html`<div
-            id="table"
-            class="table bg-theme-table dark:bg-theme-table-dark text-theme-text dark:text-theme-text-dark text-sm font-mono"
-        >
-            <outerbase-thead>
-                <outerbase-tr header>
-                    <!-- first column of (optional) checkboxes -->
-                    ${this.selectableRows
-                        ? html`<outerbase-th
+        const tableContainerClasses = { dark: this.theme == Theme.dark }
+        const tableClasses = {
+            'table bg-theme-table dark:bg-theme-table-dark': true,
+            'text-theme-text dark:text-theme-text-dark text-sm font-mono': true,
+        }
+
+        return html`<span class=${classMap(tableContainerClasses)}
+            ><div id="table" class=${classMap(tableClasses)}>
+                <outerbase-thead>
+                    <outerbase-tr header>
+                        <!-- first column of (optional) checkboxes -->
+                        ${this.selectableRows
+                            ? html`<outerbase-th
                               table-height=${ifDefined(this._height)}
+                              theme=${this.theme}
                               ?separate-cells=${true}
                               ?outter-border=${this.outterBorder}
                               ?is-last=${0 === this.visibleColumns.length}
                               ?blank=${true}
                           /></outerbase-th>`
-                        : null}
+                            : null}
+                        ${repeat(
+                            this.visibleColumns,
+                            ({ name }, _idx) => name,
+                            ({ name }, idx) => {
+                                // omit column resizer on the last column because it's sort-of awkward
+                                return html`<outerbase-th
+                                    .options=${this.columnOptions || nothing}
+                                    table-height=${ifDefined(this._height)}
+                                    theme=${this.theme}
+                                    name="${this.renamedColumns[name] ?? name}"
+                                    original-value="${name}"
+                                    left-distance-to-viewport=${this.distanceToLeftViewport}
+                                    ?separate-cells=${true}
+                                    ?outter-border=${this.outterBorder}
+                                    ?menu=${!this.isNonInteractive}
+                                    ?with-resizer=${!this.isNonInteractive}
+                                    ?is-last=${idx === this.visibleColumns.length - 1}
+                                    ?removable=${true}
+                                    ?interactive=${!this.isNonInteractive}
+                                    @column-hidden=${this._onColumnHidden}
+                                    @column-removed=${this._onColumnRemoved}
+                                    @resize-start=${this._onColumnResizeStart}
+                                    @resize=${this._onColumnResized}
+                                >
+                                </outerbase-th>`
+                            }
+                        )}
+                    </outerbase-tr>
+                </outerbase-thead>
+
+                <outerbase-rowgroup>
+                    <!-- render a TableRow element for each row of data -->
                     ${repeat(
-                        this.visibleColumns,
-                        ({ name }, _idx) => name,
-                        ({ name }, idx) => {
-                            // omit column resizer on the last column because it's sort-of awkward
-                            return html`<outerbase-th
-                                @column-hidden=${this._onColumnHidden}
-                                @column-removed=${this._onColumnRemoved}
-                                @resize-start=${this._onColumnResizeStart}
-                                @resize=${this._onColumnResized}
-                                table-height=${ifDefined(this._height)}
-                                ?separate-cells=${true}
-                                ?outter-border=${this.outterBorder}
-                                ?menu=${!this.isNonInteractive}
-                                ?with-resizer=${!this.isNonInteractive}
-                                ?is-last=${idx === this.visibleColumns.length - 1}
-                                ?removable=${true}
-                                ?interactive=${!this.isNonInteractive}
-                                name="${this.renamedColumns[name] ?? name}"
-                                original-value="${name}"
-                                .options=${this.columnOptions || nothing}
-                                left-distance-to-viewport=${this.distanceToLeftViewport}
-                            >
-                            </outerbase-th>`
+                        this.rows,
+                        ({ id }) => id,
+                        ({ id, values, originalValues, isNew }, rowIndex) => {
+                            return !this.removedRowUUIDs.has(id)
+                                ? html`<outerbase-tr
+                                      .selected=${this.selectedRowUUIDs.has(id)}
+                                      ?new=${isNew}
+                                      @on-selection=${this._onRowSelection}
+                                  >
+                                      <!-- checkmark cell -->
+                                      ${this.selectableRows
+                                          ? html`<outerbase-td
+                                                .position=${{
+                                                    row: id,
+                                                    column: '__selected', // our own; not expected to exist in DB
+                                                }}
+                                                .type=${null}
+                                                theme=${this.theme}
+                                                ?separate-cells=${true}
+                                                ?draw-right-border=${true}
+                                                ?bottom-border=${true}
+                                                ?outter-border=${this.outterBorder}
+                                                ?blank=${true}
+                                                ?is-last-row=${rowIndex === this.rows.length - 1}
+                                                ?is-last-column=${false}
+                                                ?interactive=${!this.isNonInteractive}
+                                                ?row-selector="${true}"
+                                            >
+                                                <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
+                                                <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
+                                                    <input
+                                                        class="row-select-checkbox h-4 w-4 mr-[1px] block focus:z-10 "
+                                                        type="checkbox"
+                                                        ?checked="${this.selectedRowUUIDs.has(id)}"
+                                                        @click="${() => this.toggleSelectedRow(id)}"
+                                                        tabindex="0"
+                                                    />
+                                                </div>
+                                            </outerbase-td>`
+                                          : null}
+
+                                      <!-- render a TableCell for each column of data in the current row -->
+                                      ${repeat(
+                                          this.visibleColumns,
+                                          ({ name }) => name, // use the column name as the unique identifier for each entry in this row
+                                          ({ name }, idx) => html`
+                                              <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
+                                              <outerbase-td
+                                                  .position=${{ row: id, column: name }}
+                                                  value=${values[name] ?? ''}
+                                                  original-value=${originalValues[name]}
+                                                  left-distance-to-viewport=${this.distanceToLeftViewport}
+                                                  table-bounding-rect="${tableBoundingRect}"
+                                                  theme=${this.theme}
+                                                  ?separate-cells=${true}
+                                                  ?draw-right-border=${true}
+                                                  ?bottom-border=${true}
+                                                  ?outter-border=${this.outterBorder}
+                                                  ?is-last-row=${rowIndex === this.rows.length - 1}
+                                                  ?is-last-column=${idx === this.visibleColumns.length - 1}
+                                                  ?menu=${!this.isNonInteractive}
+                                                  ?selectable-text=${this.isNonInteractive}
+                                                  ?interactive=${!this.isNonInteractive}
+                                                  ?hide-dirt=${isNew}
+                                                  @cell-updated=${() => {
+                                                      this.dispatchEvent(new RowUpdatedEvent({ id, values, originalValues, isNew }))
+                                                  }}
+                                              >
+                                              </outerbase-td>
+                                          `
+                                      )}
+                                  </outerbase-tr>`
+                                : null
                         }
                     )}
-                </outerbase-tr>
-            </outerbase-thead>
-
-            <outerbase-rowgroup>
-                <!-- render a TableRow element for each row of data -->
-                ${repeat(
-                    this.rows,
-                    ({ id }) => id,
-                    ({ id, values, originalValues, isNew }, rowIndex) => {
-                        return !this.removedRowUUIDs.has(id)
-                            ? html`<outerbase-tr
-                                  .selected=${this.selectedRowUUIDs.has(id)}
-                                  ?new=${isNew}
-                                  @on-selection=${this._onRowSelection}
-                              >
-                                  <!-- checkmark cell -->
-                                  ${this.selectableRows
-                                      ? html`<outerbase-td
-                                            ?separate-cells=${true}
-                                            ?draw-right-border=${true}
-                                            ?bottom-border=${true}
-                                            ?outter-border=${this.outterBorder}
-                                            ?blank=${true}
-                                            ?is-last-row=${rowIndex === this.rows.length - 1}
-                                            ?is-last-column=${false}
-                                            ?interactive=${!this.isNonInteractive}
-                                            .position=${{
-                                                row: id,
-                                                column: '__selected', // our own; not expected to exist in DB
-                                            }}
-                                            .type=${null}
-                                            ?row-selector="${true}"
-                                        >
-                                            <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
-                                            <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
-                                                <input
-                                                    class="row-select-checkbox h-4 w-4 mr-[1px] block focus:z-10 "
-                                                    type="checkbox"
-                                                    ?checked="${this.selectedRowUUIDs.has(id)}"
-                                                    @click="${() => this.toggleSelectedRow(id)}"
-                                                    tabindex="0"
-                                                />
-                                            </div>
-                                        </outerbase-td>`
-                                      : null}
-
-                                  <!-- render a TableCell for each column of data in the current row -->
-                                  ${repeat(
-                                      this.visibleColumns,
-                                      ({ name }) => name, // use the column name as the unique identifier for each entry in this row
-                                      ({ name }, idx) => html`
-                                          <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
-                                          <outerbase-td
-                                              ?separate-cells=${true}
-                                              ?draw-right-border=${true}
-                                              ?bottom-border=${true}
-                                              ?outter-border=${this.outterBorder}
-                                              ?is-last-row=${rowIndex === this.rows.length - 1}
-                                              ?is-last-column=${idx === this.visibleColumns.length - 1}
-                                              ?menu=${!this.isNonInteractive}
-                                              ?selectable-text=${this.isNonInteractive}
-                                              ?interactive=${!this.isNonInteractive}
-                                              ?hide-dirt=${isNew}
-                                              value=${values[name] ?? ''}
-                                              original-value=${originalValues[name]}
-                                              .position=${{ row: id, column: name }}
-                                              left-distance-to-viewport=${this.distanceToLeftViewport}
-                                              table-bounding-rect="${tableBoundingRect}"
-                                              @cell-updated=${() => {
-                                                  this.dispatchEvent(new RowUpdatedEvent({ id, values, originalValues, isNew }))
-                                              }}
-                                          >
-                                          </outerbase-td>
-                                      `
-                                  )}
-                              </outerbase-tr>`
-                            : null
-                    }
-                )}
-            </outerbase-rowgroup>
-        </div>`
+                </outerbase-rowgroup>
+            </div>
+        </span>`
     }
 }
 

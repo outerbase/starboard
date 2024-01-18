@@ -11,6 +11,7 @@ import { ColumnHiddenEvent, ColumnRemovedEvent, ColumnRenameEvent, ColumnUpdated
 import './column-menu.js' // <outerbase-th-menu />
 import type { ColumnMenu } from './column-menu.js'
 import type { HeaderMenuOptions } from '../../types.js'
+import { Theme } from '../../types.js'
 
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
@@ -30,6 +31,7 @@ export class TH extends MutableElement {
                 (!this.withResizer && this.isLastColumn && this.outterBorder) ||
                 (!this.withResizer && this.separateCells && !this.isLastColumn),
             'cursor-pointer': this.isInteractive,
+            dark: this.theme == Theme.dark,
         }
     }
 
@@ -95,6 +97,9 @@ export class TH extends MutableElement {
     @property({ attribute: 'left-distance-to-viewport', type: Number })
     protected distanceToLeftViewport = -1
 
+    @property({ attribute: 'theme', type: String })
+    public theme = Theme.light
+
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
@@ -119,9 +124,17 @@ export class TH extends MutableElement {
             value: 'reset',
         })
 
+        const blankElementClasses = {
+            'absolute top-0 bottom-0 right-0 left-0': true,
+            dark: this.theme == Theme.dark,
+        }
+        const resultContainerClasses = {
+            dark: this.theme == Theme.dark,
+        }
+
         if (this.blank) {
             // an element to preserve the right-border
-            return html`<div class="absolute top-0 bottom-0 right-0 left-0"></div> `
+            return html`<div class=${classMap(blankElementClasses)}></div> `
         } else {
             const body = this.isEditing
                 ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
@@ -132,6 +145,7 @@ export class TH extends MutableElement {
                 : this.hasMenu
                   ? html`<outerbase-th-menu
                         class="font-mono"
+                        theme=${this.theme}
                         .options=${this.dirty ? optionsWithRevert : this.options}
                         @menu-selection=${this.onMenuSelection}
                         left-distance-to-viewport=${this.distanceToLeftViewport}
@@ -140,10 +154,12 @@ export class TH extends MutableElement {
                   : html`<span class="font-mono">${this.value}</span>`
 
             return this.withResizer
-                ? html`<slot></slot>
+                ? html`<span class=${classMap(resultContainerClasses)}
+                      ><slot></slot>
                       ${body}
-                      <column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer>`
-                : html`<slot></slot>${body}`
+                      <column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer
+                  ></span>`
+                : html`<span class=${classMap(resultContainerClasses)}><slot></slot>${body}</span>`
         }
     }
 
