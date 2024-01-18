@@ -201,6 +201,7 @@ export class Table extends ClassifiedElement {
             ]
             this.rows = this.rows.map((row) => ({ ...row, values: { ...row.values, [name]: '' } }))
             this.dispatchEvent(new ColumnAddedEvent({ name }))
+            this.updateVisibleColumns()
         }
 
         // create row
