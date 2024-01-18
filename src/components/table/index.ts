@@ -387,7 +387,6 @@ export class Table extends ClassifiedElement {
                                                 ?blank=${true}
                                                 ?is-last-row=${rowIndex === this.rows.length - 1}
                                                 ?is-last-column=${false}
-                                                ?interactive=${!this.isNonInteractive}
                                                 ?row-selector="${true}"
                                             >
                                                 <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
