@@ -132,7 +132,7 @@ export class Menu extends ClassifiedElement {
         if (!this.open) return null
 
         return html` <ul
-            class="absolute ${this
+            class="absolute max-w-56 ${this
                 .menuPositionClasses} z-20 text-base bg-white dark:bg-black shadow-lg rounded-2xl p-1 duration-150 ease-bounce overflow-hidden"
             role="menu"
         >
