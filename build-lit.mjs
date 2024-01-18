@@ -1,6 +1,7 @@
 import { watch } from 'chokidar'
 import { spawn } from 'node:child_process'
 
+// JOHNNY monitor `tailwind.config.mjs` and `tsconfig.distribute.json`
 const pathToWatch = './src'
 
 // Function to handle the execution of the build command
