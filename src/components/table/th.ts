@@ -1,6 +1,6 @@
-import { html } from 'lit'
+import { html, type PropertyValueMap } from 'lit'
 import { ifDefined } from 'lit/directives/if-defined.js'
-import { customElement, property } from 'lit/decorators.js'
+import { customElement, property, state } from 'lit/decorators.js'
 
 // import subcomponents
 import '../column-resizer.js'
@@ -103,6 +103,13 @@ export class TH extends MutableElement {
     public override disconnectedCallback(): void {
         super.disconnectedCallback
         this.removeEventListener('contextmenu', this.onContextMenu)
+    }
+
+    @state()
+    private width: number = -1
+    protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        this.width = parseInt(window.getComputedStyle(this).width, 10)
+        this.style.width = `${this.width}px`
     }
 
     protected override render() {

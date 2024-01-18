@@ -270,6 +270,8 @@ export class Table extends ClassifiedElement {
         }
     }
 
+    /////
+    // dynamically adjust the table's width when columns are being resized
     private _previousWidth = 0
     // this variable is utilized while updating widths on('mousemove')
     private _onColumnResizeStart(_event: ResizeStartEvent) {
