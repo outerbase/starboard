@@ -5,6 +5,7 @@ import { Table as OuterbaseTable } from '../components/table'
 import spaceballs from '../lib/sample-data.json'
 const rows = spaceballs.map((d) => ({...d, traits: JSON.stringify(d.traits)})).map((values) => ({id: crypto.randomUUID(), values, originalValues: values }))
 const columns = Object.keys(rows[0].values).map((name) => ({name}))
+
 ---
 <html lang="en" class="h-full">
     <head>
@@ -38,17 +39,18 @@ const columns = Object.keys(rows[0].values).map((name) => ({name}))
     <body class="vh-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
         <main class="m-12 pb-24">
             <h1 class="font-bold text-xl">Static</h1>
-            <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
-            <div class="bg-white dark:bg-black inline-block"><OuterbaseTable client:only="lit" schema={{columns}} rows={rows} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} keyboard-shortcuts selectable-rows outter-border></OuterbaseTable></div>
-            <!-- <OuterbaseTable client:only="lit" data={data} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} keyboard-shortcuts selectable-rows column-options={JSON.stringify([{'label':'Custom Option', 'value': 'custom-value', 'classes': 'text-red-500'}])}></OuterbaseTable> -->
+            <div class="bg-white dark:bg-black inline-block">
+                <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
+                <OuterbaseTable client:only="lit" schema={{columns}} data={rows} keyboard-shortcuts selectable-rows outter-border></OuterbaseTable>
+            </div>
             
             <h1 class="font-bold text-xl mt-8">SSR w/ Hydration</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
-            <div class="bg-white dark:bg-black inline-block"><OuterbaseTable client:load schema={{columns}} rows={rows} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} selectable-rows outter-border></OuterbaseTable></div>
+            <div class="bg-white dark:bg-black inline-block"><OuterbaseTable client:load schema={{columns}} data={rows} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} selectable-rows outter-border></OuterbaseTable></div>
             
             <h1 class="font-bold text-xl mt-8">SSR w/o Hydration</h1>
             <!-- @ts-ignore Astro doesn't seem to understand what `data` is.. -->
-            <div class="bg-white dark:bg-black inline-block"><OuterbaseTable schema={{columns}} rows={rows} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} non-interactive outter-border></OuterbaseTable></div>
+            <div class="bg-white dark:bg-black inline-block"><OuterbaseTable schema={{columns}} data={rows} auth-token={import.meta.env.PUBLIC_AUTH_TOKEN} non-interactive outter-border></OuterbaseTable></div>
         </main>
     </body>
 </html>
