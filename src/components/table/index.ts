@@ -407,6 +407,7 @@ export class Table extends ClassifiedElement {
                                               ?menu=${!this.isNonInteractive}
                                               ?selectable-text=${this.isNonInteractive}
                                               ?interactive=${!this.isNonInteractive}
+                                              ?hide-dirt=${isNew}
                                               value=${values[name] ?? ''}
                                               originalValue=${originalValues[name]}
                                               .position=${{ row: id, column: name }}
