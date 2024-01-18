@@ -411,7 +411,7 @@ export class Table extends ClassifiedElement {
                                               ?interactive=${!this.isNonInteractive}
                                               ?hide-dirt=${isNew}
                                               value=${values[name] ?? ''}
-                                              originalValue=${originalValues[name]}
+                                              original-value=${originalValues[name]}
                                               .position=${{ row: id, column: name }}
                                               left-distance-to-viewport=${this.distanceToLeftViewport}
                                               table-bounding-rect="${tableBoundingRect}"
