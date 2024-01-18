@@ -171,7 +171,6 @@ export class Menu extends ClassifiedElement {
     }
 
     protected override render() {
-        console.log('menu:theme', this.theme)
         // @click shows/hides the menu
         // @dblclick prevents parent's dblclick
         // @keydown navigates the menu

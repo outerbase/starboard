@@ -308,7 +308,6 @@ export class Table extends ClassifiedElement {
     }
 
     protected override render() {
-        console.log('table-index:theme', this.theme)
         const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null
         // WARNING `overflow-hidden` breaks the stickyness of the header
         // 'overflow-hidden' is necessary to prevent the ColumnResizer from going beyond the table.
