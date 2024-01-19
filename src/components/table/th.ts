@@ -4,7 +4,6 @@ import { customElement, property, state } from 'lit/decorators.js'
 
 // import subcomponents
 import '../column-resizer-element.js'
-import { TWStyles } from '../../../tailwind/index.js'
 import { MutableElement } from '../mutable-element.js'
 import { classMap } from 'lit/directives/class-map.js'
 import { ColumnHiddenEvent, ColumnRemovedEvent, ColumnRenameEvent, ColumnUpdatedEvent, MenuSelectedEvent } from '../../lib/events.js'
@@ -16,7 +15,6 @@ import { Theme } from '../../types.js'
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
 export class TH extends MutableElement {
-    static override styles = TWStyles
     protected override get classMap() {
         return {
             'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />

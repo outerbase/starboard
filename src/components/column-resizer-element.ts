@@ -2,14 +2,11 @@ import { customElement, property } from 'lit/decorators.js'
 import { html, type PropertyValueMap } from 'lit'
 
 import type { TH } from './table/th.js'
-import { TWStyles } from '../../tailwind/index.js'
 import { ClassifiedElement } from './classified-element.js'
 import { ResizeEndEvent, ResizeEvent, ResizeStartEvent } from '../lib/events.js'
 
 @customElement('column-resizer')
 export class ColumnResizer extends ClassifiedElement {
-    static override styles = TWStyles
-
     @property({ type: Number, attribute: 'height' })
     protected height?: number
 

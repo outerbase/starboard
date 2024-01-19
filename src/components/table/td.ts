@@ -2,7 +2,6 @@ import { html } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
-import { TWStyles } from '../../../tailwind/index.js'
 import { MutableElement } from '../mutable-element.js'
 import { CellUpdateEvent, type MenuSelectedEvent } from '../../lib/events.js'
 
@@ -13,7 +12,6 @@ import { Theme } from '../../types.js'
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
 export class TableData extends MutableElement {
-    static override styles = TWStyles
     protected override get classMap() {
         return {
             'table-cell relative px-cell-padding-x py-cell-padding-y ': true,

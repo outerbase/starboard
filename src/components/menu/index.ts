@@ -2,7 +2,6 @@ import { html, type PropertyValueMap } from 'lit'
 import { repeat } from 'lit/directives/repeat.js'
 import { property, state } from 'lit/decorators.js'
 
-import { TWStyles } from '../../../tailwind/index.js'
 import { MenuSelectedEvent } from '../../lib/events.js'
 import { CaretDown } from '../../lib/icons/caret-down.js'
 import { ClassifiedElement } from '../classified-element.js'
@@ -11,7 +10,6 @@ import { Theme } from '../../types.js'
 import { classMap } from 'lit/directives/class-map.js'
 
 export class Menu extends ClassifiedElement {
-    static override styles = TWStyles
     protected override get classMap() {
         return {
             'relative flex items-center justify-between gap-2': true,

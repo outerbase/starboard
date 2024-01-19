@@ -17,7 +17,6 @@ import {
 import { type Columns, type Schema, type HeaderMenuOptions, type RowAsRecord, ColumnStatus, Theme } from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
 import { ClassifiedElement } from '../classified-element.js'
-import { TWStyles } from '../../../tailwind/index.js'
 
 // import subcomponents
 import './tbody.js'
@@ -29,8 +28,6 @@ import { classMap } from 'lit/directives/class-map.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
-    static override styles = TWStyles // necessary, or *nothing* is styled
-
     // STATE
     @property({ type: Boolean, attribute: 'selectable-rows' })
     public selectableRows = false

@@ -2,11 +2,14 @@
 
 import { LitElement, html, type PropertyValueMap } from 'lit'
 import { property } from 'lit/decorators.js'
+import { TWStyles } from '../../tailwind/index.js'
 
 import classMapToClassName from '../lib/class-map-to-class-name.js'
 
 // is propogated to the DOM and therefore it's CSS is applied
 export class ClassifiedElement extends LitElement {
+    static override styles = TWStyles
+
     // classMap is a pairing of class(es) (a string) with a boolean expression
     // such that only the truthy values are rendered out and the rest are dropped
     // if a property used in such a boolean expression changes, this value is recomputed
