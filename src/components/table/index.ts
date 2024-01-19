@@ -16,7 +16,6 @@ import {
 } from '../../lib/events.js'
 import { type Columns, type Schema, type HeaderMenuOptions, type RowAsRecord, ColumnStatus, Theme } from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
-import dbRowsForSource from '../../lib/rows-for-source-id.js'
 import { ClassifiedElement } from '../classified-element.js'
 import { TWStyles } from '../../../tailwind/index.js'
 
@@ -38,10 +37,6 @@ export class Table extends ClassifiedElement {
 
     @property({ type: String, attribute: 'keyboard-shortcuts' })
     public keyboardShortcuts: boolean = false
-
-    // TODO use or remove this property
-    @property({ type: String, attribute: 'source-id' })
-    public sourceId?: string
 
     @property({ type: Object, attribute: 'schema' })
     public schema?: Schema
@@ -255,20 +250,6 @@ export class Table extends ClassifiedElement {
             if (this.schema) {
                 this.columns = this.schema.columns
                 this.updateVisibleColumns()
-            }
-        }
-
-        // Note: if both `data` and `source-id` are passed to `<outerbase-component />`
-        //       then it will initially render with the provided data but immediately fetch data for the provided `source-id`
-        if (_changedProperties.has('sourceId')) {
-            if (!this.authToken) throw new Error('Unable to fetch data without `auth-token`')
-
-            const previousSourceId = _changedProperties.get('sourceId')
-            if (this.sourceId && this.sourceId !== previousSourceId) {
-                console.debug(`sourceId changed from ${previousSourceId} to ${this.sourceId}; fetching new data`)
-                dbRowsForSource(this.sourceId, this.authToken).then((data) => {
-                    //
-                })
             }
         }
     }

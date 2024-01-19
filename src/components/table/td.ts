@@ -6,8 +6,8 @@ import { TWStyles } from '../../../tailwind/index.js'
 import { MutableElement } from '../mutable-element.js'
 import { CellUpdateEvent, type MenuSelectedEvent } from '../../lib/events.js'
 
-import './cell-menu.js' // <outerbase-td-menu />
-import type { CellMenu } from './cell-menu.js'
+import '../menu/cell-menu.js' // <outerbase-td-menu />
+import type { CellMenu } from '../menu/cell-menu.js'
 import { Theme } from '../../types.js'
 
 // tl;dr <td/>, table-cell

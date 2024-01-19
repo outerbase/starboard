@@ -8,8 +8,8 @@ import { TWStyles } from '../../../tailwind/index.js'
 import { MutableElement } from '../mutable-element.js'
 import { classMap } from 'lit/directives/class-map.js'
 import { ColumnHiddenEvent, ColumnRemovedEvent, ColumnRenameEvent, ColumnUpdatedEvent, MenuSelectedEvent } from '../../lib/events.js'
-import './column-menu.js' // <outerbase-th-menu />
-import type { ColumnMenu } from './column-menu.js'
+import '../menu/column-menu.js' // <outerbase-th-menu />
+import type { ColumnMenu } from '../menu/column-menu.js'
 import type { HeaderMenuOptions } from '../../types.js'
 import { Theme } from '../../types.js'
 
