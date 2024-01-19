@@ -66,10 +66,11 @@ export class AddColumnElement extends ClassifiedElement {
                 <input
                     required
                     type="text"
-                    id="column-name"
                     name="column-name"
+                    id="column-name"
                     class=${classMap(AddColumnElement.inputClasses)}
                     placeholder="Enter name"
+                    autocomplete="off"
                     .value=${this.columnName}
                     @input=${this.onChange}
                 />
@@ -78,7 +79,14 @@ export class AddColumnElement extends ClassifiedElement {
 
             <div class="flex flex-col gap-1">
                 <label for="data-type" class=${classMap(AddColumnElement.labelClasses)}>Select Type</label>
-                <input required type="text" id="data-type" name="data-type" class=${classMap(AddColumnElement.inputClasses)} />
+                <input
+                    required
+                    type="text"
+                    name="data-type"
+                    id="data-type"
+                    class=${classMap(AddColumnElement.inputClasses)}
+                    autocomplete="off"
+                />
             </div>
 
             <button class=${classMap(AddColumnElement.buttonClasses)} type="submit">Create Column</button>
