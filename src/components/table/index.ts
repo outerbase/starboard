@@ -14,7 +14,7 @@ import {
     RowSelectedEvent,
     RowUpdatedEvent,
 } from '../../lib/events.js'
-import { type Columns, type Schema, type HeaderMenuOptions, type RowAsRecord, ColumnStatus, Theme } from '../../types.js'
+import { type Columns, type Schema, type HeaderMenuOptions, type RowAsRecord, ColumnStatus, Theme, type TableColumn } from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
 import { ClassifiedElement } from '../classified-element.js'
 
@@ -109,6 +109,25 @@ export class Table extends ClassifiedElement {
         this.dispatchEvent(new RowAddedEvent(_row))
     }
 
+    protected addNewColumn(name: string) {
+        const column: TableColumn = {
+            is_nullable: false,
+            name,
+            position: this.columns.length,
+            model: 'column',
+            type: 'string',
+            unique: false,
+            primaryKey: false,
+            autoIncrement: false,
+            status: ColumnStatus.created,
+        }
+
+        this.columns = [...this.columns, column]
+        this.rows = this.rows.map((row) => ({ ...row, values: { ...row.values, [name]: '' } }))
+        this.dispatchEvent(new ColumnAddedEvent({ name })) // JOHNNY pass the other data along too?
+        this.updateVisibleColumns()
+    }
+
     public toggleSelectedRow(uuid: string) {
         const _set = this.selectedRowUUIDs
         if (_set.has(uuid)) _set.delete(uuid)
@@ -170,23 +189,7 @@ export class Table extends ClassifiedElement {
         if (key === 'C') {
             const defaultName = `Column ${Date.now()}`
             const name = prompt('Choose a unique name for this column', defaultName) || defaultName
-            this.columns = [
-                ...this.columns,
-                {
-                    is_nullable: false,
-                    name,
-                    position: this.columns.length,
-                    model: 'column',
-                    type: 'string',
-                    unique: false,
-                    primaryKey: false,
-                    autoIncrement: false,
-                    status: ColumnStatus.created,
-                },
-            ]
-            this.rows = this.rows.map((row) => ({ ...row, values: { ...row.values, [name]: '' } }))
-            this.dispatchEvent(new ColumnAddedEvent({ name }))
-            this.updateVisibleColumns()
+            this.addNewColumn(name)
         }
 
         // create row
