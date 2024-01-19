@@ -3,7 +3,7 @@ import { ifDefined } from 'lit/directives/if-defined.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
 // import subcomponents
-import '../column-resizer.js'
+import '../column-resizer-element.js'
 import { TWStyles } from '../../../tailwind/index.js'
 import { MutableElement } from '../mutable-element.js'
 import { classMap } from 'lit/directives/class-map.js'
