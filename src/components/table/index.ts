@@ -6,6 +6,7 @@ import { repeat } from 'lit/directives/repeat.js'
 import {
     ColumnAddedEvent,
     ColumnHiddenEvent,
+    ColumnPluginActivatedEvent,
     ColumnRemovedEvent,
     ColumnUpdatedEvent,
     ResizeEvent,
@@ -272,8 +273,11 @@ export class Table extends ClassifiedElement {
         this._previousWidth = table.clientWidth
     }
 
-    private _onColumnUpdated(_event: ColumnUpdatedEvent) {
-        console.log('The column was updated')
+    @state()
+    protected _activePlugin?: any
+    private _onColumnPluginActivated(_event: ColumnPluginActivatedEvent) {
+        this._activePlugin = _event.data?.value
+        console.log('The plugin was activated', this._activePlugin)
     }
 
     private _onColumnResized({ delta }: ResizeEvent) {
@@ -344,7 +348,7 @@ export class Table extends ClassifiedElement {
                                     @column-hidden=${this._onColumnHidden}
                                     @column-removed=${this._onColumnRemoved}
                                     @resize-start=${this._onColumnResizeStart}
-                                    @column-updated=${this._onColumnUpdated}
+                                    @column-plugin-activated=${this._onColumnPluginActivated}
                                     @resize=${this._onColumnResized}
                                 >
                                 </outerbase-th>`
@@ -409,6 +413,7 @@ export class Table extends ClassifiedElement {
                                                   left-distance-to-viewport=${this.distanceToLeftViewport}
                                                   table-bounding-rect="${tableBoundingRect}"
                                                   theme=${this.theme}
+                                                  plugin=${this._activePlugin}
                                                   ?separate-cells=${true}
                                                   ?draw-right-border=${true}
                                                   ?bottom-border=${true}

@@ -8,6 +8,7 @@ import { CellUpdateEvent, type MenuSelectedEvent } from '../../lib/events.js'
 import '../menu/cell-menu.js' // <outerbase-td-menu />
 import type { CellMenu } from '../menu/cell-menu.js'
 import { Theme } from '../../types.js'
+import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
@@ -89,6 +90,9 @@ export class TableData extends MutableElement {
     @property({ attribute: 'theme', type: String })
     public theme = Theme.light
 
+    @property({ attribute: 'plugin', type: String })
+    public plugin?: any
+
     @state()
     protected options = [
         { label: 'Edit', value: 'edit' },
@@ -110,7 +114,7 @@ export class TableData extends MutableElement {
 
     public override connectedCallback(): void {
         super.connectedCallback()
-        this.addEventListener('contextmenu', this.onContextMenu)
+        // this.addEventListener('contextmenu', this.onContextMenu)
     }
 
     public override disconnectedCallback(): void {
@@ -119,7 +123,13 @@ export class TableData extends MutableElement {
     }
 
     protected override render() {
+        console.log('td:render:plugin', this.plugin)
+
         const darkClass = classMap({ 'font-mono': true, dark: this.theme == Theme.dark })
+
+        const displayedBlah = this.plugin
+            ? html`${unsafeHTML(this.plugin)}`
+            : html`${this.value || html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}`
 
         return this.isEditing
             ? // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
@@ -150,9 +160,7 @@ export class TableData extends MutableElement {
                         ?menu=${this.hasMenu}
                         ?selectable-text=${!this.isInteractive}
                         @menu-selection=${this.onMenuSelection}
-                        ><span class=${darkClass}
-                            >${this.value || html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}</span
-                        ></outerbase-td-menu
+                        ><span class=${darkClass}>${displayedBlah}</span></outerbase-td-menu
                     >`
     }
 

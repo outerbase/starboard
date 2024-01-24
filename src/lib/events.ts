@@ -53,6 +53,12 @@ export class ColumnHiddenEvent extends ColumnEvent {
     }
 }
 
+export class ColumnPluginActivatedEvent extends ColumnEvent {
+    constructor(attr: ColumnAttributes) {
+        super('column-plugin-activated', attr)
+    }
+}
+
 export class ColumnUpdatedEvent extends ColumnEvent {
     constructor(attr: ColumnAttributes) {
         super('column-updated', attr)

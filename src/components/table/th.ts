@@ -1,4 +1,4 @@
-import { html, type PropertyValueMap } from 'lit'
+import { html, type PropertyValueMap, type PropertyValues } from 'lit'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
@@ -6,7 +6,14 @@ import { customElement, property, state } from 'lit/decorators.js'
 import '../column-resizer-element.js'
 import { MutableElement } from '../mutable-element.js'
 import { classMap } from 'lit/directives/class-map.js'
-import { ColumnHiddenEvent, ColumnRemovedEvent, ColumnRenameEvent, ColumnUpdatedEvent, MenuSelectedEvent } from '../../lib/events.js'
+import {
+    ColumnHiddenEvent,
+    ColumnPluginActivatedEvent,
+    ColumnRemovedEvent,
+    ColumnRenameEvent,
+    ColumnUpdatedEvent,
+    MenuSelectedEvent,
+} from '../../lib/events.js'
 import '../menu/column-menu.js' // <outerbase-th-menu />
 import type { ColumnMenu } from '../menu/column-menu.js'
 import type { HeaderMenuOptions } from '../../types.js'
@@ -49,7 +56,7 @@ export class TH extends MutableElement {
     public plugins: {
         displayName: string
         webComponent: string
-    }[]
+    }[] = []
 
     @property({ type: Boolean, attribute: 'blank' })
     public blank = false
@@ -106,7 +113,7 @@ export class TH extends MutableElement {
 
     public override connectedCallback(): void {
         super.connectedCallback()
-        this.addEventListener('contextmenu', this.onContextMenu)
+        // this.addEventListener('contextmenu', this.onContextMenu)
     }
 
     public override disconnectedCallback(): void {
@@ -216,6 +223,16 @@ export class TH extends MutableElement {
     protected onMenuSelection(event: MenuSelectedEvent) {
         event.stopPropagation()
         let dispatchColumnUpdateEvent = false
+
+        // JOHNNY be less ahcky
+        if (event.value.indexOf('<') === 0) {
+            return this.dispatchEvent(
+                new ColumnPluginActivatedEvent({
+                    name: '???',
+                    data: { value: event.value },
+                })
+            )
+        }
 
         switch (event.value) {
             case 'hide':
