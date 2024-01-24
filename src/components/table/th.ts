@@ -45,6 +45,12 @@ export class TH extends MutableElement {
     @property({ attribute: 'name', type: String })
     public override value = ''
 
+    @property({ attribute: 'plugins', type: Array })
+    public plugins: {
+        displayName: string
+        webComponent: string
+    }[]
+
     @property({ type: Boolean, attribute: 'blank' })
     public blank = false
 
@@ -62,7 +68,7 @@ export class TH extends MutableElement {
     isInteractive = false
 
     @property({ attribute: 'options', type: Array })
-    options?: HeaderMenuOptions = [
+    options: HeaderMenuOptions = [
         {
             label: 'Sort A-Z',
             value: 'sort:alphabetical:ascending',
@@ -106,6 +112,21 @@ export class TH extends MutableElement {
     public override disconnectedCallback(): void {
         super.disconnectedCallback
         this.removeEventListener('contextmenu', this.onContextMenu)
+    }
+
+    protected override willUpdate(_changedProperties: PropertyValues<this>) {
+        super.willUpdate(_changedProperties)
+
+        const newPluginOptions =
+            this.plugins?.map((plugin) => ({
+                label: plugin.displayName,
+                value: plugin.webComponent,
+                classes: 'Test',
+            })) ?? []
+
+        if (_changedProperties.has('plugins')) {
+            this.options = [...this.options, ...newPluginOptions]
+        }
     }
 
     @state()
