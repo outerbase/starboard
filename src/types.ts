@@ -83,8 +83,11 @@ export enum Theme {
 }
 
 export type ColumnPlugin = {
-    displayName: string
-    tagName: string
+    columnName: string
     config: string
+    displayName: string
     metadata: string
+    id: string
+    pluginWorkspaceId: string
+    tagName: string
 }

@@ -232,7 +232,7 @@ export class TH extends MutableElement {
         // handle (potential) plugin selection
         const plugin = this.plugins.find(({ tagName }) => event.value === tagName)
         if (plugin) {
-            return this.dispatchEvent(new ColumnPluginActivatedEvent(plugin))
+            return this.dispatchEvent(new ColumnPluginActivatedEvent({ ...plugin, columnName: this.value }))
         }
 
         switch (event.value) {
