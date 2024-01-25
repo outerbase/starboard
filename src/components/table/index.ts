@@ -56,6 +56,9 @@ export class Table extends ClassifiedElement {
     @property({ attribute: 'plugins', type: Array })
     public plugins?: Array<ColumnPlugin>
 
+    @property({ attribute: 'installed-plugins', type: Array })
+    public installedPlugins?: Record<string, string | undefined>
+
     @state()
     protected rows: Array<RowAsRecord> = []
 
@@ -307,6 +310,7 @@ export class Table extends ClassifiedElement {
         // 'overflow-hidden' is necessary to prevent the ColumnResizer from going beyond the table.
         // because the Resizer stays in place as you scroll down the page
         // while the rest of the table scrolls out of view
+        console.log('These are the current installed plugins', this.installedPlugins)
 
         const tableContainerClasses = { dark: this.theme == Theme.dark }
         const tableClasses = {
@@ -410,6 +414,7 @@ export class Table extends ClassifiedElement {
                                           ({ name }) => name, // use the column name as the unique identifier for each entry in this row
                                           ({ name }, idx) => html`
                                               <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
+                                              <!-- TODO @caleb & johnny move plugins to support the new installedPlugins variable -->
                                               <outerbase-td
                                                   .position=${{ row: id, column: name }}
                                                   value=${values[name] ?? ''}
