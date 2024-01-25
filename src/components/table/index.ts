@@ -6,7 +6,9 @@ import { repeat } from 'lit/directives/repeat.js'
 import {
     ColumnAddedEvent,
     ColumnHiddenEvent,
+    ColumnPluginActivatedEvent,
     ColumnRemovedEvent,
+    ColumnUpdatedEvent,
     ResizeEvent,
     ResizeStartEvent,
     RowAddedEvent,
@@ -32,10 +34,10 @@ export class Table extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'selectable-rows' })
     public selectableRows = false
 
-    @property({ type: String, attribute: 'keyboard-shortcuts' })
+    @property({ attribute: 'keyboard-shortcuts', type: Boolean })
     public keyboardShortcuts: boolean = false
 
-    @property({ type: Object, attribute: 'schema' })
+    @property({ attribute: 'schema', type: Object })
     public schema?: Schema
 
     @property({ attribute: 'data', type: Array })
@@ -43,16 +45,22 @@ export class Table extends ClassifiedElement {
         this.rows = rows
     }
 
+    @property({ attribute: 'plugins', type: Array })
+    public plugins?: {
+        displayName: string
+        webComponent: string
+    }[]
+
     @state()
     protected rows: Array<RowAsRecord> = []
 
-    @property({ type: Boolean, attribute: 'non-interactive' })
+    @property({ attribute: 'non-interactive', type: Boolean })
     public isNonInteractive = false
 
-    @property({ type: String, attribute: 'auth-token' })
+    @property({ attribute: 'auth-token', type: String })
     public authToken?: string
 
-    @property({ type: Array, attribute: 'column-options' })
+    @property({ attribute: 'column-options', type: Array })
     public columnOptions?: Array<HeaderMenuOptions>
 
     @property({ attribute: 'outter-border', type: Boolean })
@@ -265,6 +273,13 @@ export class Table extends ClassifiedElement {
         this._previousWidth = table.clientWidth
     }
 
+    @state()
+    protected _activePlugin?: any
+    private _onColumnPluginActivated(_event: ColumnPluginActivatedEvent) {
+        this._activePlugin = _event.data?.value
+        console.log('The plugin was activated', this._activePlugin)
+    }
+
     private _onColumnResized({ delta }: ResizeEvent) {
         const table = this.shadowRoot?.getElementById('table')
         if (!table) throw new Error('Unexpectedly missing a table')
@@ -321,6 +336,7 @@ export class Table extends ClassifiedElement {
                                     theme=${this.theme}
                                     name="${this.renamedColumns[name] ?? name}"
                                     original-value="${name}"
+                                    .plugins="${this.plugins}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
                                     ?separate-cells=${true}
                                     ?outter-border=${this.outterBorder}
@@ -332,6 +348,7 @@ export class Table extends ClassifiedElement {
                                     @column-hidden=${this._onColumnHidden}
                                     @column-removed=${this._onColumnRemoved}
                                     @resize-start=${this._onColumnResizeStart}
+                                    @column-plugin-activated=${this._onColumnPluginActivated}
                                     @resize=${this._onColumnResized}
                                 >
                                 </outerbase-th>`
@@ -396,6 +413,7 @@ export class Table extends ClassifiedElement {
                                                   left-distance-to-viewport=${this.distanceToLeftViewport}
                                                   table-bounding-rect="${tableBoundingRect}"
                                                   theme=${this.theme}
+                                                  plugin=${this._activePlugin}
                                                   ?separate-cells=${true}
                                                   ?draw-right-border=${true}
                                                   ?bottom-border=${true}
