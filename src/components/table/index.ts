@@ -57,7 +57,7 @@ export class Table extends ClassifiedElement {
     public plugins?: Array<ColumnPlugin>
 
     @property({ attribute: 'installed-plugins', type: Array })
-    public installedPlugins?: Record<string, string | undefined>
+    public installedPlugins: Record<string, string | undefined> = {}
 
     @state()
     protected rows: Array<RowAsRecord> = []
@@ -422,7 +422,9 @@ export class Table extends ClassifiedElement {
                                                   left-distance-to-viewport=${this.distanceToLeftViewport}
                                                   table-bounding-rect="${tableBoundingRect}"
                                                   theme=${this.theme}
-                                                  .plugin=${this._activePlugin}
+                                                  .plugin=${this.plugins?.find(
+                                                      ({ pluginWorkspaceId }) => pluginWorkspaceId === this.installedPlugins[name]
+                                                  )}
                                                   ?separate-cells=${true}
                                                   ?draw-right-border=${true}
                                                   ?bottom-border=${true}
