@@ -105,6 +105,9 @@ export class TH extends MutableElement {
     @state()
     protected _options: HeaderMenuOptions = []
 
+    @state()
+    protected _pluginOptions: HeaderMenuOptions = []
+
     @property({ attribute: 'left-distance-to-viewport', type: Number })
     protected distanceToLeftViewport = -1
 
@@ -125,12 +128,11 @@ export class TH extends MutableElement {
         super.willUpdate(_changedProperties)
 
         if (_changedProperties.has('plugins')) {
-            const newPluginOptions =
+            this._pluginOptions =
                 this.plugins?.map((plugin) => ({
                     label: plugin.displayName,
                     value: plugin.tagName,
                 })) ?? []
-            this._options = [...this.options, ...newPluginOptions]
         }
     }
 
@@ -144,13 +146,14 @@ export class TH extends MutableElement {
     protected override render() {
         const options = this.dirty
             ? [
+                  ...this.options,
                   {
                       label: html`Revert to <span class="pointer-events-none italic whitespace-nowrap">${this.originalValue}</span>`,
                       value: 'reset',
                   },
-                  ...this._options,
+                  ...this._pluginOptions,
               ]
-            : this._options
+            : [...this.options, ...this._pluginOptions]
 
         const blankElementClasses = {
             'absolute top-0 bottom-0 right-0 left-0': true,
