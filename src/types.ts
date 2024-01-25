@@ -81,3 +81,10 @@ export enum Theme {
     'light',
     'dark',
 }
+
+export type ColumnPlugin = {
+    displayName: string
+    tagName: string
+    config: string
+    metadata: string
+}

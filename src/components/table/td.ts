@@ -7,7 +7,7 @@ import { CellUpdateEvent, type MenuSelectedEvent } from '../../lib/events.js'
 
 import '../menu/cell-menu.js' // <outerbase-td-menu />
 import type { CellMenu } from '../menu/cell-menu.js'
-import { Theme } from '../../types.js'
+import { Theme, type ColumnPlugin } from '../../types.js'
 import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 
 // tl;dr <td/>, table-cell
@@ -91,7 +91,7 @@ export class TableData extends MutableElement {
     public theme = Theme.light
 
     @property({ attribute: 'plugin', type: String })
-    public plugin?: any
+    public plugin?: ColumnPlugin
 
     @state()
     protected options = [
@@ -123,13 +123,16 @@ export class TableData extends MutableElement {
     }
 
     protected override render() {
-        console.log('td:render:plugin', this.plugin)
-
         const darkClass = classMap({ 'font-mono': true, dark: this.theme == Theme.dark })
 
-        const displayedBlah = this.plugin
-            ? html`${unsafeHTML(this.plugin)}`
-            : html`${this.value || html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}`
+        let cellContents
+        if (this.plugin) {
+            const { config, tagName } = this.plugin
+            const pluginAsString = unsafeHTML(`<${tagName} cellvalue="${this.value}" configuration="${config}"></${tagName}>`)
+            cellContents = html`${pluginAsString}`
+        } else {
+            cellContents = html`${this.value || html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}`
+        }
 
         return this.isEditing
             ? // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
@@ -160,7 +163,7 @@ export class TableData extends MutableElement {
                         ?menu=${this.hasMenu}
                         ?selectable-text=${!this.isInteractive}
                         @menu-selection=${this.onMenuSelection}
-                        ><span class=${darkClass}>${displayedBlah}</span></outerbase-td-menu
+                        ><span class=${darkClass}>${cellContents}</span></outerbase-td-menu
                     >`
     }
 

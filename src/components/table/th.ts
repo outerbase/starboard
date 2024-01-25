@@ -16,7 +16,7 @@ import {
 } from '../../lib/events.js'
 import '../menu/column-menu.js' // <outerbase-th-menu />
 import type { ColumnMenu } from '../menu/column-menu.js'
-import type { HeaderMenuOptions } from '../../types.js'
+import type { HeaderMenuOptions, ColumnPlugin } from '../../types.js'
 import { Theme } from '../../types.js'
 
 // tl;dr <th/>, table-cell
@@ -53,10 +53,7 @@ export class TH extends MutableElement {
     public override value = ''
 
     @property({ attribute: 'plugins', type: Array })
-    public plugins: {
-        displayName: string
-        webComponent: string
-    }[] = []
+    public plugins: Array<ColumnPlugin> = []
 
     @property({ type: Boolean, attribute: 'blank' })
     public blank = false
@@ -105,6 +102,9 @@ export class TH extends MutableElement {
         },
     ]
 
+    @state()
+    protected _options: HeaderMenuOptions = []
+
     @property({ attribute: 'left-distance-to-viewport', type: Number })
     protected distanceToLeftViewport = -1
 
@@ -124,15 +124,13 @@ export class TH extends MutableElement {
     protected override willUpdate(_changedProperties: PropertyValues<this>) {
         super.willUpdate(_changedProperties)
 
-        const newPluginOptions =
-            this.plugins?.map((plugin) => ({
-                label: plugin.displayName,
-                value: plugin.webComponent,
-                classes: 'Test',
-            })) ?? []
-
         if (_changedProperties.has('plugins')) {
-            this.options = [...this.options, ...newPluginOptions]
+            const newPluginOptions =
+                this.plugins?.map((plugin) => ({
+                    label: plugin.displayName,
+                    value: plugin.tagName,
+                })) ?? []
+            this._options = [...this.options, ...newPluginOptions]
         }
     }
 
@@ -144,11 +142,15 @@ export class TH extends MutableElement {
     }
 
     protected override render() {
-        const optionsWithRevert = this.options ? [...this.options] : []
-        optionsWithRevert.splice(-1, 0, {
-            label: html`Revert to <span class="pointer-events-none italic whitespace-nowrap">${this.originalValue}</span>`,
-            value: 'reset',
-        })
+        const options = this.dirty
+            ? [
+                  {
+                      label: html`Revert to <span class="pointer-events-none italic whitespace-nowrap">${this.originalValue}</span>`,
+                      value: 'reset',
+                  },
+                  ...this._options,
+              ]
+            : this._options
 
         const blankElementClasses = {
             'absolute top-0 bottom-0 right-0 left-0': true,
@@ -172,7 +174,7 @@ export class TH extends MutableElement {
                   ? html`<outerbase-th-menu
                         class="font-mono"
                         theme=${this.theme}
-                        .options=${this.dirty ? optionsWithRevert : this.options}
+                        .options=${options}
                         @menu-selection=${this.onMenuSelection}
                         left-distance-to-viewport=${this.distanceToLeftViewport}
                         ><span class="font-mono">${this.value}</span></outerbase-th-menu
@@ -224,14 +226,10 @@ export class TH extends MutableElement {
         event.stopPropagation()
         let dispatchColumnUpdateEvent = false
 
-        // JOHNNY be less ahcky
-        if (event.value.indexOf('<') === 0) {
-            return this.dispatchEvent(
-                new ColumnPluginActivatedEvent({
-                    name: '???',
-                    data: { value: event.value },
-                })
-            )
+        // handle (potential) plugin selection
+        const plugin = this.plugins.find(({ tagName }) => event.value === tagName)
+        if (plugin) {
+            return this.dispatchEvent(new ColumnPluginActivatedEvent(plugin))
         }
 
         switch (event.value) {

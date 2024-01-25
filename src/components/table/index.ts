@@ -8,7 +8,6 @@ import {
     ColumnHiddenEvent,
     ColumnPluginActivatedEvent,
     ColumnRemovedEvent,
-    ColumnUpdatedEvent,
     ResizeEvent,
     ResizeStartEvent,
     RowAddedEvent,
@@ -16,7 +15,16 @@ import {
     RowSelectedEvent,
     RowUpdatedEvent,
 } from '../../lib/events.js'
-import { type Columns, type Schema, type HeaderMenuOptions, type RowAsRecord, ColumnStatus, Theme, type TableColumn } from '../../types.js'
+import {
+    type Columns,
+    type Schema,
+    type HeaderMenuOptions,
+    type RowAsRecord,
+    type TableColumn,
+    type ColumnPlugin,
+    ColumnStatus,
+    Theme,
+} from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
 import { ClassifiedElement } from '../classified-element.js'
 
@@ -46,10 +54,7 @@ export class Table extends ClassifiedElement {
     }
 
     @property({ attribute: 'plugins', type: Array })
-    public plugins?: {
-        displayName: string
-        webComponent: string
-    }[]
+    public plugins?: Array<ColumnPlugin>
 
     @state()
     protected rows: Array<RowAsRecord> = []
@@ -275,9 +280,8 @@ export class Table extends ClassifiedElement {
 
     @state()
     protected _activePlugin?: any
-    private _onColumnPluginActivated(_event: ColumnPluginActivatedEvent) {
-        this._activePlugin = _event.data?.value
-        console.log('The plugin was activated', this._activePlugin)
+    private _onColumnPluginActivated({ plugin }: ColumnPluginActivatedEvent) {
+        this._activePlugin = plugin
     }
 
     private _onColumnResized({ delta }: ResizeEvent) {
@@ -413,7 +417,7 @@ export class Table extends ClassifiedElement {
                                                   left-distance-to-viewport=${this.distanceToLeftViewport}
                                                   table-bounding-rect="${tableBoundingRect}"
                                                   theme=${this.theme}
-                                                  plugin=${this._activePlugin}
+                                                  .plugin=${this._activePlugin}
                                                   ?separate-cells=${true}
                                                   ?draw-right-border=${true}
                                                   ?bottom-border=${true}

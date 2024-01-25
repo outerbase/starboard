@@ -1,4 +1,4 @@
-import type { CellDetail, Data, RowAsRecord } from '../types.js'
+import type { CellDetail, Data, RowAsRecord, ColumnPlugin } from '../types.js'
 
 type ColumnAttributes = { name: string; data?: Data }
 class BubblyEvent extends Event {
@@ -29,6 +29,15 @@ export class ColumnEvent extends BubblyEvent {
     }
 }
 
+export class ColumnPluginEvent extends BubblyEvent {
+    public plugin: ColumnPlugin
+
+    constructor(type: string, plugin: ColumnPlugin) {
+        super(type)
+        this.plugin = plugin
+    }
+}
+
 export class ColumnAddedEvent extends ColumnEvent {
     constructor(attr: ColumnAttributes) {
         super('column-added', attr)
@@ -53,9 +62,15 @@ export class ColumnHiddenEvent extends ColumnEvent {
     }
 }
 
-export class ColumnPluginActivatedEvent extends ColumnEvent {
-    constructor(attr: ColumnAttributes) {
-        super('column-plugin-activated', attr)
+export class ColumnPluginActivatedEvent extends ColumnPluginEvent {
+    constructor(plugin: ColumnPlugin) {
+        super('column-plugin-activated', plugin)
+    }
+}
+
+export class ColumnPluginDeactivatedEvent extends ColumnPluginEvent {
+    constructor(plugin: ColumnPlugin) {
+        super('column-plugin-deactivated', plugin)
     }
 }
 
