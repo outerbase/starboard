@@ -155,19 +155,20 @@ export class TH extends MutableElement {
               ]
             : [...this.options]
 
-        options.splice(2, 0, {
-            label: html`<div class="flex items-center justify-between">Plugins ${CaretRight(16)}</div>`,
-            value: 'plugins',
-            options: hasPlugin
-                ? [
-                      {
-                          label: html`<span class="font-bold">Remove Plugin</span> `,
-                          value: 'uninstall-column-plugin',
-                      },
-                      ...this._pluginOptions,
-                  ]
-                : this._pluginOptions,
-        })
+        options.splice(
+            2,
+            0,
+            hasPlugin
+                ? {
+                      label: html`<span class="italic">Remove Plugin</span> `,
+                      value: 'uninstall-column-plugin',
+                  }
+                : {
+                      label: html`<div class="flex items-center justify-between">Plugins ${CaretRight(16)}</div>`,
+                      value: 'plugins',
+                      options: this._pluginOptions,
+                  }
+        )
 
         const blankElementClasses = {
             'absolute top-0 bottom-0 right-0 left-0': true,
