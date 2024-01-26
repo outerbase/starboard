@@ -12,7 +12,8 @@ import { classMap } from 'lit/directives/class-map.js'
 export class Menu extends ClassifiedElement {
     protected override get classMap() {
         return {
-            'relative flex items-center justify-between gap-2': true,
+            relative: true,
+            'flex items-center justify-between gap-2': !this.withoutPadding,
             'font-medium select-none whitespace-nowrap': true,
             dark: this.theme == Theme.dark,
         }
@@ -33,6 +34,9 @@ export class Menu extends ClassifiedElement {
 
     @property({ attribute: 'theme', type: String })
     public theme = Theme.light
+
+    @property({ attribute: 'without-padding', type: Boolean })
+    public withoutPadding = false
 
     @state()
     protected historyStack: Array<HeaderMenuOptions> = []

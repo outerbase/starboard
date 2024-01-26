@@ -15,7 +15,8 @@ import { unsafeHTML } from 'lit/directives/unsafe-html.js'
 export class TableData extends MutableElement {
     protected override get classMap() {
         return {
-            'table-cell relative px-cell-padding-x py-cell-padding-y ': true,
+            'table-cell relative': true,
+            'px-cell-padding-x py-cell-padding-y ': !this.plugin,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
             'focus:ring-2 focus:ring-black dark:focus:ring-white focus:z-10 focus:outline-none': !this.isEditing && this.isInteractive,
@@ -160,6 +161,7 @@ export class TableData extends MutableElement {
                                   },
                               ]
                             : this.options}
+                        ?without-padding=${!!this.plugin}
                         ?menu=${this.hasMenu}
                         ?selectable-text=${!this.isInteractive}
                         @menu-selection=${this.onMenuSelection}
