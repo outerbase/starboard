@@ -59,9 +59,6 @@ export class TH extends MutableElement {
     @property({ attribute: 'installed-plugins', type: Object })
     public installedPlugins: Record<string, PluginWorkspaceInstallationId | undefined> = {}
 
-    @property({ attribute: 'plugin', type: Array })
-    public plugin?: ColumnPlugin
-
     @property({ type: Boolean, attribute: 'blank' })
     public blank = false
 
@@ -140,10 +137,6 @@ export class TH extends MutableElement {
                     label: plugin.displayName,
                     value: plugin.tagName,
                 })) ?? []
-        }
-
-        if (_changedProperties.has('plugin')) {
-            if (this.plugin) this.plugin.columnName = this.originalValue ?? this.value
         }
     }
 
@@ -259,8 +252,6 @@ export class TH extends MutableElement {
 
         // look for the 'none' plugin and delete installed column plugin as a result when chosen
         if (event.value === 'uninstall-column-plugin') {
-            if (!this.plugin) throw new Error("Attempted to uninstall a plugin that we didn't think was installed")
-
             // starboard can immediately update it's state
             // dashboard will also receive this event
 

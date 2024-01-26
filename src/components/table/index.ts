@@ -6,7 +6,6 @@ import { repeat } from 'lit/directives/repeat.js'
 import {
     ColumnAddedEvent,
     ColumnHiddenEvent,
-    ColumnPluginActivatedEvent,
     ColumnPluginDeactivatedEvent,
     ColumnRemovedEvent,
     ResizeEvent,
@@ -342,9 +341,6 @@ export class Table extends ClassifiedElement {
                                     .options=${this.columnOptions || nothing}
                                     .plugins="${this.plugins}"
                                     installed-plugins=${JSON.stringify(this.installedPlugins)}
-                                    .plugin=${this.plugins?.find(
-                                        ({ pluginWorkspaceId }) => pluginWorkspaceId === this.installedPlugins[name]?.plugin_workspace_id
-                                    )}
                                     table-height=${ifDefined(this._height)}
                                     theme=${this.theme}
                                     name="${this.renamedColumns[name] ?? name}"
