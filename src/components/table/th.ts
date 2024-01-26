@@ -19,6 +19,7 @@ import '../menu/column-menu.js' // <outerbase-th-menu />
 import type { ColumnMenu } from '../menu/column-menu.js'
 import type { HeaderMenuOptions, ColumnPlugin, PluginWorkspaceInstallationId } from '../../types.js'
 import { Theme } from '../../types.js'
+import { CaretRight } from '../../lib/icons/caret-right.js'
 
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
@@ -85,12 +86,6 @@ export class TH extends MutableElement {
             label: 'Sort Z-A',
             value: 'sort:alphabetical:descending',
         },
-        // TODO @johnny implement nested menus to support this
-        // {
-        //     label: 'Plugins',
-        //     value: 'plugins',
-        //     // value: html`<div class="bg-yellow-50 w-8 h-8>submenu</div>`,
-        // },
         {
             label: 'Hide Column',
             value: 'hide',
@@ -120,7 +115,7 @@ export class TH extends MutableElement {
 
     public override connectedCallback(): void {
         super.connectedCallback()
-        // this.addEventListener('contextmenu', this.onContextMenu)
+        this.addEventListener('contextmenu', this.onContextMenu)
     }
 
     public override disconnectedCallback(): void {
@@ -157,16 +152,22 @@ export class TH extends MutableElement {
                       label: html`Revert to <span class="pointer-events-none italic whitespace-nowrap">${this.originalValue}</span>`,
                       value: 'reset',
                   },
-                  ...this._pluginOptions,
               ]
-            : [...this.options, ...this._pluginOptions]
+            : [...this.options]
 
-        if (hasPlugin) {
-            options.push({
-                label: 'None',
-                value: 'uninstall-column-plugin',
-            })
-        }
+        options.splice(2, 0, {
+            label: html`<div class="flex items-center justify-between">Plugins ${CaretRight(16)}</div>`,
+            value: 'plugins',
+            options: hasPlugin
+                ? [
+                      {
+                          label: html`<span class="font-bold">Remove Plugin</span> `,
+                          value: 'uninstall-column-plugin',
+                      },
+                      ...this._pluginOptions,
+                  ]
+                : this._pluginOptions,
+        })
 
         const blankElementClasses = {
             'absolute top-0 bottom-0 right-0 left-0': true,

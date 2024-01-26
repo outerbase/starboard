@@ -6,7 +6,7 @@ import { MenuSelectedEvent } from '../../lib/events.js'
 import { CaretDown } from '../../lib/icons/caret-down.js'
 import { ClassifiedElement } from '../classified-element.js'
 import classMapToClassName from '../../lib/class-map-to-class-name.js'
-import { Theme } from '../../types.js'
+import { Theme, type HeaderMenuOptions } from '../../types.js'
 import { classMap } from 'lit/directives/class-map.js'
 
 export class Menu extends ClassifiedElement {
@@ -21,14 +21,21 @@ export class Menu extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'open' })
     public open = false
 
-    @property({ type: String, attribute: 'selection' })
+    // @property({ attribute: 'selection', type: String })
+    @state()
     public selection?: string
 
     @property({ type: Array, attribute: 'options' })
-    public options: Array<Record<'label' | 'value' | 'classes', string>> = []
+    public options: HeaderMenuOptions = []
+
+    @state()
+    protected activeOptions: HeaderMenuOptions = []
 
     @property({ attribute: 'theme', type: String })
     public theme = Theme.light
+
+    @state()
+    protected historyStack: Array<HeaderMenuOptions> = []
 
     @state()
     protected focused?: string
@@ -61,10 +68,21 @@ export class Menu extends ClassifiedElement {
         // when the menu is being closed
         else if (_changedProperties.has('open') && !this.open) {
             this.removeAttribute('aria-expanded')
+
+            // reset history; restore root menu ietms
+            if (this.historyStack.length > 0) {
+                this.options = this.historyStack[0]
+                this.historyStack = []
+            }
             if (this.outsideClicker) {
                 delete this.activeEvent
                 document.removeEventListener('click', this.outsideClicker)
             }
+        }
+
+        if (_changedProperties.has('options')) {
+            // reset the menu to it's root
+            this.activeOptions = this.options
         }
     }
 
@@ -83,16 +101,37 @@ export class Menu extends ClassifiedElement {
     }
 
     protected onItemClick(event: MouseEvent) {
-        const el = event.target as HTMLUListElement
-        const value = el.getAttribute('data-value')
+        const el = event.target as HTMLElement
+
+        // look for someone with a `data-value`
+        // this was necessary when passing in a label that
+        // is itself another html element such that the literal thing
+        // being clicked does NOT have the value
+        let parent = el
+        while (parent && !parent.hasAttribute('data-value') && parent.parentElement) {
+            parent = parent.parentElement
+        }
+
+        const value = parent.getAttribute('data-value')
         if (!value) throw new Error("onItemClick didn't recover a selection value")
-        this.onSelection(value)
+        this.onSelection(event, value)
     }
 
-    protected onSelection(value: string) {
-        const selectionEvent = new MenuSelectedEvent(value)
-        this.selection = value
-        this.dispatchEvent(selectionEvent)
+    protected onSelection(event: Event, value: string) {
+        const submenu = this.options.find((opt) => opt.value === value)
+        if (submenu && submenu.options) {
+            event.stopPropagation()
+            event.preventDefault()
+            this.historyStack.push(this.options)
+            this.options = submenu.options
+            return
+        }
+
+        if (typeof value === 'string') {
+            const selectionEvent = new MenuSelectedEvent(value)
+            this.selection = value
+            this.dispatchEvent(selectionEvent)
+        }
     }
 
     protected onKeyDown(event: KeyboardEvent) {
@@ -104,22 +143,22 @@ export class Menu extends ClassifiedElement {
             event.preventDefault()
             this.open = !this.open
 
-            if (!this.open && this.focused) this.onSelection(this.focused)
+            if (!this.open && this.focused) this.onSelection(event, this.focused)
         } else if (code === 'ArrowDown' || code === 'ArrowRight') {
             event.preventDefault()
-            if (!this.focused) this.focused = this.options[0]?.value
+            if (!this.focused) this.focused = this.activeOptions[0]?.value
             else {
-                const idx = this.options.findIndex(({ value }, _idx) => value === this.focused)
-                if (idx > -1 && idx < this.options.length - 1) this.focused = this.options[idx + 1].value
-                else if (idx === this.options.length - 1) this.focused = this.options[0].value
+                const idx = this.activeOptions.findIndex(({ value }, _idx) => value === this.focused)
+                if (idx > -1 && idx < this.activeOptions.length - 1) this.focused = this.activeOptions[idx + 1].value
+                else if (idx === this.activeOptions.length - 1) this.focused = this.activeOptions[0].value
             }
         } else if (code === 'ArrowUp' || code === 'ArrowLeft') {
             event.preventDefault()
-            if (!this.focused) this.focused = this.options[this.options.length - 1]?.value
+            if (!this.focused) this.focused = this.activeOptions[this.activeOptions.length - 1]?.value
             else {
-                const idx = this.options.findIndex(({ value }, _idx) => value === this.focused)
-                if (idx > 0) this.focused = this.options[idx - 1].value
-                else if (idx === 0) this.focused = this.options[this.options.length - 1].value
+                const idx = this.activeOptions.findIndex(({ value }, _idx) => value === this.focused)
+                if (idx > 0) this.focused = this.activeOptions[idx - 1].value
+                else if (idx === 0) this.focused = this.activeOptions[this.activeOptions.length - 1].value
             }
         } else if (code === 'Tab') {
             // prevent tabbing focus away from an open menu
@@ -146,14 +185,14 @@ export class Menu extends ClassifiedElement {
 
         return html`<ul class=${classMap(classes)} role="menu">
             ${repeat(
-                this.options,
+                this.activeOptions,
                 ({ label }) => label,
                 ({ label, value, classes }) =>
                     html`<li
                         @click=${this.onItemClick}
                         data-value=${value}
                         class=${classMapToClassName({
-                            [classes]: !!classes,
+                            [classes ?? '']: !!classes,
                             'text-ellipsis overflow-hidden': true,
                             'rounded-xl px-4 py-3': true,
                             'cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700': true,

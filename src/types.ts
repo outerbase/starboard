@@ -75,6 +75,7 @@ export type HeaderMenuOptions = Array<{
     value: string
     classes?: string
     icon?: string | null
+    options?: HeaderMenuOptions // sub menu
 }>
 
 export enum Theme {
