@@ -114,7 +114,7 @@ export class TableData extends MutableElement {
 
     public override connectedCallback(): void {
         super.connectedCallback()
-        // this.addEventListener('contextmenu', this.onContextMenu)
+        this.addEventListener('contextmenu', this.onContextMenu)
     }
 
     public override disconnectedCallback(): void {
