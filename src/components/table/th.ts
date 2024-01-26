@@ -9,6 +9,7 @@ import { classMap } from 'lit/directives/class-map.js'
 import {
     ColumnHiddenEvent,
     ColumnPluginActivatedEvent,
+    ColumnPluginDeactivatedEvent,
     ColumnRemovedEvent,
     ColumnRenameEvent,
     ColumnUpdatedEvent,
@@ -16,7 +17,7 @@ import {
 } from '../../lib/events.js'
 import '../menu/column-menu.js' // <outerbase-th-menu />
 import type { ColumnMenu } from '../menu/column-menu.js'
-import type { HeaderMenuOptions, ColumnPlugin } from '../../types.js'
+import type { HeaderMenuOptions, ColumnPlugin, PluginWorkspaceInstallationId } from '../../types.js'
 import { Theme } from '../../types.js'
 
 // tl;dr <th/>, table-cell
@@ -54,6 +55,12 @@ export class TH extends MutableElement {
 
     @property({ attribute: 'plugins', type: Array })
     public plugins: Array<ColumnPlugin> = []
+
+    @property({ attribute: 'installed-plugins', type: Object })
+    public installedPlugins: Record<string, PluginWorkspaceInstallationId | undefined> = {}
+
+    @property({ attribute: 'plugin', type: Array })
+    public plugin?: ColumnPlugin
 
     @property({ type: Boolean, attribute: 'blank' })
     public blank = false
@@ -133,6 +140,15 @@ export class TH extends MutableElement {
                     label: plugin.displayName,
                     value: plugin.tagName,
                 })) ?? []
+
+            this._pluginOptions.push({
+                label: 'None',
+                value: 'uninstall-column-plugin',
+            })
+        }
+
+        if (_changedProperties.has('plugin')) {
+            if (this.plugin) this.plugin.columnName = this.originalValue ?? this.value
         }
     }
 
@@ -229,10 +245,26 @@ export class TH extends MutableElement {
         event.stopPropagation()
         let dispatchColumnUpdateEvent = false
 
+        const columnName = this.originalValue ?? this.value
+
         // handle (potential) plugin selection
         const plugin = this.plugins.find(({ tagName }) => event.value === tagName)
         if (plugin) {
-            return this.dispatchEvent(new ColumnPluginActivatedEvent({ ...plugin, columnName: this.value }))
+            return this.dispatchEvent(new ColumnPluginActivatedEvent(columnName, { ...plugin, columnName: this.value }))
+        }
+
+        // look for the 'none' plugin and delete installed column plugin as a result when chosen
+        if (event.value === 'uninstall-column-plugin') {
+            if (!this.plugin) throw new Error("Attempted to uninstall a plugin that we didn't think was installed")
+
+            // starboard can immediately update it's state
+            // dashboard will also receive this event
+
+            const name = this.originalValue ?? this.value
+            const installedPlugin = this.installedPlugins[name]
+            if (!installedPlugin) throw new Error(`Attempting to uninstall a non-existent plugin: ${name}`)
+
+            this.dispatchEvent(new ColumnPluginDeactivatedEvent(columnName, installedPlugin))
         }
 
         switch (event.value) {

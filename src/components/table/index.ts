@@ -7,6 +7,7 @@ import {
     ColumnAddedEvent,
     ColumnHiddenEvent,
     ColumnPluginActivatedEvent,
+    ColumnPluginDeactivatedEvent,
     ColumnRemovedEvent,
     ResizeEvent,
     ResizeStartEvent,
@@ -24,6 +25,7 @@ import {
     type ColumnPlugin,
     ColumnStatus,
     Theme,
+    type PluginWorkspaceInstallationId,
 } from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
 import { ClassifiedElement } from '../classified-element.js'
@@ -57,7 +59,7 @@ export class Table extends ClassifiedElement {
     public plugins?: Array<ColumnPlugin>
 
     @property({ attribute: 'installed-plugins', type: Array })
-    public installedPlugins: Record<string, string | undefined> = {}
+    public installedPlugins: Record<string, PluginWorkspaceInstallationId | undefined> = {}
 
     @state()
     protected rows: Array<RowAsRecord> = []
@@ -281,10 +283,9 @@ export class Table extends ClassifiedElement {
         this._previousWidth = table.clientWidth
     }
 
-    @state()
-    protected _activePlugin?: any
-    private _onColumnPluginActivated({ plugin }: ColumnPluginActivatedEvent) {
-        this._activePlugin = plugin
+    private _onColumnPluginDeactivated({ column }: ColumnPluginDeactivatedEvent) {
+        delete this.installedPlugins[column]
+        this.requestUpdate('installedPlugins')
     }
 
     private _onColumnResized({ delta }: ResizeEvent) {
@@ -310,7 +311,6 @@ export class Table extends ClassifiedElement {
         // 'overflow-hidden' is necessary to prevent the ColumnResizer from going beyond the table.
         // because the Resizer stays in place as you scroll down the page
         // while the rest of the table scrolls out of view
-        console.log('These are the current installed plugins', this.installedPlugins)
 
         const tableContainerClasses = { dark: this.theme == Theme.dark }
         const tableClasses = {
@@ -340,11 +340,15 @@ export class Table extends ClassifiedElement {
                                 // omit column resizer on the last column because it's sort-of awkward
                                 return html`<outerbase-th
                                     .options=${this.columnOptions || nothing}
+                                    .plugins="${this.plugins}"
+                                    installed-plugins=${JSON.stringify(this.installedPlugins)}
+                                    .plugin=${this.plugins?.find(
+                                        ({ pluginWorkspaceId }) => pluginWorkspaceId === this.installedPlugins[name]?.plugin_workspace_id
+                                    )}
                                     table-height=${ifDefined(this._height)}
                                     theme=${this.theme}
                                     name="${this.renamedColumns[name] ?? name}"
                                     original-value="${name}"
-                                    .plugins="${this.plugins}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
                                     ?separate-cells=${true}
                                     ?outter-border=${this.outterBorder}
@@ -356,7 +360,7 @@ export class Table extends ClassifiedElement {
                                     @column-hidden=${this._onColumnHidden}
                                     @column-removed=${this._onColumnRemoved}
                                     @resize-start=${this._onColumnResizeStart}
-                                    @column-plugin-activated=${this._onColumnPluginActivated}
+                                    @column-plugin-deactivated=${this._onColumnPluginDeactivated}
                                     @resize=${this._onColumnResized}
                                 >
                                 </outerbase-th>`
@@ -423,7 +427,8 @@ export class Table extends ClassifiedElement {
                                                   table-bounding-rect="${tableBoundingRect}"
                                                   theme=${this.theme}
                                                   .plugin=${this.plugins?.find(
-                                                      ({ pluginWorkspaceId }) => pluginWorkspaceId === this.installedPlugins[name]
+                                                      ({ pluginWorkspaceId }) =>
+                                                          pluginWorkspaceId === this.installedPlugins[name]?.plugin_workspace_id
                                                   )}
                                                   ?separate-cells=${true}
                                                   ?draw-right-border=${true}
