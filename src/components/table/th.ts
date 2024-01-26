@@ -140,11 +140,6 @@ export class TH extends MutableElement {
                     label: plugin.displayName,
                     value: plugin.tagName,
                 })) ?? []
-
-            this._pluginOptions.push({
-                label: 'None',
-                value: 'uninstall-column-plugin',
-            })
         }
 
         if (_changedProperties.has('plugin')) {
@@ -160,6 +155,8 @@ export class TH extends MutableElement {
     }
 
     protected override render() {
+        const name = this.originalValue ?? this.value
+        const hasPlugin = typeof this.installedPlugins[name] !== 'undefined'
         const options = this.dirty
             ? [
                   ...this.options,
@@ -170,6 +167,13 @@ export class TH extends MutableElement {
                   ...this._pluginOptions,
               ]
             : [...this.options, ...this._pluginOptions]
+
+        if (hasPlugin) {
+            options.push({
+                label: 'None',
+                value: 'uninstall-column-plugin',
+            })
+        }
 
         const blankElementClasses = {
             'absolute top-0 bottom-0 right-0 left-0': true,
