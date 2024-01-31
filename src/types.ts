@@ -97,3 +97,34 @@ export type PluginWorkspaceInstallationId = {
     plugin_workspace_id: string
     plugin_installation_id: string
 }
+
+export enum PluginEvent {
+    onEdit = 'onedit',
+    onStopEdit = 'onstopedit',
+    onCancelEdit = 'oncanceledit',
+    onSave = 'onsave',
+    updateCell = 'updatecell',
+    updateRow = 'updaterow',
+    createRow = 'createrow',
+    deleteRow = 'deleterow',
+    getNextPage = 'getnextpage',
+    getPreviousPage = 'getpreviouspage',
+
+    configurePlugin = 'configure_plugin',
+    installPlugin = 'install_plugin',
+    ephemeralPluginInstall = 'ephemeral_install_plugin',
+    uninstallPlugin = 'uninstall_plugin',
+    sortColumn = 'sort_column',
+    hideColumn = 'hide_column',
+    deleteColumn = 'delete_column',
+    createColumn = 'create_column',
+    updateColumn = 'update_column',
+
+    createIndex = 'create_index',
+    updateIndex = 'update_index',
+    deleteIndex = 'delete_index',
+    pageNext = 'page_next',
+
+    // DEPRECATED: Use `updateCell` instead
+    cellValue = 'cellvalue',
+}
