@@ -7,11 +7,11 @@ import { CellUpdateEvent, type MenuSelectedEvent } from '../../lib/events.js'
 
 import '../menu/cell-menu.js' // <outerbase-td-menu />
 import type { CellMenu } from '../menu/cell-menu.js'
-import { Theme, type ColumnPlugin } from '../../types.js'
+import { Theme, type ColumnPlugin, PluginEvent } from '../../types.js'
 import { UnsafeHTMLDirective, unsafeHTML } from 'lit/directives/unsafe-html.js'
 import type { DirectiveResult } from 'lit/async-directive.js'
 
-type PluginActionEvent = CustomEvent<{ action: 'onEdit'; value: any }>
+type PluginActionEvent = CustomEvent<{ action: PluginEvent.onEdit | PluginEvent.onStopEdit | PluginEvent.onCancelEdit; value: any }>
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
@@ -119,8 +119,17 @@ export class TableData extends MutableElement {
     }
 
     protected onPluginEvent({ detail: { action, value } }: PluginActionEvent) {
-        if (action === 'onEdit') {
+        // TODO not `.toLowerCase()`? update the enum to match what is emitted?
+        const eventName = action.toLowerCase()
+
+        if (eventName === PluginEvent.onEdit) {
             this.isDisplayingPluginEditor = !this.isDisplayingPluginEditor
+            // TODO add an event listener for clicks outside the plugin to stop editing?
+        } else if (eventName === PluginEvent.onStopEdit) {
+            this.isDisplayingPluginEditor = false
+            // TODO update our value to match the one from the editor
+        } else if (eventName === PluginEvent.onCancelEdit) {
+            this.isDisplayingPluginEditor = false
         }
     }
 
