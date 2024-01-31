@@ -1,4 +1,4 @@
-import { html } from 'lit'
+import { html, type TemplateResult } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
@@ -8,7 +8,10 @@ import { CellUpdateEvent, type MenuSelectedEvent } from '../../lib/events.js'
 import '../menu/cell-menu.js' // <outerbase-td-menu />
 import type { CellMenu } from '../menu/cell-menu.js'
 import { Theme, type ColumnPlugin } from '../../types.js'
-import { unsafeHTML } from 'lit/directives/unsafe-html.js'
+import { UnsafeHTMLDirective, unsafeHTML } from 'lit/directives/unsafe-html.js'
+import type { DirectiveResult } from 'lit/async-directive.js'
+
+type PluginActionEvent = CustomEvent<{ action: 'onEdit'; value: any }>
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
@@ -97,10 +100,12 @@ export class TableData extends MutableElement {
     @state()
     protected options = [
         { label: 'Edit', value: 'edit' },
-        // { label: 'Edit as JSON', value: 'edit:json' },
         { label: 'Copy', value: 'copy' },
         { label: 'Clear', value: 'clear' },
     ]
+
+    @state()
+    protected isDisplayingPluginEditor = false
 
     override tabIndex = 0
 
@@ -113,24 +118,44 @@ export class TableData extends MutableElement {
         }
     }
 
+    protected onPluginEvent({ detail: { action, value } }: PluginActionEvent) {
+        if (action === 'onEdit') {
+            this.isDisplayingPluginEditor = !this.isDisplayingPluginEditor
+        }
+    }
+
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
+        // @ts-ignore insists on `Event` insetad of `PluginActionEvent`
+        this.addEventListener('custom-change', this.onPluginEvent)
     }
 
     public override disconnectedCallback(): void {
         super.disconnectedCallback()
         this.removeEventListener('contextmenu', this.onContextMenu)
+        // @ts-ignore insists on `Event` insetad of `PluginActionEvent`
+        this.removeEventListener('custom-change', this.onPluginEvent)
     }
 
     protected override render() {
         const darkClass = classMap({ 'font-mono': true, dark: this.theme == Theme.dark })
 
-        let cellContents
+        let cellContents: TemplateResult<1>
+        let cellEditorContents: DirectiveResult<typeof UnsafeHTMLDirective> | undefined
+
         if (this.plugin) {
             const { config, tagName } = this.plugin
             const pluginAsString = unsafeHTML(`<${tagName} cellvalue="${this.value}" configuration="${config}"></${tagName}>`)
             cellContents = html`${pluginAsString}`
+
+            if (this.isDisplayingPluginEditor) {
+                cellEditorContents = unsafeHTML(
+                    `<${tagName.replace('outerbase-plugin-cell', 'outerbase-plugin-editor')} cellvalue="${
+                        this.value
+                    }" configuration="${config}"></${tagName}>`
+                )
+            }
         } else {
             cellContents = html`${this.value || html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}`
         }
@@ -165,7 +190,8 @@ export class TableData extends MutableElement {
                         ?menu=${this.hasMenu}
                         ?selectable-text=${!this.isInteractive}
                         @menu-selection=${this.onMenuSelection}
-                        ><span class=${darkClass}>${cellContents}</span></outerbase-td-menu
+                        ><span class=${darkClass}>${cellContents}</span
+                        ><span class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
                     >`
     }
 
