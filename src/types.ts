@@ -91,6 +91,7 @@ export type ColumnPlugin = {
     id: string
     pluginWorkspaceId: string
     tagName: string
+    isDefault: boolean
 }
 
 export type PluginWorkspaceInstallationId = {

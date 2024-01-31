@@ -423,8 +423,7 @@ export class Table extends ClassifiedElement {
                                                   table-bounding-rect="${tableBoundingRect}"
                                                   theme=${this.theme}
                                                   .plugin=${this.plugins?.find(
-                                                      ({ pluginWorkspaceId }) =>
-                                                          pluginWorkspaceId === this.installedPlugins[name]?.plugin_workspace_id
+                                                      ({ id }) => id === this.installedPlugins?.[name]?.plugin_installation_id
                                                   )}
                                                   ?separate-cells=${true}
                                                   ?draw-right-border=${true}

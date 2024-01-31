@@ -123,13 +123,16 @@ export class TableData extends MutableElement {
         const eventName = action.toLowerCase()
 
         if (eventName === PluginEvent.onEdit) {
-            this.isDisplayingPluginEditor = !this.isDisplayingPluginEditor
+            this.isDisplayingPluginEditor = true
             // TODO add an event listener for clicks outside the plugin to stop editing?
         } else if (eventName === PluginEvent.onStopEdit) {
             this.isDisplayingPluginEditor = false
             // TODO update our value to match the one from the editor
         } else if (eventName === PluginEvent.onCancelEdit) {
             this.isDisplayingPluginEditor = false
+        } else if (eventName === PluginEvent.updateCell) {
+            this.value = value
+            this.dispatchChangedEvent()
         }
     }
 
@@ -154,15 +157,17 @@ export class TableData extends MutableElement {
         let cellEditorContents: DirectiveResult<typeof UnsafeHTMLDirective> | undefined
 
         if (this.plugin) {
-            const { config, tagName } = this.plugin
-            const pluginAsString = unsafeHTML(`<${tagName} cellvalue="${this.value}" configuration="${config}"></${tagName}>`)
+            const { config, tagName, metadata } = this.plugin
+            const pluginAsString = unsafeHTML(
+                `<${tagName} cellvalue=${this.value} configuration=${config} metadata=${metadata}></${tagName}>`
+            )
             cellContents = html`${pluginAsString}`
 
             if (this.isDisplayingPluginEditor) {
                 cellEditorContents = unsafeHTML(
-                    `<${tagName.replace('outerbase-plugin-cell', 'outerbase-plugin-editor')} cellvalue="${
+                    `<${tagName.replace('outerbase-plugin-cell', 'outerbase-plugin-editor')} cellvalue=${
                         this.value
-                    }" configuration="${config}"></${tagName}>`
+                    } configuration=${config} metadata=${metadata}></${tagName}>`
                 )
             }
         } else {
@@ -200,7 +205,7 @@ export class TableData extends MutableElement {
                         ?selectable-text=${!this.isInteractive}
                         @menu-selection=${this.onMenuSelection}
                         ><span class=${darkClass}>${cellContents}</span
-                        ><span class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
+                        ><span class="absolute top-1">${cellEditorContents}</span></outerbase-td-menu
                     >`
     }
 
