@@ -55,7 +55,7 @@ export class TH extends MutableElement {
     public override value = ''
 
     @property({ attribute: 'plugins', type: Array })
-    public plugins: Array<ColumnPlugin> = []
+    public plugins?: Array<ColumnPlugin>
 
     @property({ attribute: 'installed-plugins', type: Object })
     public installedPlugins: Record<string, PluginWorkspaceInstallationId | undefined> = {}
@@ -127,8 +127,9 @@ export class TH extends MutableElement {
         super.willUpdate(_changedProperties)
 
         if (_changedProperties.has('plugins')) {
+            const withoutDefault = this.plugins?.filter((p) => !p.isDefault) ?? []
             this._pluginOptions =
-                this.plugins?.map((plugin) => ({
+                withoutDefault.map((plugin) => ({
                     label: plugin.displayName,
                     value: plugin.tagName,
                 })) ?? []
@@ -144,7 +145,7 @@ export class TH extends MutableElement {
 
     protected override render() {
         const name = this.originalValue ?? this.value
-        const hasPlugin = typeof this.installedPlugins?.[name] !== 'undefined'
+        const hasPlugin = typeof this.installedPlugins?.[name] !== 'undefined' && !this.installedPlugins?.[name]?.isDefaultPlugin
         const options = this.dirty
             ? [
                   ...this.options,
@@ -247,7 +248,7 @@ export class TH extends MutableElement {
         const columnName = this.originalValue ?? this.value
 
         // handle (potential) plugin selection
-        const plugin = this.plugins.find(({ tagName }) => event.value === tagName)
+        const plugin = this.plugins?.find(({ tagName }) => event.value === tagName)
         if (plugin) {
             return this.dispatchEvent(new ColumnPluginActivatedEvent(columnName, { ...plugin, columnName: this.value }))
         }
