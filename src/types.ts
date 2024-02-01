@@ -98,6 +98,7 @@ export type PluginWorkspaceInstallationId = {
     plugin_workspace_id: string
     plugin_installation_id: string
     isDefaultPlugin?: boolean
+    supportingAttributes: string
 }
 
 export enum PluginEvent {
