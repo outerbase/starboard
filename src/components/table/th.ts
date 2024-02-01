@@ -144,7 +144,7 @@ export class TH extends MutableElement {
 
     protected override render() {
         const name = this.originalValue ?? this.value
-        const hasPlugin = typeof this.installedPlugins?.[name] !== 'undefined'
+        const hasPlugin = typeof this.installedPlugins?.[name] !== 'undefined' && !this.installedPlugins?.[name]?.isDefaultPlugin
         const options = this.dirty
             ? [
                   ...this.options,
