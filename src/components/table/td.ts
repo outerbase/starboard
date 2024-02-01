@@ -162,7 +162,7 @@ export class TableData extends MutableElement {
         if (this.plugin) {
             const { config, tagName, metadata } = this.plugin
             const pluginAsString = unsafeHTML(
-                `<${tagName} cellvalue=${this.value} cat="dog" configuration=${config} ${this.pluginAttributes}></${tagName}>`
+                `<${tagName} cellvalue=${this.value} configuration=${config} ${this.pluginAttributes}></${tagName}>`
             )
             cellContents = html`${pluginAsString}`
 
@@ -170,7 +170,7 @@ export class TableData extends MutableElement {
                 cellEditorContents = unsafeHTML(
                     `<${tagName.replace('outerbase-plugin-cell', 'outerbase-plugin-editor')} cellvalue=${
                         this.value
-                    } configuration=${config} carpet="ji" ${this.pluginAttributes}></${tagName}>`
+                    } configuration=${config} ${this.pluginAttributes}></${tagName}>`
                 )
             }
         } else {
