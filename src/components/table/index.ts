@@ -412,35 +412,43 @@ export class Table extends ClassifiedElement {
                                       ${repeat(
                                           this.visibleColumns,
                                           ({ name }) => name, // use the column name as the unique identifier for each entry in this row
-                                          ({ name }, idx) => html`
-                                              <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
-                                              <!-- TODO @caleb & johnny move plugins to support the new installedPlugins variable -->
-                                              <outerbase-td
-                                                  .position=${{ row: id, column: name }}
-                                                  value=${values[name] ?? ''}
-                                                  original-value=${originalValues[name]}
-                                                  left-distance-to-viewport=${this.distanceToLeftViewport}
-                                                  table-bounding-rect="${tableBoundingRect}"
-                                                  theme=${this.theme}
-                                                  .plugin=${this.plugins?.find(
-                                                      ({ id }) => id === this.installedPlugins?.[name]?.plugin_installation_id
-                                                  )}
-                                                  ?separate-cells=${true}
-                                                  ?draw-right-border=${true}
-                                                  ?bottom-border=${true}
-                                                  ?outter-border=${this.outterBorder}
-                                                  ?is-last-row=${rowIndex === this.rows.length - 1}
-                                                  ?is-last-column=${idx === this.visibleColumns.length - 1}
-                                                  ?menu=${!this.isNonInteractive}
-                                                  ?selectable-text=${this.isNonInteractive}
-                                                  ?interactive=${!this.isNonInteractive}
-                                                  ?hide-dirt=${isNew}
-                                                  @cell-updated=${() => {
-                                                      this.dispatchEvent(new RowUpdatedEvent({ id, values, originalValues, isNew }))
-                                                  }}
-                                              >
-                                              </outerbase-td>
-                                          `
+                                          ({ name }, idx) => {
+                                              const installedPlugin = this.plugins?.find(
+                                                  ({ pluginWorkspaceId }) =>
+                                                      pluginWorkspaceId === this.installedPlugins?.[name]?.plugin_workspace_id
+                                              )
+                                              const defaultPlugin = this.plugins?.find(
+                                                  ({ id }) => id === this.installedPlugins?.[name]?.plugin_installation_id
+                                              )
+                                              const plugin = installedPlugin ? installedPlugin : defaultPlugin
+                                              return html`
+                                                  <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
+                                                  <!-- TODO @caleb & johnny move plugins to support the new installedPlugins variable -->
+                                                  <outerbase-td
+                                                      .position=${{ row: id, column: name }}
+                                                      value=${values[name] ?? ''}
+                                                      original-value=${originalValues[name]}
+                                                      left-distance-to-viewport=${this.distanceToLeftViewport}
+                                                      table-bounding-rect="${tableBoundingRect}"
+                                                      theme=${this.theme}
+                                                      .plugin=${plugin}
+                                                      ?separate-cells=${true}
+                                                      ?draw-right-border=${true}
+                                                      ?bottom-border=${true}
+                                                      ?outter-border=${this.outterBorder}
+                                                      ?is-last-row=${rowIndex === this.rows.length - 1}
+                                                      ?is-last-column=${idx === this.visibleColumns.length - 1}
+                                                      ?menu=${!this.isNonInteractive}
+                                                      ?selectable-text=${this.isNonInteractive}
+                                                      ?interactive=${!this.isNonInteractive}
+                                                      ?hide-dirt=${isNew}
+                                                      @cell-updated=${() => {
+                                                          this.dispatchEvent(new RowUpdatedEvent({ id, values, originalValues, isNew }))
+                                                      }}
+                                                  >
+                                                  </outerbase-td>
+                                              `
+                                          }
                                       )}
                                   </outerbase-tr>`
                                 : null
