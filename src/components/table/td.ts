@@ -160,7 +160,7 @@ export class TableData extends MutableElement {
         let cellEditorContents: DirectiveResult<typeof UnsafeHTMLDirective> | undefined
 
         if (this.plugin) {
-            const { config, tagName, metadata } = this.plugin
+            const { config, tagName } = this.plugin
             const pluginAsString = unsafeHTML(
                 `<${tagName} cellvalue=${this.value} configuration=${config} ${this.pluginAttributes}></${tagName}>`
             )
