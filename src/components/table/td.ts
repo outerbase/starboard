@@ -37,6 +37,9 @@ export class TableData extends MutableElement {
         }
     }
 
+    @property({ attribute: 'plugin-attributes', type: String })
+    public pluginAttributes: String = ''
+
     // allows, for example, <outerbase-td max-width="max-w-xl" />
     @property({ type: String, attribute: 'max-width' })
     public maxWidth: string = ''
@@ -159,7 +162,7 @@ export class TableData extends MutableElement {
         if (this.plugin) {
             const { config, tagName, metadata } = this.plugin
             const pluginAsString = unsafeHTML(
-                `<${tagName} cellvalue=${this.value} configuration=${config} metadata=${metadata}></${tagName}>`
+                `<${tagName} cellvalue=${this.value} cat="dog" configuration=${config} ${this.pluginAttributes}></${tagName}>`
             )
             cellContents = html`${pluginAsString}`
 
@@ -167,7 +170,7 @@ export class TableData extends MutableElement {
                 cellEditorContents = unsafeHTML(
                     `<${tagName.replace('outerbase-plugin-cell', 'outerbase-plugin-editor')} cellvalue=${
                         this.value
-                    } configuration=${config} metadata=${metadata}></${tagName}>`
+                    } configuration=${config} carpet="ji" ${this.pluginAttributes}></${tagName}>`
                 )
             }
         } else {
@@ -205,7 +208,7 @@ export class TableData extends MutableElement {
                         ?selectable-text=${!this.isInteractive}
                         @menu-selection=${this.onMenuSelection}
                         ><span class=${darkClass}>${cellContents}</span
-                        ><span class="absolute top-1">${cellEditorContents}</span></outerbase-td-menu
+                        ><span class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
                     >`
     }
 

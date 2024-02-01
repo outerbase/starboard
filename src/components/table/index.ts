@@ -88,6 +88,9 @@ export class Table extends ClassifiedElement {
     @property({ attribute: 'theme', type: String })
     public theme = Theme.light
 
+    @property({ attribute: 'plugin-attributes', type: String })
+    public pluginAttributes: String = ''
+
     @state()
     private _height?: number
 
@@ -423,6 +426,7 @@ export class Table extends ClassifiedElement {
                                                   ({ id }) => id === this.installedPlugins?.[name]?.plugin_installation_id
                                               )
                                               const plugin = installedPlugin ?? defaultPlugin
+
                                               return html`
                                                   <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
                                                   <!-- TODO @caleb & johnny move plugins to support the new installedPlugins variable -->
@@ -434,6 +438,7 @@ export class Table extends ClassifiedElement {
                                                       table-bounding-rect="${tableBoundingRect}"
                                                       theme=${this.theme}
                                                       .plugin=${plugin}
+                                                      plugin-attributes=${this.installedPlugins?.[name]?.supportingAttributes ?? ''}
                                                       ?separate-cells=${true}
                                                       ?draw-right-border=${true}
                                                       ?bottom-border=${true}
