@@ -58,7 +58,7 @@ export class Table extends ClassifiedElement {
     public plugins?: Array<ColumnPlugin>
 
     @property({ attribute: 'installed-plugins', type: Array })
-    public installedPlugins: Record<string, PluginWorkspaceInstallationId | undefined> = {}
+    public installedPlugins?: Record<string, PluginWorkspaceInstallationId | undefined>
 
     @state()
     protected rows: Array<RowAsRecord> = []
@@ -283,8 +283,10 @@ export class Table extends ClassifiedElement {
     }
 
     private _onColumnPluginDeactivated({ column }: ColumnPluginDeactivatedEvent) {
-        delete this.installedPlugins[column]
-        this.requestUpdate('installedPlugins')
+        if (this.installedPlugins) {
+            delete this.installedPlugins[column]
+            this.requestUpdate('installedPlugins')
+        }
     }
 
     private _onColumnResized({ delta }: ResizeEvent) {
@@ -420,7 +422,7 @@ export class Table extends ClassifiedElement {
                                               const defaultPlugin = this.plugins?.find(
                                                   ({ id }) => id === this.installedPlugins?.[name]?.plugin_installation_id
                                               )
-                                              const plugin = installedPlugin ? installedPlugin : defaultPlugin
+                                              const plugin = installedPlugin ?? defaultPlugin
                                               return html`
                                                   <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
                                                   <!-- TODO @caleb & johnny move plugins to support the new installedPlugins variable -->
