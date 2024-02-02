@@ -305,6 +305,8 @@ export class Table extends ClassifiedElement {
     }
 
     private setCssVariablesForPlugin(theme: Theme) {
+        if (typeof document === 'undefined') return
+
         if (theme === Theme.dark) {
             document.documentElement.style.setProperty('--ob-background-color', '#0A0A0A')
             document.documentElement.style.setProperty('--ob-text-color', '#D4D4D4')
