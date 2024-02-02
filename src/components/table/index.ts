@@ -36,6 +36,7 @@ import './th.js'
 import './thead.js'
 import './tr.js'
 import { classMap } from 'lit/directives/class-map.js'
+import { TWStyles } from '../../../tailwind/index.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -309,8 +310,8 @@ export class Table extends ClassifiedElement {
         return this.getBoundingClientRect().left
     }
 
-    static styles = [
-        ...super.styles,
+    static override styles = [
+        TWStyles,
 
         // custom checkbox/checkmark styles
         css`
