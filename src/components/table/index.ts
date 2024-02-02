@@ -273,6 +273,10 @@ export class Table extends ClassifiedElement {
                 this.updateVisibleColumns()
             }
         }
+
+        if (_changedProperties.has('theme')) {
+            this.setCssVariablesForPlugin(this.theme)
+        }
     }
 
     /////
@@ -298,6 +302,23 @@ export class Table extends ClassifiedElement {
         if (!table) throw new Error('Unexpectedly missing a table')
 
         table.style.width = `${this._previousWidth + delta}px`
+    }
+
+    private setCssVariablesForPlugin(theme: Theme) {
+        if (theme === Theme.dark) {
+            document.documentElement.style.setProperty('--ob-background-color', '#0A0A0A')
+            document.documentElement.style.setProperty('--ob-text-color', '#D4D4D4')
+            document.documentElement.style.setProperty('--ob-border-color', '#262626')
+            document.documentElement.style.setProperty('--ob-null-text-color', '#959497')
+        } else {
+            document.documentElement.style.setProperty('--ob-background-color', '#FAFAFA')
+            document.documentElement.style.setProperty('--ob-text-color', '#525252')
+            document.documentElement.style.setProperty('--ob-border-color', '#E5E5E5')
+            document.documentElement.style.setProperty('--ob-null-text-color', '#D0D0D0')
+        }
+
+        document.documentElement.style.setProperty('--ob-font-family', '"Inter", sans-serif')
+        document.documentElement.style.setProperty('--ob-cell-font-family', "'input-mono', monospace")
     }
 
     // TODO @johnny this does not get update if the page containing the table changes
