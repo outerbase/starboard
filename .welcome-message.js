@@ -1,10 +1,11 @@
+import pkg from './package.json' with { type: 'json' }
 console.log(`\
                    /|
                   /_|__
                  | ____ |
                  | ____ |
                  | ____ |  starboard
-                 | ____ |     v0.0.1
+                 | ____ |     ${pkg.version}
                  | ____ |
                  | ____ |
                  | ____ |
