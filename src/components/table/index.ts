@@ -1,5 +1,5 @@
 import { customElement, property, state } from 'lit/decorators.js'
-import { html, nothing, type PropertyValueMap } from 'lit'
+import { css, html, nothing, type PropertyValueMap } from 'lit'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { repeat } from 'lit/directives/repeat.js'
 
@@ -309,6 +309,29 @@ export class Table extends ClassifiedElement {
         return this.getBoundingClientRect().left
     }
 
+    static styles = [
+        ...super.styles,
+
+        // custom checkbox/checkmark styles
+        css`
+            input[type='checkbox'] {
+                appearance: none;
+            }
+
+            input[type='checkbox']::before {
+                content: '';
+                width: 0.65em;
+                height: 0.65em;
+                transform: scale(0);
+                // transition: 120ms transform ease-in-out;
+            }
+
+            input[type='checkbox']:checked::before {
+                transform: scale(1);
+            }
+        `,
+    ]
+
     protected override render() {
         const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null
         // WARNING `overflow-hidden` breaks the stickyness of the header
@@ -403,7 +426,7 @@ export class Table extends ClassifiedElement {
                                                 <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
                                                 <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
                                                     <input
-                                                        class="row-select-checkbox h-4 w-4 mr-[1px] block focus:z-10 "
+                                                        class="row-select-checkbox h-4 w-4 focus:z-10 rounded-[4px] border border-neutral-500 grid place-content-center cursor-pointer before:rounded-sm before:shadow-checkbox"
                                                         type="checkbox"
                                                         ?checked="${this.selectedRowUUIDs.has(id)}"
                                                         @click="${() => this.toggleSelectedRow(id)}"
