@@ -204,7 +204,7 @@ export class TH extends MutableElement {
                 ? html`<span class=${classMap(resultContainerClasses)}
                       ><slot></slot>
                       ${body}
-                      <column-resizer .column=${this} height="${ifDefined(this.tableHeight)}"></column-resizer
+                      <column-resizer .column=${this} height="${ifDefined(this.tableHeight)}" theme=${this.theme}></column-resizer
                   ></span>`
                 : html`<span class=${classMap(resultContainerClasses)}><slot></slot>${body}</span>`
         }

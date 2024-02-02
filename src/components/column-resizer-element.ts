@@ -4,17 +4,22 @@ import { html, type PropertyValueMap } from 'lit'
 import type { TH } from './table/th.js'
 import { ClassifiedElement } from './classified-element.js'
 import { ResizeEndEvent, ResizeEvent, ResizeStartEvent } from '../lib/events.js'
+import { Theme } from '../types.js'
+import { classMap } from 'lit/directives/class-map.js'
 
 @customElement('column-resizer')
 export class ColumnResizer extends ClassifiedElement {
     @property({ type: Number, attribute: 'height' })
-    protected height?: number
+    public height?: number
 
     // this successfully sets/receives `column` when `.column={...}` is passed
     // but it's unclear whether updates to `.column` are reflected
     // the docs explicitly say it won't be observed, but it has been tested to definitely work on the initial render
     @property({ type: Object })
-    protected column?: TH
+    public column?: TH
+
+    @property({ attribute: 'theme', type: Number })
+    public theme = Theme.light
 
     private xPosition?: number
     private width?: number
@@ -70,9 +75,16 @@ export class ColumnResizer extends ClassifiedElement {
     }
 
     protected override render() {
+        const classes = classMap({
+            'absolute z-10 top-0 bottom-0 -right-[7px] w-4': true,
+            'flex justify-center': true,
+            'cursor-col-resize group': true,
+            dark: this.theme === Theme.dark,
+        })
+
         // the reason for nested div's here is to increase the click/draggable area while preserving a smaller visual element
         return html`
-            <div class="z-10 absolute top-0 bottom-0 -right-[7px] cursor-col-resize w-4 group flex justify-center">
+            <div class=${classes}>
                 <div
                     class="h-full ml-[1px] w-[1px] group-hover:w-1 group-active:w-1 bg-theme-border dark:bg-theme-border-dark group-hover:bg-blue-400 group-active:bg-blue-500 dark:group-hover:bg-blue-900 dark:group-active:bg-blue-800"
                 ></div>
