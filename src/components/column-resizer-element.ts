@@ -74,6 +74,13 @@ export class ColumnResizer extends ClassifiedElement {
         }
     }
 
+    protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        if (this.column) {
+            this.width = parseInt(window.getComputedStyle(this.column).width, 10)
+            this.column.style.width = `${this.width}px`
+        }
+    }
+
     protected override render() {
         const classes = classMap({
             'absolute z-10 top-0 bottom-0 -right-[7px] w-4': true,
