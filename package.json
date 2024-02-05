@@ -17,8 +17,7 @@
         "dev-tailwind": "concurrently \"tailwindcss -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css --watch\" \"node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.ts --watch\"",
         "build-tailwind": "tailwindcss -c ./tailwind.config.distribute.mjs -i ./tailwind/tailwindlib.css -o ./tailwind/tailwind.css && node ./tailwind/css-to-js.mjs --input ./tailwind/tailwind.css --output ./tailwind/index.ts",
         "print-welcome-msg": "node .welcome-message.js",
-        "prepack": "pnpm build:lit",
-        "postinstall": "pnpm build:lit"
+        "prepack": "pnpm build:lit"
     },
     "dependencies": {
         "lit": "^2.8.0",
