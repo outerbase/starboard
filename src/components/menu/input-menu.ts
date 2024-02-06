@@ -1,4 +1,4 @@
-import { customElement, property, state } from 'lit/decorators.js'
+import { customElement, property } from 'lit/decorators.js'
 
 import { Menu } from './index.js'
 import { classMap } from 'lit/directives/class-map.js'
@@ -54,6 +54,8 @@ export class InputMenu extends Menu {
         return html`
             <slot></slot>
             <input
+            id="trigger"
+            @keydown=${this.onKeyDown}
             .value=${this.value}
             @input=${(event: InputEvent) => {
                 const { value } = event.target as HTMLInputElement
@@ -69,7 +71,11 @@ export class InputMenu extends Menu {
                 autocomplete="off"
                 required
             >
-                <div class=${classMap(triggerClasses)} @click=${this.onTrigger} aria-haspopup="menu">${CaretDown(16)}</div>
+                <div class=${classMap(triggerClasses)} @click=${(event: MouseEvent) => {
+                    const trigger = this.shadowRoot?.querySelector('#trigger') as HTMLElement | null
+                    trigger?.focus()
+                    this.onTrigger(event)
+                }} aria-haspopup="menu">${CaretDown(16)}</div>
                 ${this.listElement}
             </input>
         `
