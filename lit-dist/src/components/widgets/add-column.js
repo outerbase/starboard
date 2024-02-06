@@ -94,10 +94,10 @@ AddColumnElement.labelClasses = {
 };
 AddColumnElement.inputClasses = {
     'focus:ring-1 focus:ring-neutral-950 dark:focus:ring-neutral-50 focus:outline-none ': true,
-    'bg-neutral-50 dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400': true,
+    'px-2 py-1.5': true,
+    'bg-neutral-50 dark:bg-neutral-950 text-neutral-950 dark:text-neutral-50': true,
     'placeholder-neutral-400 dark:placeholder-neutral-600': true,
     'rounded-md border border-neutral-400 dark:border-neutral-600': true,
-    'px-2 py-1.5': true,
 };
 AddColumnElement.buttonClasses = {
     'bg-neutral-950 dark:bg-neutral-50 hover:bg-neutral-800 hover:dark:bg-neutral-200': true,
