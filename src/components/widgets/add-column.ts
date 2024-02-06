@@ -62,7 +62,7 @@ export class AddColumnElement extends ClassifiedElement {
 
         // JOHNNY listen for this event in `<OuterbaseTable />` and update the stuff
         //        be mindful to avoid double-firing the event
-        this.dispatchEvent(new ColumnAddedEvent({ name: this.columnName, data: { type: this } }))
+        this.dispatchEvent(new ColumnAddedEvent({ name: this.columnName, data: { type: this.columnType } }))
     }
 
     render() {
