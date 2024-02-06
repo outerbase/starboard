@@ -10,7 +10,12 @@ import { ChangeEvent } from '../../lib/events.js'
 @customElement('outerbase-input-menu')
 export class InputMenu extends Menu {
     @property({ type: Object })
-    protected _classMap = {}
+    protected _classMap = {
+        'px-2 py-1.5': true,
+        'bg-neutral-50 dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400': true,
+        'placeholder-neutral-400 dark:placeholder-neutral-600': true,
+        'rounded-md border border-neutral-400 dark:border-neutral-600': true,
+    }
 
     @property({ type: String })
     protected value = ''
