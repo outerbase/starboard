@@ -1,6 +1,6 @@
 # build output
 dist/
-lit-dist/
+# lit-dist/
 starboard-*.tgz
 
 # generated types
