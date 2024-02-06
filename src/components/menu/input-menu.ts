@@ -31,6 +31,8 @@ export class InputMenu extends Menu {
         const { code } = event
         if (code === 'Space') {
             return
+        } else if (code === 'ArrowDown') {
+            this.open = true
         } else super.onKeyDown(event)
     }
 
