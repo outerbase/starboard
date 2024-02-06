@@ -29,7 +29,7 @@ export class InputMenu extends Menu {
         if (this.open) return super.onKeyDown(event)
 
         const { code } = event
-        if (code === 'Space') {
+        if (code === 'Space' || code === 'ArrowLeft' || code === 'ArrowRight') {
             return
         } else if (code === 'ArrowDown') {
             this.open = true
