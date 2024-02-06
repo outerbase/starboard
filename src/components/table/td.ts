@@ -22,7 +22,7 @@ export class TableData extends MutableElement {
             'px-cell-padding-x py-cell-padding-y ': !this.plugin,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
-            'focus:ring-2 focus:ring-black dark:focus:ring-white focus:z-10 focus:outline-none': !this.isEditing && this.isInteractive,
+            'focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none': !this.isEditing && this.isInteractive,
 
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty && !this.hideDirt, // dirty cells
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
