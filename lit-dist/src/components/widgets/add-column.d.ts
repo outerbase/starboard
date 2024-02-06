@@ -1,5 +1,6 @@
 import { type TemplateResult } from 'lit';
 import { ClassifiedElement } from '../classified-element';
+import '../menu/input-menu.js';
 export declare class AddColumnElement extends ClassifiedElement {
     protected get classMap(): {
         'inline-block p-3.5 w-40': boolean;
@@ -22,6 +23,7 @@ export declare class AddColumnElement extends ClassifiedElement {
         'px-5 py-1.5 rounded-md': boolean;
     };
     protected columnName: string;
+    protected columnType: string;
     protected errorMessage: TemplateResult<1> | undefined;
     protected onChange(event: InputEvent): void;
     protected onSubmit(event: Event): void;

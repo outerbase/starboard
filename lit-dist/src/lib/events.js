@@ -120,3 +120,9 @@ export class ResizeEvent extends BubblyEvent {
         this.delta = delta;
     }
 }
+export class ChangeEvent extends BubblyEvent {
+    constructor(value) {
+        super('change');
+        this.value = value;
+    }
+}

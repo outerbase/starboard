@@ -77,5 +77,9 @@ export declare class ResizeEvent extends BubblyEvent {
     delta: number;
     constructor(delta: number);
 }
+export declare class ChangeEvent extends BubblyEvent {
+    value: string;
+    constructor(value: string);
+}
 export {};
 //# sourceMappingURL=events.d.ts.map
