@@ -25,6 +25,7 @@ export class AddColumnElement extends ClassifiedElement {
     }
 
     static inputClasses = {
+        'focus:ring-1 focus:ring-neutral-950 dark:focus:ring-neutral-50 focus:outline-none ': true,
         'bg-neutral-50 dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400': true,
         'placeholder-neutral-400 dark:placeholder-neutral-600': true,
         'rounded-md border border-neutral-400 dark:border-neutral-600': true,
