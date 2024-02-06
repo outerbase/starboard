@@ -12,6 +12,7 @@ export class MutableElement extends ClassifiedElement {
         super(...arguments);
         // the cell's row's uuid and column name
         this.position = { column: '', row: '' }; // TODO let this be undefined?
+        this.readonly = false;
         this.isEditing = false;
     }
     get dirty() {
@@ -19,11 +20,13 @@ export class MutableElement extends ClassifiedElement {
     }
     connectedCallback() {
         super.connectedCallback();
-        this.addEventListener('dblclick', this.onDoubleClick);
+        if (!this.readonly)
+            this.addEventListener('dblclick', this.onDoubleClick);
     }
     disconnectedCallback() {
         super.disconnectedCallback();
-        this.removeEventListener('dblclick', this.onDoubleClick);
+        if (!this.readonly)
+            this.removeEventListener('dblclick', this.onDoubleClick);
     }
     updated(changedProps) {
         super.updated(changedProps);
@@ -103,6 +106,9 @@ __decorate([
 __decorate([
     property({ attribute: 'original-value', type: String })
 ], MutableElement.prototype, "originalValue", void 0);
+__decorate([
+    property({ attribute: 'read-only', type: Boolean })
+], MutableElement.prototype, "readonly", void 0);
 __decorate([
     state()
 ], MutableElement.prototype, "isEditing", void 0);

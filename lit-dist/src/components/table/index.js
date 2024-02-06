@@ -35,6 +35,7 @@ let Table = class Table extends ClassifiedElement {
         this.renamedColumns = {};
         this.theme = Theme.light;
         this.pluginAttributes = '';
+        this.readonly = false;
         this.columns = [];
         this.visibleColumns = [];
         this.selectedRowUUIDs = new Set();
@@ -258,6 +259,7 @@ let Table = class Table extends ClassifiedElement {
                                     ?is-last-row=${rowIndex === this.rows.length - 1}
                                     ?is-last-column=${false}
                                     ?row-selector="${true}"
+                                    ?read-only=${this.readonly}
                                 >
                                     <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
                                     <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
@@ -300,6 +302,7 @@ let Table = class Table extends ClassifiedElement {
                                           ?selectable-text=${this.isNonInteractive}
                                           ?interactive=${!this.isNonInteractive}
                                           ?hide-dirt=${isNew}
+                                          ?read-only=${this.readonly}
                                           @cell-updated=${() => {
                         this.dispatchEvent(new RowUpdatedEvent({ id, values, originalValues, isNew }));
                     }}
@@ -330,6 +333,7 @@ let Table = class Table extends ClassifiedElement {
                               ?outter-border=${this.outterBorder}
                               ?is-last=${0 === this.visibleColumns.length}
                               ?blank=${true}
+                              ?read-only=${this.readonly}
                           /></outerbase-th>`
             : null}
                         ${repeat(this.visibleColumns, ({ name }, _idx) => name, ({ name }, idx) => {
@@ -355,6 +359,7 @@ let Table = class Table extends ClassifiedElement {
                                     @resize-start=${this._onColumnResizeStart}
                                     @column-plugin-deactivated=${this._onColumnPluginDeactivated}
                                     @resize=${this._onColumnResized}
+                                    ?read-only=${this.readonly}
                                 >
                                 </outerbase-th>`;
         })}
@@ -438,6 +443,9 @@ __decorate([
 __decorate([
     property({ attribute: 'plugin-attributes', type: String })
 ], Table.prototype, "pluginAttributes", void 0);
+__decorate([
+    property({ attribute: 'read-only', type: Boolean })
+], Table.prototype, "readonly", void 0);
 __decorate([
     state()
 ], Table.prototype, "_height", void 0);

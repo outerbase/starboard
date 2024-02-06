@@ -7,6 +7,7 @@ export declare class MutableElement extends ClassifiedElement {
     position: Position;
     label?: string;
     originalValue?: string;
+    readonly: boolean;
     private valueBeforeEdit?;
     isEditing: boolean;
     connectedCallback(): void;

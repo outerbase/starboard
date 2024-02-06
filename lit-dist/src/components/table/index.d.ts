@@ -24,6 +24,7 @@ export declare class Table extends ClassifiedElement {
     renamedColumns: Record<string, string>;
     theme: Theme;
     pluginAttributes: String;
+    readonly: boolean;
     private _height?;
     private resizeObserver?;
     protected columns: Columns;
