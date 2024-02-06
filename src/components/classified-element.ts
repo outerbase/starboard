@@ -18,7 +18,7 @@ export class ClassifiedElement extends LitElement {
     }
 
     @property({ reflect: true, attribute: 'class', type: String })
-    private _class = ''
+    protected _class = ''
 
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)

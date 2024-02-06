@@ -1,10 +1,13 @@
+// https://www.figma.com/file/9jKTBFtr4oSWHsTNTEydcC/Action-Bar-Update?type=design&node-id=17-93528&mode=design&t=7DdNRVMi5wZmqPxS-4
+
 import { html, type TemplateResult } from 'lit'
 import { ClassifiedElement } from '../classified-element'
 import { customElement, state } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
 import { WarningOctagon } from '../../lib/icons/warning-octagon.js'
-import { ColumnAddedEvent } from '../../lib/events.js'
+import { ChangeEvent, ColumnAddedEvent, MenuSelectedEvent } from '../../lib/events.js'
 
+import '../menu/input-menu.js'
 @customElement('outerbase-add-column')
 export class AddColumnElement extends ClassifiedElement {
     protected get classMap() {
@@ -38,6 +41,9 @@ export class AddColumnElement extends ClassifiedElement {
     protected columnName = ''
 
     @state()
+    protected columnType = ''
+
+    @state()
     protected errorMessage: TemplateResult<1> | undefined
 
     protected onChange(event: InputEvent) {
@@ -56,7 +62,7 @@ export class AddColumnElement extends ClassifiedElement {
 
         // JOHNNY listen for this event in `<OuterbaseTable />` and update the stuff
         //        be mindful to avoid double-firing the event
-        this.dispatchEvent(new ColumnAddedEvent({ name: this.columnName }))
+        this.dispatchEvent(new ColumnAddedEvent({ name: this.columnName, data: { type: this } }))
     }
 
     render() {
@@ -79,14 +85,25 @@ export class AddColumnElement extends ClassifiedElement {
 
             <div class="flex flex-col gap-1">
                 <label for="data-type" class=${classMap(AddColumnElement.labelClasses)}>Select Type</label>
-                <input
-                    required
-                    type="text"
-                    name="data-type"
-                    id="data-type"
-                    class=${classMap(AddColumnElement.inputClasses)}
-                    autocomplete="off"
-                />
+
+                <outerbase-input-menu
+                    ._classMap=${AddColumnElement.inputClasses}
+                    .options=${[
+                        { label: 'Text', value: 'Text' },
+                        { label: 'Integer', value: 'Integer' },
+                        { label: 'Date and time', value: 'Date and time' },
+                        { label: 'Boolean', value: 'Boolean' },
+                        { label: 'Image', value: 'Image' },
+                        { label: 'etc.', value: 'etc.' },
+                    ]}
+                    @change=${(event: ChangeEvent) => {
+                        event.stopPropagation()
+                        this.columnType = event.value
+                    }}
+                    @menu-selection=${(event: MenuSelectedEvent) => {
+                        event.stopPropagation()
+                    }}
+                ></outerbase-input-menu>
             </div>
 
             <button class=${classMap(AddColumnElement.buttonClasses)} type="submit">Create Column</button>

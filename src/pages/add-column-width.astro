@@ -1,0 +1,19 @@
+---
+import { AddColumnElement } from '../components/widgets/add-column'
+---
+
+<html lang="en" class="h-full">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width" />
+        <meta name="generator" content={Astro.generator} />
+        <script>
+            addEventListener('menu-selection', console.info)
+            addEventListener('change', console.info)
+        </script>
+    </head>
+
+    <body class="h-full bg-theme-page dark:bg-theme-page-dark text-theme-text dark:text-theme-text-dark">
+        <div class="flex mt-8 justify-center items-center"><AddColumnElement client:load /></div>
+    </body>
+</html>
