@@ -25,6 +25,15 @@ export class InputMenu extends Menu {
         this.value = value
     }
 
+    protected onKeyDown(event: KeyboardEvent) {
+        if (this.open) return super.onKeyDown(event)
+
+        const { code } = event
+        if (code === 'Space') {
+            return
+        } else super.onKeyDown(event)
+    }
+
     public override connectedCallback() {
         super.connectedCallback()
         this.addEventListener('menu-selection', this.onMenuSelection)
@@ -47,6 +56,8 @@ export class InputMenu extends Menu {
         const triggerClasses = {
             'absolute right-1': true,
             'border border-transparent': true,
+            'bg-neutral-50 dark:bg-neutral-950': true,
+
             'hover:bg-neutral-100 dark:hover:bg-neutral-900 active:border-neutral-200 dark:active:border-neutral-800': true,
             'p-0.5 rounded-md': true,
         }
