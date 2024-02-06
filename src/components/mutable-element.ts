@@ -25,6 +25,9 @@ export class MutableElement extends ClassifiedElement {
     @property({ attribute: 'original-value', type: String })
     public originalValue?: string
 
+    @property({ attribute: 'read-only', type: Boolean })
+    public readonly = false
+
     private valueBeforeEdit?: string
 
     @state()
@@ -32,12 +35,12 @@ export class MutableElement extends ClassifiedElement {
 
     public override connectedCallback() {
         super.connectedCallback()
-        this.addEventListener('dblclick', this.onDoubleClick)
+        if (!this.readonly) this.addEventListener('dblclick', this.onDoubleClick)
     }
 
     public override disconnectedCallback() {
         super.disconnectedCallback()
-        this.removeEventListener('dblclick', this.onDoubleClick)
+        if (!this.readonly) this.removeEventListener('dblclick', this.onDoubleClick)
     }
 
     protected override updated(changedProps: PropertyValues<this>) {
