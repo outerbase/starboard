@@ -393,6 +393,12 @@ Table.styles = [
             input[type='checkbox']:checked::before {
                 transform: scale(1);
             }
+
+            outerbase-rowgroup:before {
+                content: '';
+                display: block;
+                height: 2px; /* Adjust the height to control the space */
+            }
         `,
 ];
 __decorate([
