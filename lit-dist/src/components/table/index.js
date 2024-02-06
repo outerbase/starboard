@@ -298,7 +298,7 @@ let Table = class Table extends ClassifiedElement {
                                           ?outter-border=${this.outterBorder}
                                           ?is-last-row=${rowIndex === this.rows.length - 1}
                                           ?is-last-column=${idx === this.visibleColumns.length - 1}
-                                          ?menu=${!this.isNonInteractive}
+                                          ?menu=${!this.isNonInteractive && !this.readonly}
                                           ?selectable-text=${this.isNonInteractive}
                                           ?interactive=${!this.isNonInteractive}
                                           ?hide-dirt=${isNew}
@@ -349,7 +349,7 @@ let Table = class Table extends ClassifiedElement {
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
                                     ?separate-cells=${true}
                                     ?outter-border=${this.outterBorder}
-                                    ?menu=${!this.isNonInteractive}
+                                    ?menu=${!this.isNonInteractive && !this.readonly}
                                     ?with-resizer=${!this.isNonInteractive}
                                     ?is-last=${idx === this.visibleColumns.length - 1}
                                     ?removable=${true}
