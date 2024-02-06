@@ -1202,6 +1202,12 @@ video {
   outline-offset: 2px;
 }
 
+.focus\\:ring-1:focus {
+  --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
+  --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
+  box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000);
+}
+
 .focus\\:ring-2:focus {
   --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
   --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
@@ -1227,6 +1233,11 @@ video {
 .focus\\:ring-blue-300:focus {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(147 197 253 / var(--tw-ring-opacity));
+}
+
+.focus\\:ring-neutral-950:focus {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgb(10 10 10 / var(--tw-ring-opacity));
 }
 
 .active\\:border-neutral-200:active {
@@ -1391,6 +1402,11 @@ video {
 :is(.dark .dark\\:focus\\:ring-blue-900:focus) {
   --tw-ring-opacity: 1;
   --tw-ring-color: rgb(30 58 138 / var(--tw-ring-opacity));
+}
+
+:is(.dark .dark\\:focus\\:ring-neutral-50:focus) {
+  --tw-ring-opacity: 1;
+  --tw-ring-color: rgb(250 250 250 / var(--tw-ring-opacity));
 }
 
 :is(.dark .dark\\:focus\\:ring-white:focus) {
