@@ -52,7 +52,7 @@ export class Menu extends ClassifiedElement {
 
     // for closing menus when an ousside click occurs
     private outsideClicker: ((event: MouseEvent) => void) | undefined
-    private activeEvent: MouseEvent | undefined
+    private activeEvent: Event | undefined
 
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
@@ -101,7 +101,7 @@ export class Menu extends ClassifiedElement {
         }
     }
 
-    protected onTrigger(event: MouseEvent) {
+    protected onTrigger(event: Event) {
         this.open = !this.open
         this.activeEvent = event
     }
