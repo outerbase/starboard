@@ -43,19 +43,19 @@ const columns = Object.keys(rows[0].values).map((name) => ({ name }))
             <h1 class="font-bold text-xl">Static</h1>
             <div class="bg-white dark:bg-black inline-block">
                 <!-- @ts-ignore Astro doesn't seem to understand some of the params being passed -->
-                <OuterbaseTable client:only="lit" schema={{ columns }} data={rows} keyboard-shortcuts selectable-rows outter-border />
+                <OuterbaseTable client:only="lit" schema={{ columns }} data={rows} keyboard-shortcuts selectable-rows outer-border />
             </div>
 
             <h1 class="font-bold text-xl mt-8">SSR w/ Hydration</h1>
             <div class="bg-white dark:bg-black inline-block">
                 <!-- @ts-ignore Astro doesn't seem to understand some of the params being passed -->
-                <OuterbaseTable client:load schema={{ columns }} data={rows} selectable-rows outter-border />
+                <OuterbaseTable client:load schema={{ columns }} data={rows} selectable-rows outer-border />
             </div>
 
             <h1 class="font-bold text-xl mt-8">SSR w/o Hydration</h1>
             <div class="bg-white dark:bg-black inline-block">
                 <!-- @ts-ignore Astro doesn't seem to understand some of the params being passed -->
-                <OuterbaseTable schema={{ columns }} data={rows} non-interactive outter-border />
+                <OuterbaseTable schema={{ columns }} data={rows} non-interactive outer-border />
             </div>
         </main>
     </body>

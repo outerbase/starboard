@@ -48,7 +48,7 @@ export class TH extends MutableElement {
     @property({ attribute: 'with-resizer', type: Boolean })
     public withResizer = false
 
-    @property({ attribute: 'outter-border', type: Boolean })
+    @property({ attribute: 'outer-border', type: Boolean })
     public outterBorder = false
 
     @property({ attribute: 'name', type: String })

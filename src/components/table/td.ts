@@ -76,7 +76,7 @@ export class TableData extends MutableElement {
     @property({ type: Boolean, attribute: 'row-selector' })
     isRowSelector = false
 
-    @property({ attribute: 'outter-border', type: Boolean })
+    @property({ attribute: 'outer-border', type: Boolean })
     public outterBorder = false
 
     @property({ attribute: 'is-last-column', type: Boolean })
