@@ -8,6 +8,7 @@ import {
     ColumnHiddenEvent,
     ColumnPluginDeactivatedEvent,
     ColumnRemovedEvent,
+    MenuOpenEvent,
     ResizeEvent,
     ResizeStartEvent,
     RowAddedEvent,
@@ -119,6 +120,8 @@ export class Table extends ClassifiedElement {
 
     @state()
     protected removedRowUUIDs: Set<string> = new Set()
+
+    protected closeLastMenu?: () => void
 
     // METHODS (public)
     public addNewRow(row?: Partial<RowAsRecord>) {
@@ -464,7 +467,15 @@ export class Table extends ClassifiedElement {
         }
 
         return html`<span class=${classMap(tableContainerClasses)}
-            ><div id="table" class=${classMap(tableClasses)}>
+            ><div
+                id="table"
+                class=${classMap(tableClasses)}
+                @menuopen=${(event: MenuOpenEvent) => {
+                    // remember this menu and close it when a subsequent one is opened
+                    this.closeLastMenu?.()
+                    this.closeLastMenu = event.close
+                }}
+            >
                 <outerbase-thead>
                     <outerbase-tr header>
                         <!-- first column of (optional) checkboxes -->

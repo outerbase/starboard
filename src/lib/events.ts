@@ -170,3 +170,11 @@ export class ChangeEvent extends BubblyEvent {
         this.value = value
     }
 }
+
+export class MenuOpenEvent extends BubblyEvent {
+    close: () => void
+    constructor(close: () => void) {
+        super('menuopen')
+        this.close = close
+    }
+}
