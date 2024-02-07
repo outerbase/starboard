@@ -55,10 +55,10 @@ export class AddColumnElement extends ClassifiedElement {
 
     protected onSubmit(event: Event) {
         event.preventDefault()
-        this.errorMessage = html` <div class="flex items-center gap-1 text-[8px] leading-[9.6px] text-wrap">
-            <span class="text-neutral-950">${WarningOctagon(12)}</span>
-            <span>Name cannot contain special&nbsp;characters</span>
-        </div>`
+        // this.errorMessage = html` <div class="flex items-center gap-1 text-[8px] leading-[9.6px] text-wrap">
+        //     <span class="text-neutral-950">${WarningOctagon(12)}</span>
+        //     <span>Name cannot contain special&nbsp;characters</span>
+        // </div>`
 
         if (!this.columnName) throw new Error('Missing column name')
 
