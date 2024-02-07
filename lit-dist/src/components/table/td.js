@@ -40,7 +40,6 @@ let TableData = class TableData extends MutableElement {
             { label: 'Clear', value: 'clear' },
         ];
         this.isDisplayingPluginEditor = false;
-        this.tabIndex = 0;
     }
     get classMap() {
         return {

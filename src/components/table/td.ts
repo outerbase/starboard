@@ -110,8 +110,6 @@ export class TableData extends MutableElement {
     @state()
     protected isDisplayingPluginEditor = false
 
-    override tabIndex = 0
-
     protected onContextMenu(event: MouseEvent) {
         const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
         if (menu) {
