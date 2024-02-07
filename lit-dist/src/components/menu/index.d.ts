@@ -21,7 +21,7 @@ export declare class Menu extends ClassifiedElement {
     private activeEvent;
     protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;
     protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;
-    protected onTrigger(event: MouseEvent): void;
+    protected onTrigger(event: Event): void;
     protected onItemClick(event: MouseEvent): void;
     protected onSelection(event: Event, value: string): void;
     protected onKeyDown(event: KeyboardEvent): void;

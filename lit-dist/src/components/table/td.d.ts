@@ -12,6 +12,7 @@ export declare class TableData extends MutableElement {
         [x: string]: boolean;
         'table-cell relative': boolean;
         'px-cell-padding-x py-cell-padding-y ': boolean;
+        'px-5 py-cell-padding-y': boolean;
         'border-theme-border dark:border-theme-border-dark': boolean;
         'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': boolean;
         'focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none': boolean;

@@ -7,6 +7,7 @@ import './td.js';
 import './th.js';
 import './thead.js';
 import './tr.js';
+import '../check-box.js';
 export declare class Table extends ClassifiedElement {
     selectableRows: boolean;
     keyboardShortcuts: boolean;

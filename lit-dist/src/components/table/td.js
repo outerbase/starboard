@@ -44,7 +44,8 @@ let TableData = class TableData extends MutableElement {
     get classMap() {
         return {
             'table-cell relative': true,
-            'px-cell-padding-x py-cell-padding-y ': !this.plugin,
+            'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
+            'px-5 py-cell-padding-y': this.blank,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
             'focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none': !this.isEditing && this.isInteractive,
