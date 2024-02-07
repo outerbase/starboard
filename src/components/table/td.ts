@@ -32,7 +32,7 @@ export class TableData extends MutableElement {
                 (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outterBorder) || // include last column when outterBorder
                 (this._drawRightBorder && this.separateCells && !this.isLastColumn), // internal cell walls
             'first:border-l': this.separateCells && this.outterBorder, // left/right borders when the `separate-cells` attribute is set
-            'border-b': this.withBottomBorder && ((this.isLastRow && this.outterBorder) || !this.isLastRow), // bottom border when the `with-bottom-border` attribute is set
+            'border-b': this.withBottomBorder, // bottom border when the `with-bottom-border` attribute is set
             'cursor-pointer': this.isInteractive,
         }
     }
