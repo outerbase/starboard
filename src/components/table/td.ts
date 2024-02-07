@@ -154,7 +154,7 @@ export class TableData extends MutableElement {
     }
 
     protected override render() {
-        const darkClass = classMap({ 'font-mono': true, dark: this.theme == Theme.dark })
+        const contentWrapperClass = classMap({ 'font-normal': true, dark: this.theme == Theme.dark })
 
         let cellContents: TemplateResult<1>
         let cellEditorContents: DirectiveResult<typeof UnsafeHTMLDirective> | undefined
@@ -179,12 +179,12 @@ export class TableData extends MutableElement {
 
         return this.isEditing
             ? // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
-              html`<span class=${darkClass}>&nbsp;<input .value=${this.value} @input=${this.onChange} @keydown=${
+              html`<span class=${contentWrapperClass}>&nbsp;<input .value=${this.value} @input=${this.onChange} @keydown=${
                   this.onKeyDown
               } class=${classMap({
                   'z-10 absolute top-0 bottom-0 right-0 left-0': true,
                   'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
-                  'px-3 font-mono': true,
+                  'px-3 font-normal': true,
               })} @blur=${this.onBlur}></input></span>`
             : this.blank
               ? html`<slot></slot>`
@@ -207,7 +207,7 @@ export class TableData extends MutableElement {
                         ?menu=${this.hasMenu}
                         ?selectable-text=${!this.isInteractive}
                         @menu-selection=${this.onMenuSelection}
-                        ><span class=${darkClass}>${cellContents}</span
+                        ><span class=${contentWrapperClass}>${cellContents}</span
                         ><span class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
                     >`
     }

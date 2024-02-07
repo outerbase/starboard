@@ -1007,10 +1007,6 @@ video {
   padding-bottom: 6rem;
 }
 
-.font-mono {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-}
-
 .text-\\[8px\\] {
   font-size: 8px;
 }
@@ -1041,6 +1037,10 @@ video {
 
 .font-medium {
   font-weight: 500;
+}
+
+.font-normal {
+  font-weight: 400;
 }
 
 .italic {

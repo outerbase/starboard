@@ -460,7 +460,7 @@ export class Table extends ClassifiedElement {
         const tableContainerClasses = { dark: this.theme == Theme.dark }
         const tableClasses = {
             'table bg-theme-table dark:bg-theme-table-dark': true,
-            'text-theme-text dark:text-theme-text-dark text-sm font-mono': true,
+            'text-theme-text dark:text-theme-text-dark text-sm': true,
         }
 
         return html`<span class=${classMap(tableContainerClasses)}
