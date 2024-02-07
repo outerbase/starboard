@@ -1,8 +1,8 @@
-import { LitElement, css, html } from 'lit'
-import { customElement, property, state } from 'lit/decorators.js'
-import { CheckMark } from '../lib/icons/check-mark'
-import { TWStyles } from '../../tailwind'
-import { Theme } from '../types'
+import { LitElement, html } from 'lit'
+import { customElement, property } from 'lit/decorators.js'
+import { CheckMark } from '../lib/icons/check-mark.js'
+import { TWStyles } from '../../tailwind/index.js'
+import { Theme } from '../types.js'
 import { classMap } from 'lit/directives/class-map.js'
 
 @customElement('check-box')
