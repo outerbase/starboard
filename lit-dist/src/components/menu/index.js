@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 import { html } from 'lit';
 import { repeat } from 'lit/directives/repeat.js';
 import { property, state } from 'lit/decorators.js';
-import { MenuSelectedEvent } from '../../lib/events.js';
+import { MenuOpenEvent, MenuSelectedEvent } from '../../lib/events.js';
 import { CaretDown } from '../../lib/icons/caret-down.js';
 import { ClassifiedElement } from '../classified-element.js';
 import classMapToClassName from '../../lib/class-map-to-class-name.js';
@@ -50,6 +50,7 @@ export class Menu extends ClassifiedElement {
                 }
             };
             document.addEventListener('click', this.outsideClicker);
+            this.dispatchEvent(new MenuOpenEvent(() => (this.open = false)));
         }
         // when the menu is being closed
         else if (_changedProperties.has('open') && !this.open) {

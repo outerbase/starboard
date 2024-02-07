@@ -321,7 +321,15 @@ let Table = class Table extends ClassifiedElement {
             'text-theme-text dark:text-theme-text-dark text-sm': true,
         };
         return html `<span class=${classMap(tableContainerClasses)}
-            ><div id="table" class=${classMap(tableClasses)}>
+            ><div
+                id="table"
+                class=${classMap(tableClasses)}
+                @menuopen=${(event) => {
+            // remember this menu and close it when a subsequent one is opened
+            this.closeLastMenu?.();
+            this.closeLastMenu = event.close;
+        }}
+            >
                 <outerbase-thead>
                     <outerbase-tr header>
                         <!-- first column of (optional) checkboxes -->

@@ -32,6 +32,7 @@ export declare class Table extends ClassifiedElement {
     protected updateVisibleColumns(): void;
     protected selectedRowUUIDs: Set<string>;
     protected removedRowUUIDs: Set<string>;
+    protected closeLastMenu?: () => void;
     addNewRow(row?: Partial<RowAsRecord>): void;
     protected addNewColumn(name: string): void;
     toggleSelectedRow(uuid: string): void;

@@ -81,5 +81,9 @@ export declare class ChangeEvent extends BubblyEvent {
     value: string;
     constructor(value: string);
 }
+export declare class MenuOpenEvent extends BubblyEvent {
+    close: () => void;
+    constructor(close: () => void);
+}
 export {};
 //# sourceMappingURL=events.d.ts.map
