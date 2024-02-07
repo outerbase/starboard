@@ -77,7 +77,7 @@ export class Table extends ClassifiedElement {
     public columnOptions?: Array<HeaderMenuOptions>
 
     @property({ attribute: 'outer-border', type: Boolean })
-    public outterBorder = false
+    public outerBorder = false
 
     // TODO @johnny make this a Set
     @property({ attribute: 'hidden-columns', type: Array })
@@ -375,7 +375,7 @@ export class Table extends ClassifiedElement {
                                     ?separate-cells=${true}
                                     ?draw-right-border=${true}
                                     ?bottom-border=${true}
-                                    ?outer-border=${this.outterBorder}
+                                    ?outer-border=${this.outerBorder}
                                     ?blank=${true}
                                     ?is-last-row=${rowIndex === this.rows.length - 1}
                                     ?is-last-column=${false}
@@ -421,7 +421,7 @@ export class Table extends ClassifiedElement {
                                           ?separate-cells=${true}
                                           ?draw-right-border=${true}
                                           ?bottom-border=${true}
-                                          ?outer-border=${this.outterBorder}
+                                          ?outer-border=${this.outerBorder}
                                           ?is-last-row=${rowIndex === this.rows.length - 1}
                                           ?is-last-column=${idx === this.visibleColumns.length - 1}
                                           ?menu=${!this.isNonInteractive && !this.readonly}
@@ -468,7 +468,7 @@ export class Table extends ClassifiedElement {
                               table-height=${ifDefined(this._height)}
                               theme=${this.theme}
                               ?separate-cells=${true}
-                              ?outer-border=${this.outterBorder}
+                              ?outer-border=${this.outerBorder}
                               ?is-last=${0 === this.visibleColumns.length}
                               ?blank=${true}
                               ?read-only=${this.readonly}
@@ -489,7 +489,7 @@ export class Table extends ClassifiedElement {
                                     original-value="${name}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
                                     ?separate-cells=${true}
-                                    ?outer-border=${this.outterBorder}
+                                    ?outer-border=${this.outerBorder}
                                     ?menu=${!this.isNonInteractive && !this.readonly}
                                     ?with-resizer=${!this.isNonInteractive}
                                     ?is-last=${idx === this.visibleColumns.length - 1}

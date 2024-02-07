@@ -30,9 +30,9 @@ export class TableData extends MutableElement {
             'max-w-64': !this.maxWidth, // default max width, unless specified
             'border-r':
                 this.isInteractive ||
-                (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outterBorder) || // include last column when outterBorder
+                (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outerBorder) || // include last column when outerBorder
                 (this._drawRightBorder && this.separateCells && !this.isLastColumn), // internal cell walls
-            'first:border-l': this.separateCells && this.outterBorder, // left/right borders when the `separate-cells` attribute is set
+            'first:border-l': this.separateCells && this.outerBorder, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bottom-border` attribute is set
             'cursor-pointer': this.isInteractive,
         }
@@ -78,7 +78,7 @@ export class TableData extends MutableElement {
     isRowSelector = false
 
     @property({ attribute: 'outer-border', type: Boolean })
-    public outterBorder = false
+    public outerBorder = false
 
     @property({ attribute: 'is-last-column', type: Boolean })
     protected isLastColumn = false

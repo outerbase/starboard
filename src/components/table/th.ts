@@ -28,14 +28,14 @@ export class TH extends MutableElement {
         return {
             'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
             'border-b border-theme-border dark:border-theme-border-dark': true,
-            'first:border-l border-t': this.outterBorder,
+            'first:border-l border-t': this.outerBorder,
             'px-cell-padding-x py-cell-padding-y': true,
             'bg-theme-column dark:bg-theme-column-dark': !this.dirty,
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty,
             'select-none': this.hasMenu, // this is really about handling SSR without hydration; TODO use a better flag?
             // prevent double borders
             'border-r':
-                (!this.withResizer && this.isLastColumn && this.outterBorder) ||
+                (!this.withResizer && this.isLastColumn && this.outerBorder) ||
                 (!this.withResizer && this.separateCells && !this.isLastColumn),
             'cursor-pointer': this.isInteractive,
             dark: this.theme == Theme.dark,
@@ -49,7 +49,7 @@ export class TH extends MutableElement {
     public withResizer = false
 
     @property({ attribute: 'outer-border', type: Boolean })
-    public outterBorder = false
+    public outerBorder = false
 
     @property({ attribute: 'name', type: String })
     public override value = ''
