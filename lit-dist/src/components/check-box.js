@@ -7,9 +7,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var CustomCheckbox_1;
 import { LitElement, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { CheckMark } from '../lib/icons/check-mark';
-import { TWStyles } from '../../tailwind';
-import { Theme } from '../types';
+import { CheckMark } from '../lib/icons/check-mark.js';
+import { TWStyles } from '../../tailwind/index.js';
+import { Theme } from '../types.js';
 import { classMap } from 'lit/directives/class-map.js';
 let CustomCheckbox = CustomCheckbox_1 = class CustomCheckbox extends LitElement {
     constructor() {

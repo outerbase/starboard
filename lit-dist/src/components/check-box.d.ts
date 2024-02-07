@@ -1,5 +1,5 @@
 import { LitElement } from 'lit';
-import { Theme } from '../types';
+import { Theme } from '../types.js';
 export declare class CustomCheckbox extends LitElement {
     static styles: import("lit").CSSResult;
     static checkedTemplate: import("lit").TemplateResult<1>;
