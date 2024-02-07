@@ -10,7 +10,6 @@ import { html } from 'lit';
 import { ClassifiedElement } from '../classified-element';
 import { customElement, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { WarningOctagon } from '../../lib/icons/warning-octagon.js';
 import { ColumnAddedEvent } from '../../lib/events.js';
 import '../menu/input-menu.js';
 let AddColumnElement = AddColumnElement_1 = class AddColumnElement extends ClassifiedElement {
@@ -34,10 +33,10 @@ let AddColumnElement = AddColumnElement_1 = class AddColumnElement extends Class
     }
     onSubmit(event) {
         event.preventDefault();
-        this.errorMessage = html ` <div class="flex items-center gap-1 text-[8px] leading-[9.6px] text-wrap">
-            <span class="text-neutral-950">${WarningOctagon(12)}</span>
-            <span>Name cannot contain special&nbsp;characters</span>
-        </div>`;
+        // this.errorMessage = html` <div class="flex items-center gap-1 text-[8px] leading-[9.6px] text-wrap">
+        //     <span class="text-neutral-950">${WarningOctagon(12)}</span>
+        //     <span>Name cannot contain special&nbsp;characters</span>
+        // </div>`
         if (!this.columnName)
             throw new Error('Missing column name');
         // JOHNNY listen for this event in `<OuterbaseTable />` and update the stuff
@@ -97,7 +96,7 @@ AddColumnElement.labelClasses = {
 AddColumnElement.inputClasses = {
     'focus:ring-1 focus:ring-neutral-500 focus:outline-none ': true,
     'px-2 py-1.5': true,
-    'bg-neutral-50 dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400': true,
+    'bg-neutral-50 dark:bg-neutral-950 text-neutral-950 dark:text-neutral-50': true,
     'placeholder-neutral-600 dark:placeholder-neutral-400': true,
     'rounded-md border border-neutral-400 dark:border-neutral-600 focus:dark:border-neutral-300': true,
 };

@@ -14,7 +14,7 @@ export declare class AddColumnElement extends ClassifiedElement {
     static inputClasses: {
         'focus:ring-1 focus:ring-neutral-500 focus:outline-none ': boolean;
         'px-2 py-1.5': boolean;
-        'bg-neutral-50 dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400': boolean;
+        'bg-neutral-50 dark:bg-neutral-950 text-neutral-950 dark:text-neutral-50': boolean;
         'placeholder-neutral-600 dark:placeholder-neutral-400': boolean;
         'rounded-md border border-neutral-400 dark:border-neutral-600 focus:dark:border-neutral-300': boolean;
     };

@@ -1068,11 +1068,6 @@ video {
   color: rgb(250 250 250 / var(--tw-text-opacity));
 }
 
-.text-neutral-600 {
-  --tw-text-opacity: 1;
-  color: rgb(82 82 82 / var(--tw-text-opacity));
-}
-
 .text-neutral-950 {
   --tw-text-opacity: 1;
   color: rgb(10 10 10 / var(--tw-text-opacity));
@@ -1335,11 +1330,6 @@ video {
 :is(.dark .dark\\:text-black) {
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity));
-}
-
-:is(.dark .dark\\:text-neutral-400) {
-  --tw-text-opacity: 1;
-  color: rgb(163 163 163 / var(--tw-text-opacity));
 }
 
 :is(.dark .dark\\:text-neutral-50) {
