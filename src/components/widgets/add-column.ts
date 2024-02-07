@@ -25,17 +25,18 @@ export class AddColumnElement extends ClassifiedElement {
     }
 
     static inputClasses = {
-        'focus:ring-1 focus:ring-neutral-950 dark:focus:ring-neutral-50 focus:outline-none ': true,
+        'focus:ring-1 focus:ring-neutral-500 focus:outline-none ': true,
         'px-2 py-1.5': true,
-        'bg-neutral-50 dark:bg-neutral-950 text-neutral-950 dark:text-neutral-50': true,
-        'placeholder-neutral-400 dark:placeholder-neutral-600': true,
-        'rounded-md border border-neutral-400 dark:border-neutral-600': true,
+        'bg-neutral-50 dark:bg-neutral-950 text-neutral-600 dark:text-neutral-400': true,
+        'placeholder-neutral-600 dark:placeholder-neutral-400': true,
+        'rounded-md border border-neutral-400 dark:border-neutral-600 focus:dark:border-neutral-300': true,
     }
 
     static buttonClasses = {
         'bg-neutral-950 dark:bg-neutral-50 hover:bg-neutral-800 hover:dark:bg-neutral-200': true,
         'text-neutral-50 dark:text-neutral-950': true,
         'px-5 py-1.5 rounded-md': true,
+        'disabled:bg-neutral-400 disabled:dark:bg-neutral-600': true,
     }
 
     @state()
@@ -107,7 +108,9 @@ export class AddColumnElement extends ClassifiedElement {
                 ></outerbase-input-menu>
             </div>
 
-            <button class=${classMap(AddColumnElement.buttonClasses)} type="submit">Create Column</button>
+            <button ?disabled="${this.columnName.length === 0}" class=${classMap(AddColumnElement.buttonClasses)} type="submit">
+                Create Column
+            </button>
         </form>`
     }
 }
