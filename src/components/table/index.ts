@@ -387,6 +387,7 @@ export class Table extends ClassifiedElement {
                                         <check-box
                                             ?checked="${this.selectedRowUUIDs.has(id)}"
                                             @click="${() => this.toggleSelectedRow(id)}"
+                                            theme=${this.theme}
                                         />
                                     </div>
                                 </outerbase-td>`

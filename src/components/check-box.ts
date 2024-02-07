@@ -2,6 +2,8 @@ import { LitElement, css, html } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import { CheckMark } from '../lib/icons/check-mark'
 import { TWStyles } from '../../tailwind'
+import { Theme } from '../types'
+import { classMap } from 'lit/directives/class-map.js'
 
 @customElement('check-box')
 export class CustomCheckbox extends LitElement {
@@ -13,14 +15,19 @@ export class CustomCheckbox extends LitElement {
     static uncheckedTemplate = html`<span class="w-4 h-4 border border-neutral-500 rounded-md"></span>`
 
     @property({ type: Boolean }) checked = false
+    @property({ type: String }) theme = Theme.light
 
     toggleCheckbox() {
         this.checked = !this.checked
     }
 
     render() {
+        const classes = classMap({
+            'flex items-center cursor-pointer': true,
+            dark: this.theme == Theme.dark,
+        })
         return html`
-            <div class="flex items-center cursor-pointer" @click="${this.toggleCheckbox}">
+            <div class=${classes} @click="${this.toggleCheckbox}">
                 ${this.checked ? CustomCheckbox.checkedTemplate : CustomCheckbox.uncheckedTemplate}
                 <input type="checkbox" ?checked="${this.checked}" @change="${this.toggleCheckbox}" class="hidden" />
             </div>
