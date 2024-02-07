@@ -20,7 +20,7 @@ let TH = class TH extends MutableElement {
     constructor() {
         super(...arguments);
         this.withResizer = false;
-        this.outterBorder = false;
+        this.outerBorder = false;
         this.value = '';
         this.installedPlugins = {};
         this.blank = false;
@@ -62,13 +62,13 @@ let TH = class TH extends MutableElement {
         return {
             'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
             'border-b border-theme-border dark:border-theme-border-dark': true,
-            'first:border-l border-t': this.outterBorder,
+            'first:border-l border-t': this.outerBorder,
             'px-cell-padding-x py-cell-padding-y': true,
             'bg-theme-column dark:bg-theme-column-dark': !this.dirty,
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty,
             'select-none': this.hasMenu, // this is really about handling SSR without hydration; TODO use a better flag?
             // prevent double borders
-            'border-r': (!this.withResizer && this.isLastColumn && this.outterBorder) ||
+            'border-r': (!this.withResizer && this.isLastColumn && this.outerBorder) ||
                 (!this.withResizer && this.separateCells && !this.isLastColumn),
             'cursor-pointer': this.isInteractive,
             dark: this.theme == Theme.dark,
@@ -239,7 +239,7 @@ __decorate([
 ], TH.prototype, "withResizer", void 0);
 __decorate([
     property({ attribute: 'outer-border', type: Boolean })
-], TH.prototype, "outterBorder", void 0);
+], TH.prototype, "outerBorder", void 0);
 __decorate([
     property({ attribute: 'name', type: String })
 ], TH.prototype, "value", void 0);

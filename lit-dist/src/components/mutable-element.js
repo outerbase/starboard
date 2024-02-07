@@ -63,6 +63,7 @@ export class MutableElement extends ClassifiedElement {
         if (event.code === 'Escape') {
             // abort changes
             this.isEditing = false;
+            this.focus();
             // disabling restoring the original value
             // this.value = this.originalValue
         }

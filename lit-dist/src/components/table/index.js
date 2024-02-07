@@ -4,8 +4,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var Table_1;
 import { customElement, property, state } from 'lit/decorators.js';
-import { css, html, nothing } from 'lit';
+import { html, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { ColumnAddedEvent, RowAddedEvent, RowRemovedEvent, RowSelectedEvent, RowUpdatedEvent, } from '../../lib/events.js';
@@ -21,7 +22,7 @@ import './tr.js';
 import '../check-box.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { TWStyles } from '../../../tailwind/index.js';
-let Table = class Table extends ClassifiedElement {
+let Table = Table_1 = class Table extends ClassifiedElement {
     constructor() {
         super(...arguments);
         // STATE
@@ -29,7 +30,7 @@ let Table = class Table extends ClassifiedElement {
         this.keyboardShortcuts = false;
         this.rows = [];
         this.isNonInteractive = false;
-        this.outterBorder = false;
+        this.outerBorder = false;
         // TODO @johnny make this a Set
         this.hiddenColumnNames = [];
         this.deletedColumnNames = [];
@@ -255,7 +256,7 @@ let Table = class Table extends ClassifiedElement {
                                     ?separate-cells=${true}
                                     ?draw-right-border=${true}
                                     ?bottom-border=${true}
-                                    ?outer-border=${this.outterBorder}
+                                    ?outer-border=${this.outerBorder}
                                     ?blank=${true}
                                     ?is-last-row=${rowIndex === this.rows.length - 1}
                                     ?is-last-column=${false}
@@ -294,7 +295,7 @@ let Table = class Table extends ClassifiedElement {
                                           ?separate-cells=${true}
                                           ?draw-right-border=${true}
                                           ?bottom-border=${true}
-                                          ?outer-border=${this.outterBorder}
+                                          ?outer-border=${this.outerBorder}
                                           ?is-last-row=${rowIndex === this.rows.length - 1}
                                           ?is-last-column=${idx === this.visibleColumns.length - 1}
                                           ?menu=${!this.isNonInteractive && !this.readonly}
@@ -324,6 +325,10 @@ let Table = class Table extends ClassifiedElement {
                 id="table"
                 class=${classMap(tableClasses)}
                 @menuopen=${(event) => {
+            // this special case is when the same menu is opened after being closed
+            // without this the menu is immediately closed on subsequent triggers
+            if (this.closeLastMenu === event.close)
+                return;
             // remember this menu and close it when a subsequent one is opened
             this.closeLastMenu?.();
             this.closeLastMenu = event.close;
@@ -337,7 +342,7 @@ let Table = class Table extends ClassifiedElement {
                               table-height=${ifDefined(this._height)}
                               theme=${this.theme}
                               ?separate-cells=${true}
-                              ?outer-border=${this.outterBorder}
+                              ?outer-border=${this.outerBorder}
                               ?is-last=${0 === this.visibleColumns.length}
                               ?blank=${true}
                               ?read-only=${this.readonly}
@@ -355,7 +360,7 @@ let Table = class Table extends ClassifiedElement {
                                     original-value="${name}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
                                     ?separate-cells=${true}
-                                    ?outer-border=${this.outterBorder}
+                                    ?outer-border=${this.outerBorder}
                                     ?menu=${!this.isNonInteractive && !this.readonly}
                                     ?with-resizer=${!this.isNonInteractive}
                                     ?is-last=${idx === this.visibleColumns.length - 1}
@@ -374,6 +379,13 @@ let Table = class Table extends ClassifiedElement {
                 </outerbase-thead>
 
                 <outerbase-rowgroup>
+                    ${this.isNonInteractive
+            ? null
+            : html `<outerbase-tr>
+                              ${this.isNonInteractive ? null : Table_1.BlankCell}
+                              ${repeat(this.visibleColumns, ({ name }) => name, // use the column name as the unique identifier for each entry in this row
+            ({ name }, idx) => Table_1.BlankCell)}
+                          </outerbase-tr>`}
                     <!-- render a TableRow element for each row of data -->
                     ${this.renderRows(this.rows.filter(({ isNew }) => isNew))} ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}
                 </outerbase-rowgroup>
@@ -381,17 +393,23 @@ let Table = class Table extends ClassifiedElement {
         </span>`;
     }
 };
-Table.styles = [
-    TWStyles,
-    // custom checkbox/checkmark styles
-    css `
-            outerbase-rowgroup:before {
-                content: '';
-                display: block;
-                height: 2px; /* Adjust the height to control the space */
-            }
-        `,
-];
+// the blank cell is used to add padding to the top of the table so that you can focus on a cell without the edge being clipped by the header which has a higher z-index
+Table.BlankCell = html `<outerbase-td
+    value=""
+    ?blank=${true}
+    ?separate-cells=${true}
+    ?draw-right-border=${true}
+    ?bottom-border=${false}
+    ?outer-border=${true}
+    ?is-last-row=${false}
+    ?is-last-column=${false}
+    ?menu=${false}
+    ?selectable-text=${false}
+    ?interactive=${false}
+    ?hide-dirt=${true}
+    ?read-only=${true}
+/><div class="h-0.5"></div></outerbase-td>`;
+Table.styles = [TWStyles];
 __decorate([
     property({ type: Boolean, attribute: 'selectable-rows' })
 ], Table.prototype, "selectableRows", void 0);
@@ -424,7 +442,7 @@ __decorate([
 ], Table.prototype, "columnOptions", void 0);
 __decorate([
     property({ attribute: 'outer-border', type: Boolean })
-], Table.prototype, "outterBorder", void 0);
+], Table.prototype, "outerBorder", void 0);
 __decorate([
     property({ attribute: 'hidden-columns', type: Array })
 ], Table.prototype, "hiddenColumnNames", void 0);
@@ -461,7 +479,7 @@ __decorate([
 __decorate([
     state()
 ], Table.prototype, "removedRowUUIDs", void 0);
-Table = __decorate([
+Table = Table_1 = __decorate([
     customElement('outerbase-table')
 ], Table);
 export { Table };

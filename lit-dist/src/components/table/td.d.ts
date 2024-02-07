@@ -12,7 +12,7 @@ export declare class TableData extends MutableElement {
         [x: string]: boolean;
         'table-cell relative': boolean;
         'px-cell-padding-x py-cell-padding-y ': boolean;
-        'px-5 py-cell-padding-y': boolean;
+        'px-5': boolean;
         'border-theme-border dark:border-theme-border-dark': boolean;
         'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': boolean;
         'focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none': boolean;
@@ -35,7 +35,7 @@ export declare class TableData extends MutableElement {
     isInteractive: boolean;
     private hasMenu;
     isRowSelector: boolean;
-    outterBorder: boolean;
+    outerBorder: boolean;
     protected isLastColumn: boolean;
     protected isLastRow: boolean;
     protected leftDistanceToViewport: number;
@@ -48,8 +48,10 @@ export declare class TableData extends MutableElement {
         value: string;
     }[];
     protected isDisplayingPluginEditor: boolean;
+    tabIndex: number;
     protected onContextMenu(event: MouseEvent): void;
     protected onPluginEvent({ detail: { action, value } }: PluginActionEvent): void;
+    protected onKeyDown(event: KeyboardEvent): void;
     connectedCallback(): void;
     disconnectedCallback(): void;
     protected render(): TemplateResult<1>;

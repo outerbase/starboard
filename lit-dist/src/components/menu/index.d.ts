@@ -19,6 +19,7 @@ export declare class Menu extends ClassifiedElement {
     protected get menuPositionClasses(): string;
     private outsideClicker;
     private activeEvent;
+    private close;
     protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;
     protected updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;
     protected onTrigger(event: Event): void;

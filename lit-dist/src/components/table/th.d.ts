@@ -20,7 +20,7 @@ export declare class TH extends MutableElement {
     };
     tableHeight?: number;
     withResizer: boolean;
-    outterBorder: boolean;
+    outerBorder: boolean;
     value: string;
     plugins?: Array<ColumnPlugin>;
     installedPlugins: Record<string, PluginWorkspaceInstallationId | undefined>;

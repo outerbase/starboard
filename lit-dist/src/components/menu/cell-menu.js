@@ -57,7 +57,6 @@ let CellMenu = class CellMenu extends Menu {
             <span
                 id="trigger"
                 aria-haspopup="menu"
-                tabIndex="0"
                 class=${darkClass}
                 @click=${this.onTrigger}
                 @dblclick=${(e) => e.stopPropagation()}

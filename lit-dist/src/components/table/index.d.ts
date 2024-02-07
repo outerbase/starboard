@@ -9,6 +9,7 @@ import './thead.js';
 import './tr.js';
 import '../check-box.js';
 export declare class Table extends ClassifiedElement {
+    static BlankCell: import("lit").TemplateResult<1>;
     selectableRows: boolean;
     keyboardShortcuts: boolean;
     schema?: Schema;
@@ -19,7 +20,7 @@ export declare class Table extends ClassifiedElement {
     isNonInteractive: boolean;
     authToken?: string;
     columnOptions?: Array<HeaderMenuOptions>;
-    outterBorder: boolean;
+    outerBorder: boolean;
     hiddenColumnNames: Array<string>;
     deletedColumnNames: Array<string>;
     renamedColumns: Record<string, string>;

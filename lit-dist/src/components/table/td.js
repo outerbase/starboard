@@ -28,7 +28,7 @@ let TableData = class TableData extends MutableElement {
         this.isInteractive = false;
         this.hasMenu = false;
         this.isRowSelector = false;
-        this.outterBorder = false;
+        this.outerBorder = false;
         this.isLastColumn = false;
         this.isLastRow = false;
         this.leftDistanceToViewport = -1;
@@ -40,12 +40,13 @@ let TableData = class TableData extends MutableElement {
             { label: 'Clear', value: 'clear' },
         ];
         this.isDisplayingPluginEditor = false;
+        this.tabIndex = 0;
     }
     get classMap() {
         return {
             'table-cell relative': true,
             'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
-            'px-5 py-cell-padding-y': this.blank,
+            'px-5': this.blank,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
             'focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none': !this.isEditing && this.isInteractive,
@@ -53,9 +54,9 @@ let TableData = class TableData extends MutableElement {
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
             'max-w-64': !this.maxWidth, // default max width, unless specified
             'border-r': this.isInteractive ||
-                (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outterBorder) || // include last column when outterBorder
+                (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outerBorder) || // include last column when outerBorder
                 (this._drawRightBorder && this.separateCells && !this.isLastColumn), // internal cell walls
-            'first:border-l': this.separateCells && this.outterBorder, // left/right borders when the `separate-cells` attribute is set
+            'first:border-l': this.separateCells && this.outerBorder, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bottom-border` attribute is set
             'cursor-pointer': this.isInteractive,
         };
@@ -87,17 +88,48 @@ let TableData = class TableData extends MutableElement {
             this.dispatchChangedEvent();
         }
     }
+    onKeyDown(event) {
+        super.onKeyDown(event);
+        const { code } = event;
+        if (code === 'Space') {
+            event.preventDefault();
+            const menu = this.shadowRoot?.querySelector('outerbase-td-menu');
+            if (menu) {
+                if (menu.open) {
+                    console.log('is open');
+                    menu.open = false;
+                }
+                else {
+                    console.log('is closed');
+                    menu.focus();
+                    menu.open = true;
+                }
+            }
+        }
+        if (code === 'Escape') {
+            event.preventDefault();
+            const menu = this.shadowRoot?.querySelector('outerbase-td-menu');
+            if (menu && menu.open) {
+                menu.open = false;
+            }
+        }
+        if (code === 'Enter') {
+            this.isEditing = true;
+        }
+    }
     connectedCallback() {
         super.connectedCallback();
         this.addEventListener('contextmenu', this.onContextMenu);
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.addEventListener('custom-change', this.onPluginEvent);
+        this.addEventListener('keydown', this.onKeyDown);
     }
     disconnectedCallback() {
         super.disconnectedCallback();
         this.removeEventListener('contextmenu', this.onContextMenu);
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.removeEventListener('custom-change', this.onPluginEvent);
+        this.removeEventListener('keydown', this.onKeyDown);
     }
     render() {
         const contentWrapperClass = classMap({ 'font-normal': true, dark: this.theme == Theme.dark });
@@ -209,7 +241,7 @@ __decorate([
 ], TableData.prototype, "isRowSelector", void 0);
 __decorate([
     property({ attribute: 'outer-border', type: Boolean })
-], TableData.prototype, "outterBorder", void 0);
+], TableData.prototype, "outerBorder", void 0);
 __decorate([
     property({ attribute: 'is-last-column', type: Boolean })
 ], TableData.prototype, "isLastColumn", void 0);

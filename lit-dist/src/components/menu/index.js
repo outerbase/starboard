@@ -22,6 +22,10 @@ export class Menu extends ClassifiedElement {
         this.theme = Theme.light;
         this.withoutPadding = false;
         this.historyStack = [];
+        // storing this as a variable instead of anonymous function
+        // so that the listener can determine if it's the same closer or not
+        // for the scenario when the same menu is repeatedly opened
+        this.close = () => (this.open = false);
     }
     get classMap() {
         return {
@@ -50,7 +54,7 @@ export class Menu extends ClassifiedElement {
                 }
             };
             document.addEventListener('click', this.outsideClicker);
-            this.dispatchEvent(new MenuOpenEvent(() => (this.open = false)));
+            this.dispatchEvent(new MenuOpenEvent(this.close));
         }
         // when the menu is being closed
         else if (_changedProperties.has('open') && !this.open) {
@@ -216,7 +220,7 @@ export class Menu extends ClassifiedElement {
     }
 }
 __decorate([
-    property({ type: Boolean, attribute: 'open' })
+    property({ type: Boolean, attribute: 'open', reflect: true })
 ], Menu.prototype, "open", void 0);
 __decorate([
     state()
