@@ -85,7 +85,8 @@ export class MutableElement extends ClassifiedElement {
         if (event.code === 'Escape') {
             // abort changes
             this.isEditing = false
-            this.value = this.originalValue
+            // disabling restoring the original value
+            // this.value = this.originalValue
         }
 
         if (event.code === 'Enter' || event.code === 'Tab') {
