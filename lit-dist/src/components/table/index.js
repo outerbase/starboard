@@ -254,7 +254,7 @@ let Table = class Table extends ClassifiedElement {
                                     ?separate-cells=${true}
                                     ?draw-right-border=${true}
                                     ?bottom-border=${true}
-                                    ?outter-border=${this.outterBorder}
+                                    ?outer-border=${this.outterBorder}
                                     ?blank=${true}
                                     ?is-last-row=${rowIndex === this.rows.length - 1}
                                     ?is-last-column=${false}
@@ -295,7 +295,7 @@ let Table = class Table extends ClassifiedElement {
                                           ?separate-cells=${true}
                                           ?draw-right-border=${true}
                                           ?bottom-border=${true}
-                                          ?outter-border=${this.outterBorder}
+                                          ?outer-border=${this.outterBorder}
                                           ?is-last-row=${rowIndex === this.rows.length - 1}
                                           ?is-last-column=${idx === this.visibleColumns.length - 1}
                                           ?menu=${!this.isNonInteractive && !this.readonly}
@@ -330,7 +330,7 @@ let Table = class Table extends ClassifiedElement {
                               table-height=${ifDefined(this._height)}
                               theme=${this.theme}
                               ?separate-cells=${true}
-                              ?outter-border=${this.outterBorder}
+                              ?outer-border=${this.outterBorder}
                               ?is-last=${0 === this.visibleColumns.length}
                               ?blank=${true}
                               ?read-only=${this.readonly}
@@ -348,7 +348,7 @@ let Table = class Table extends ClassifiedElement {
                                     original-value="${name}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
                                     ?separate-cells=${true}
-                                    ?outter-border=${this.outterBorder}
+                                    ?outer-border=${this.outterBorder}
                                     ?menu=${!this.isNonInteractive && !this.readonly}
                                     ?with-resizer=${!this.isNonInteractive}
                                     ?is-last=${idx === this.visibleColumns.length - 1}
@@ -432,7 +432,7 @@ __decorate([
     property({ attribute: 'column-options', type: Array })
 ], Table.prototype, "columnOptions", void 0);
 __decorate([
-    property({ attribute: 'outter-border', type: Boolean })
+    property({ attribute: 'outer-border', type: Boolean })
 ], Table.prototype, "outterBorder", void 0);
 __decorate([
     property({ attribute: 'hidden-columns', type: Array })

@@ -239,7 +239,7 @@ __decorate([
     property({ attribute: 'with-resizer', type: Boolean })
 ], TH.prototype, "withResizer", void 0);
 __decorate([
-    property({ attribute: 'outter-border', type: Boolean })
+    property({ attribute: 'outer-border', type: Boolean })
 ], TH.prototype, "outterBorder", void 0);
 __decorate([
     property({ attribute: 'name', type: String })

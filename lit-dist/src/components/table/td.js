@@ -208,7 +208,7 @@ __decorate([
     property({ type: Boolean, attribute: 'row-selector' })
 ], TableData.prototype, "isRowSelector", void 0);
 __decorate([
-    property({ attribute: 'outter-border', type: Boolean })
+    property({ attribute: 'outer-border', type: Boolean })
 ], TableData.prototype, "outterBorder", void 0);
 __decorate([
     property({ attribute: 'is-last-column', type: Boolean })
