@@ -90,13 +90,13 @@ let TableData = class TableData extends MutableElement {
     connectedCallback() {
         super.connectedCallback();
         this.addEventListener('contextmenu', this.onContextMenu);
-        // @ts-ignore insists on `Event` insetad of `PluginActionEvent`
+        // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.addEventListener('custom-change', this.onPluginEvent);
     }
     disconnectedCallback() {
         super.disconnectedCallback();
         this.removeEventListener('contextmenu', this.onContextMenu);
-        // @ts-ignore insists on `Event` insetad of `PluginActionEvent`
+        // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.removeEventListener('custom-change', this.onPluginEvent);
     }
     render() {

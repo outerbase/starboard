@@ -142,14 +142,14 @@ export class TableData extends MutableElement {
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
-        // @ts-ignore insists on `Event` insetad of `PluginActionEvent`
+        // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.addEventListener('custom-change', this.onPluginEvent)
     }
 
     public override disconnectedCallback(): void {
         super.disconnectedCallback()
         this.removeEventListener('contextmenu', this.onContextMenu)
-        // @ts-ignore insists on `Event` insetad of `PluginActionEvent`
+        // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.removeEventListener('custom-change', this.onPluginEvent)
     }
 
