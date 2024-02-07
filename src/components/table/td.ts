@@ -20,7 +20,7 @@ export class TableData extends MutableElement {
         return {
             'table-cell relative': true,
             'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
-            'px-5 py-cell-padding-y': this.blank,
+            'px-5': this.blank,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
             'focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none': !this.isEditing && this.isInteractive,
@@ -111,6 +111,8 @@ export class TableData extends MutableElement {
     @state()
     protected isDisplayingPluginEditor = false
 
+    override tabIndex = 0
+
     protected onContextMenu(event: MouseEvent) {
         const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
         if (menu) {
@@ -138,11 +140,44 @@ export class TableData extends MutableElement {
         }
     }
 
+    protected onKeyDown(event: KeyboardEvent): void {
+        super.onKeyDown(event)
+
+        const { code } = event
+        if (code === 'Space') {
+            event.preventDefault()
+            const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
+            if (menu) {
+                if (menu.open) {
+                    console.log('is open')
+                    menu.open = false
+                } else {
+                    console.log('is closed')
+                    menu.focus()
+                    menu.open = true
+                }
+            }
+        }
+
+        if (code === 'Escape') {
+            event.preventDefault()
+            const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
+            if (menu && menu.open) {
+                menu.open = false
+            }
+        }
+
+        if (code === 'Enter') {
+            this.isEditing = true
+        }
+    }
+
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.addEventListener('custom-change', this.onPluginEvent)
+        this.addEventListener('keydown', this.onKeyDown)
     }
 
     public override disconnectedCallback(): void {
@@ -150,6 +185,7 @@ export class TableData extends MutableElement {
         this.removeEventListener('contextmenu', this.onContextMenu)
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.removeEventListener('custom-change', this.onPluginEvent)
+        this.removeEventListener('keydown', this.onKeyDown)
     }
 
     protected override render() {

@@ -19,7 +19,7 @@ export class Menu extends ClassifiedElement {
         }
     }
 
-    @property({ type: Boolean, attribute: 'open' })
+    @property({ type: Boolean, attribute: 'open', reflect: true })
     public open = false
 
     // @property({ attribute: 'selection', type: String })
@@ -54,6 +54,11 @@ export class Menu extends ClassifiedElement {
     private outsideClicker: ((event: MouseEvent) => void) | undefined
     private activeEvent: Event | undefined
 
+    // storing this as a variable instead of anonymous function
+    // so that the listener can determine if it's the same closer or not
+    // for the scenario when the same menu is repeatedly opened
+    private close = () => (this.open = false)
+
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
@@ -69,7 +74,7 @@ export class Menu extends ClassifiedElement {
             }
             document.addEventListener('click', this.outsideClicker)
 
-            this.dispatchEvent(new MenuOpenEvent(() => (this.open = false)))
+            this.dispatchEvent(new MenuOpenEvent(this.close))
         }
         // when the menu is being closed
         else if (_changedProperties.has('open') && !this.open) {

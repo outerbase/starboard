@@ -43,6 +43,23 @@ import { TWStyles } from '../../../tailwind/index.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
+    // the blank cell is used to add padding to the top of the table so that you can focus on a cell without the edge being clipped by the header which has a higher z-index
+    static BlankCell = html`<outerbase-td
+    value=""
+    ?blank=${true}
+    ?separate-cells=${true}
+    ?draw-right-border=${true}
+    ?bottom-border=${false}
+    ?outer-border=${true}
+    ?is-last-row=${false}
+    ?is-last-column=${false}
+    ?menu=${false}
+    ?selectable-text=${false}
+    ?interactive=${false}
+    ?hide-dirt=${true}
+    ?read-only=${true}
+/><div class="h-0.5"></div></outerbase-td>`
+
     // STATE
     @property({ type: Boolean, attribute: 'selectable-rows' })
     public selectableRows = false
@@ -341,18 +358,7 @@ export class Table extends ClassifiedElement {
         return this.getBoundingClientRect().left
     }
 
-    static override styles = [
-        TWStyles,
-
-        // custom checkbox/checkmark styles
-        css`
-            outerbase-rowgroup:before {
-                content: '';
-                display: block;
-                height: 2px; /* Adjust the height to control the space */
-            }
-        `,
-    ]
+    static override styles = [TWStyles]
 
     protected renderRows(rows: Array<RowAsRecord>) {
         const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null
@@ -455,6 +461,10 @@ export class Table extends ClassifiedElement {
                 id="table"
                 class=${classMap(tableClasses)}
                 @menuopen=${(event: MenuOpenEvent) => {
+                    // this special case is when the same menu is opened after being closed
+                    // without this the menu is immediately closed on subsequent triggers
+                    if (this.closeLastMenu === event.close) return
+
                     // remember this menu and close it when a subsequent one is opened
                     this.closeLastMenu?.()
                     this.closeLastMenu = event.close
@@ -509,6 +519,16 @@ export class Table extends ClassifiedElement {
                 </outerbase-thead>
 
                 <outerbase-rowgroup>
+                    ${this.isNonInteractive
+                        ? null
+                        : html`<outerbase-tr>
+                              ${this.isNonInteractive ? null : Table.BlankCell}
+                              ${repeat(
+                                  this.visibleColumns,
+                                  ({ name }) => name, // use the column name as the unique identifier for each entry in this row
+                                  ({ name }, idx) => Table.BlankCell
+                              )}
+                          </outerbase-tr>`}
                     <!-- render a TableRow element for each row of data -->
                     ${this.renderRows(this.rows.filter(({ isNew }) => isNew))} ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}
                 </outerbase-rowgroup>
