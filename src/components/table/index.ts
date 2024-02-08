@@ -191,6 +191,20 @@ export class Table extends ClassifiedElement {
         })
     }
 
+    public deleteSelectedRows() {
+        this.selectedRowUUIDs.forEach((uuid) => this.removedRowUUIDs.add(uuid))
+
+        const removedRows: Array<RowAsRecord> = []
+        this.selectedRowUUIDs.forEach((_id) => {
+            const row = this.rows.find(({ id }) => _id === id)
+            if (row) removedRows.push(row)
+        })
+
+        this.dispatchEvent(new RowRemovedEvent(removedRows))
+        this.selectedRowUUIDs = new Set()
+        this.requestUpdate('removedRowUUIDs')
+    }
+
     // clear param settings
     public resetParams() {
         this.clearSelection()
@@ -245,17 +259,7 @@ export class Table extends ClassifiedElement {
 
         // delete selection
         if (key === 'D') {
-            this.selectedRowUUIDs.forEach((uuid) => this.removedRowUUIDs.add(uuid))
-
-            const removedRows: Array<RowAsRecord> = []
-            this.selectedRowUUIDs.forEach((_id) => {
-                const row = this.rows.find(({ id }) => _id === id)
-                if (row) removedRows.push(row)
-            })
-
-            this.dispatchEvent(new RowRemovedEvent(removedRows))
-            this.selectedRowUUIDs = new Set()
-            this.requestUpdate('removedRowUUIDs')
+            this.deleteSelectedRows()
         }
     }
 
