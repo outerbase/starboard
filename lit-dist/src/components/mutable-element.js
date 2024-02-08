@@ -61,15 +61,23 @@ export class MutableElement extends ClassifiedElement {
     onKeyDown(event) {
         // WARNING: the input's onBlur will NOT called
         if (event.code === 'Escape') {
+            event.stopPropagation();
+            event.preventDefault();
             // abort changes
             this.isEditing = false;
             this.focus();
             // disabling restoring the original value
             // this.value = this.originalValue
         }
-        if (event.code === 'Enter' || event.code === 'Tab') {
-            // commit changes [by doing nothing]
-            this.isEditing = false;
+        if (event.code === 'Enter' && this.isEditing) {
+            // without this setTimeout, something sets `isEditing` back and re-renders immediately, negating the effect entirely
+            setTimeout(() => {
+                this.isEditing = false;
+                this.focus();
+            }, 0);
+        }
+        if (event.code === 'Enter' && !this.isEditing) {
+            this.isEditing = true;
         }
     }
     onDoubleClick() {
