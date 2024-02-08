@@ -460,8 +460,8 @@ export class Table extends ClassifiedElement {
             'text-theme-text dark:text-theme-text-dark text-sm': true,
         }
 
-        return html`<span class=${classMap(tableContainerClasses)}
-            ><div
+        return html`<div class=${classMap(tableContainerClasses)}>
+            <div
                 id="table"
                 class=${classMap(tableClasses)}
                 @menuopen=${(event: MenuOpenEvent) => {
@@ -537,7 +537,7 @@ export class Table extends ClassifiedElement {
                     ${this.renderRows(this.rows.filter(({ isNew }) => isNew))} ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}
                 </outerbase-rowgroup>
             </div>
-        </span>`
+        </div>`
     }
 }
 

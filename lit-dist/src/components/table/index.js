@@ -323,8 +323,8 @@ let Table = Table_1 = class Table extends ClassifiedElement {
             'table bg-theme-table dark:bg-theme-table-dark': true,
             'text-theme-text dark:text-theme-text-dark text-sm': true,
         };
-        return html `<span class=${classMap(tableContainerClasses)}
-            ><div
+        return html `<div class=${classMap(tableContainerClasses)}>
+            <div
                 id="table"
                 class=${classMap(tableClasses)}
                 @menuopen=${(event) => {
@@ -393,7 +393,7 @@ let Table = Table_1 = class Table extends ClassifiedElement {
                     ${this.renderRows(this.rows.filter(({ isNew }) => isNew))} ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}
                 </outerbase-rowgroup>
             </div>
-        </span>`;
+        </div>`;
     }
 };
 // the blank cell is used to add padding to the top of the table so that you can focus on a cell without the edge being clipped by the header which has a higher z-index
