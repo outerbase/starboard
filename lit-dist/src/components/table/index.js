@@ -98,6 +98,18 @@ let Table = Table_1 = class Table extends ClassifiedElement {
             checkbox.dispatchEvent(new Event('change'));
         });
     }
+    deleteSelectedRows() {
+        this.selectedRowUUIDs.forEach((uuid) => this.removedRowUUIDs.add(uuid));
+        const removedRows = [];
+        this.selectedRowUUIDs.forEach((_id) => {
+            const row = this.rows.find(({ id }) => _id === id);
+            if (row)
+                removedRows.push(row);
+        });
+        this.dispatchEvent(new RowRemovedEvent(removedRows));
+        this.selectedRowUUIDs = new Set();
+        this.requestUpdate('removedRowUUIDs');
+    }
     // clear param settings
     resetParams() {
         this.clearSelection();
@@ -144,16 +156,7 @@ let Table = Table_1 = class Table extends ClassifiedElement {
         }
         // delete selection
         if (key === 'D') {
-            this.selectedRowUUIDs.forEach((uuid) => this.removedRowUUIDs.add(uuid));
-            const removedRows = [];
-            this.selectedRowUUIDs.forEach((_id) => {
-                const row = this.rows.find(({ id }) => _id === id);
-                if (row)
-                    removedRows.push(row);
-            });
-            this.dispatchEvent(new RowRemovedEvent(removedRows));
-            this.selectedRowUUIDs = new Set();
-            this.requestUpdate('removedRowUUIDs');
+            this.deleteSelectedRows();
         }
     }
     // LIFECYCLE HOOKS
@@ -261,7 +264,7 @@ let Table = Table_1 = class Table extends ClassifiedElement {
                                     ?is-last-row=${rowIndex === this.rows.length - 1}
                                     ?is-last-column=${false}
                                     ?row-selector="${true}"
-                                    ?read-only=${this.readonly}
+                                    ?read-only=${true}
                                 >
                                     <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
                                     <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">

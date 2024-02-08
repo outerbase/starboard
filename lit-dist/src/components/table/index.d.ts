@@ -39,6 +39,7 @@ export declare class Table extends ClassifiedElement {
     protected addNewColumn(name: string): void;
     toggleSelectedRow(uuid: string): void;
     clearSelection(): void;
+    deleteSelectedRows(): void;
     resetParams(): void;
     protected _onColumnRemoved({ name }: ColumnRemovedEvent): void;
     protected _onColumnHidden({ name }: ColumnHiddenEvent): void;

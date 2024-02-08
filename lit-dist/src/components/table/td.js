@@ -113,6 +113,29 @@ let TableData = class TableData extends MutableElement {
                 menu.open = false;
             }
         }
+        if (code === 'Enter') {
+            // toggle row checkbox
+            function findNestedElement(node, tagName) {
+                if (node.tagName === tagName.toUpperCase()) {
+                    return node;
+                }
+                if (node.children) {
+                    for (let child of node.children) {
+                        const found = findNestedElement(child, tagName);
+                        if (found) {
+                            return found;
+                        }
+                    }
+                }
+                return null;
+            }
+            // Then, get all nodes assigned to the slot
+            const slot = this.shadowRoot?.querySelector('slot');
+            const nodes = slot?.assignedNodes({ flatten: true });
+            const checkBox = Array.from(nodes ?? []).reduce((found, node) => found || findNestedElement(node, 'check-box'), null);
+            if (checkBox)
+                checkBox.checked = !checkBox.checked;
+        }
     }
     connectedCallback() {
         super.connectedCallback();
@@ -146,7 +169,7 @@ let TableData = class TableData extends MutableElement {
         }
         return this.isEditing
             ? // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
-                html `<span class=${contentWrapperClass}>&nbsp;<input .value=${value} @input=${this.onChange} class=${classMap({
+                html `<span class=${contentWrapperClass}>&nbsp;<input .value=${value ?? ''} @input=${this.onChange} class=${classMap({
                     'z-10 absolute top-0 bottom-0 right-0 left-0': true,
                     'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
                     'px-3 font-normal': true,
