@@ -107,7 +107,6 @@ export class MutableElement extends ClassifiedElement {
     }
 
     protected onDoubleClick() {
-        if (this.value === undefined) return
         this.isEditing = true
     }
 
