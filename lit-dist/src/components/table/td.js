@@ -129,23 +129,24 @@ let TableData = class TableData extends MutableElement {
         this.removeEventListener('keydown', this.onKeyDown);
     }
     render() {
+        const value = this.value === null ? null : typeof this.value === 'object' ? JSON.stringify(this.value) : this.value;
         const contentWrapperClass = classMap({ 'font-normal': true, dark: this.theme == Theme.dark });
         let cellContents;
         let cellEditorContents;
         if (this.plugin) {
             const { config, tagName } = this.plugin;
-            const pluginAsString = unsafeHTML(`<${tagName} cellvalue=${this.value} configuration=${config} ${this.pluginAttributes}></${tagName}>`);
+            const pluginAsString = unsafeHTML(`<${tagName} cellvalue=${value} configuration=${config} ${this.pluginAttributes}></${tagName}>`);
             cellContents = html `${pluginAsString}`;
             if (this.isDisplayingPluginEditor) {
-                cellEditorContents = unsafeHTML(`<${tagName.replace('outerbase-plugin-cell', 'outerbase-plugin-editor')} cellvalue=${this.value} configuration=${config} ${this.pluginAttributes}></${tagName}>`);
+                cellEditorContents = unsafeHTML(`<${tagName.replace('outerbase-plugin-cell', 'outerbase-plugin-editor')} cellvalue=${value} configuration=${config} ${this.pluginAttributes}></${tagName}>`);
             }
         }
         else {
-            cellContents = html `${this.value || html `<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}`;
+            cellContents = html `${value || html `<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}`;
         }
         return this.isEditing
             ? // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
-                html `<span class=${contentWrapperClass}>&nbsp;<input .value=${this.value} @input=${this.onChange} class=${classMap({
+                html `<span class=${contentWrapperClass}>&nbsp;<input .value=${value} @input=${this.onChange} class=${classMap({
                     'z-10 absolute top-0 bottom-0 right-0 left-0': true,
                     'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
                     'px-3 font-normal': true,

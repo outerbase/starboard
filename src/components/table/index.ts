@@ -417,8 +417,8 @@ export class Table extends ClassifiedElement {
                                       <!-- TODO @caleb & johnny move plugins to support the new installedPlugins variable -->
                                       <outerbase-td
                                           .position=${{ row: id, column: name }}
-                                          value=${values[name] ?? ''}
-                                          original-value=${originalValues[name]}
+                                          .value=${values[name]}
+                                          .original-value=${originalValues[name]}
                                           left-distance-to-viewport=${this.distanceToLeftViewport}
                                           table-bounding-rect="${tableBoundingRect}"
                                           theme=${this.theme}
