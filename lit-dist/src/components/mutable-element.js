@@ -76,9 +76,9 @@ export class MutableElement extends ClassifiedElement {
                 this.focus();
             }, 0);
         }
-        if (event.code === 'Enter' && !this.isEditing) {
-            this.isEditing = true;
-        }
+        // if (event.code === 'Enter' && !this.isEditing) {
+        //     this.isEditing = true
+        // }
     }
     onDoubleClick() {
         if (this.value === undefined)

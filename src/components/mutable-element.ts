@@ -101,7 +101,7 @@ export class MutableElement extends ClassifiedElement {
             }, 0)
         }
 
-        if (event.code === 'Enter' && !this.isEditing) {
+        if (event.code === 'Enter' && !this.isEditing && !this.readonly) {
             this.isEditing = true
         }
     }

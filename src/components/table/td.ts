@@ -167,6 +167,33 @@ export class TableData extends MutableElement {
                 menu.open = false
             }
         }
+
+        if (code === 'Enter') {
+            // toggle row checkbox
+            function findNestedElement(node: HTMLElement, tagName: string): HTMLElement | null {
+                if (node.tagName === tagName.toUpperCase()) {
+                    return node
+                }
+                if (node.children) {
+                    for (let child of node.children) {
+                        const found = findNestedElement(child as HTMLElement, tagName)
+                        if (found) {
+                            return found
+                        }
+                    }
+                }
+                return null
+            }
+
+            // Then, get all nodes assigned to the slot
+            const slot = this.shadowRoot?.querySelector('slot')
+            const nodes = slot?.assignedNodes({ flatten: true })
+            const checkBox = Array.from(nodes ?? []).reduce(
+                (found: HTMLElement | null, node) => found || findNestedElement(node as HTMLElement, 'check-box'),
+                null
+            ) as HTMLInputElement | null
+            if (checkBox) checkBox.checked = !checkBox.checked
+        }
     }
 
     public override connectedCallback(): void {
