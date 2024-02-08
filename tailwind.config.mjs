@@ -174,6 +174,7 @@ export default {
                 flat: '6px 6px 1px 0px #FFF;',
                 checkbox: 'inset 1em 1em',
                 ringlet: '0px 0px 0px 3px #d4d4d4;',
+                'ringlet-dark': '0px 0px 0px 3px #525252;',
             },
         },
         fontFamily: {

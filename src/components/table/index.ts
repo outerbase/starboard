@@ -391,6 +391,7 @@ export class Table extends ClassifiedElement {
                                     ?is-last-column=${false}
                                     ?row-selector="${true}"
                                     ?read-only=${true}
+                                    ?interactive=${true}
                                 >
                                     <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
                                     <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">

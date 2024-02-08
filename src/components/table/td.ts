@@ -1,4 +1,4 @@
-import { html, type TemplateResult } from 'lit'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
@@ -23,7 +23,7 @@ export class TableData extends MutableElement {
             'px-5': this.blank,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
-            'focus:shadow-ringlet focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-white focus:outline-none':
+            'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none':
                 !this.isEditing && this.isInteractive,
 
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty && !this.hideDirt, // dirty cells
@@ -112,7 +112,13 @@ export class TableData extends MutableElement {
     @state()
     protected isDisplayingPluginEditor = false
 
-    override tabIndex = 0
+    protected willUpdate(changedProperties: PropertyValues<this>): void {
+        super.willUpdate(changedProperties)
+        if (changedProperties.has('isInteractive') && this.isInteractive === true) {
+            // prevent blank rows from being selectable; i.e. the first row that is used just for padding
+            this.tabIndex = 0
+        }
+    }
 
     protected onContextMenu(event: MouseEvent) {
         const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
@@ -145,6 +151,34 @@ export class TableData extends MutableElement {
         super.onKeyDown(event)
 
         const { code } = event
+
+        const target = event.target
+        if (target instanceof HTMLElement && !this.isEditing) {
+            const parent = target.parentElement
+            const index = Array.from(parent?.children ?? []).indexOf(target) // Find the index of the current element among its siblings
+
+            if (code === 'ArrowRight') (target?.nextElementSibling as HTMLElement)?.focus()
+            else if (code === 'ArrowLeft') (target?.previousElementSibling as HTMLElement)?.focus()
+            else if (code === 'ArrowDown') {
+                event.preventDefault()
+                const parentSibling = parent ? parent.nextElementSibling : null // Get the parent's next sibling
+                if (parentSibling && parentSibling.children.length > index) {
+                    var nthChild = parentSibling.children[index] as HTMLElement | undefined // Find the nth child of the parent's sibling
+                    if (nthChild) {
+                        nthChild.focus() // Set focus on the nth child
+                    }
+                }
+            } else if (code === 'ArrowUp') {
+                event.preventDefault()
+                const parentSibling = parent ? parent.previousElementSibling : null // Get the parent's next sibling
+                if (parentSibling && parentSibling.children.length > index) {
+                    var nthChild = parentSibling.children[index] as HTMLElement | undefined // Find the nth child of the parent's sibling
+                    if (nthChild) {
+                        nthChild.focus() // Set focus on the nth child
+                    }
+                }
+            }
+        }
 
         // toggle menu on 'Space' key, unless typing input
         if (code === 'Space' && !this.isEditing) {
