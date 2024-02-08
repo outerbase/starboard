@@ -1,4 +1,4 @@
-import { type TemplateResult } from 'lit';
+import { type PropertyValues, type TemplateResult } from 'lit';
 import { MutableElement } from '../mutable-element.js';
 import { type MenuSelectedEvent } from '../../lib/events.js';
 import '../menu/cell-menu.js';
@@ -15,7 +15,7 @@ export declare class TableData extends MutableElement {
         'px-5': boolean;
         'border-theme-border dark:border-theme-border-dark': boolean;
         'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': boolean;
-        'focus:shadow-ringlet focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-white focus:outline-none': boolean;
+        'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none': boolean;
         'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': boolean;
         'max-w-64': boolean;
         'border-r': boolean;
@@ -48,7 +48,7 @@ export declare class TableData extends MutableElement {
         value: string;
     }[];
     protected isDisplayingPluginEditor: boolean;
-    tabIndex: number;
+    protected willUpdate(changedProperties: PropertyValues<this>): void;
     protected onContextMenu(event: MouseEvent): void;
     protected onPluginEvent({ detail: { action, value } }: PluginActionEvent): void;
     protected onKeyDown(event: KeyboardEvent): void;
