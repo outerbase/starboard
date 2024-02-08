@@ -144,31 +144,28 @@ export class TableData extends MutableElement {
         super.onKeyDown(event)
 
         const { code } = event
-        if (code === 'Space') {
+
+        // toggle menu on 'Space' key, unless typing input
+        if (code === 'Space' && !this.isEditing) {
             event.preventDefault()
             const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
             if (menu) {
                 if (menu.open) {
-                    console.log('is open')
                     menu.open = false
                 } else {
-                    console.log('is closed')
                     menu.focus()
                     menu.open = true
                 }
             }
         }
 
+        // close menu on 'Escape' key
         if (code === 'Escape') {
             event.preventDefault()
             const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
             if (menu && menu.open) {
                 menu.open = false
             }
-        }
-
-        if (code === 'Enter') {
-            this.isEditing = true
         }
     }
 
@@ -214,9 +211,7 @@ export class TableData extends MutableElement {
 
         return this.isEditing
             ? // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
-              html`<span class=${contentWrapperClass}>&nbsp;<input .value=${this.value} @input=${this.onChange} @keydown=${
-                  this.onKeyDown
-              } class=${classMap({
+              html`<span class=${contentWrapperClass}>&nbsp;<input .value=${this.value} @input=${this.onChange} class=${classMap({
                   'z-10 absolute top-0 bottom-0 right-0 left-0': true,
                   'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
                   'px-3 font-normal': true,
