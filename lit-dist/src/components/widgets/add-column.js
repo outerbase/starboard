@@ -10,6 +10,7 @@ import { html } from 'lit';
 import { ClassifiedElement } from '../classified-element';
 import { customElement, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+// import { WarningOctagon } from '../../lib/icons/warning-octagon.js'
 import { ColumnAddedEvent } from '../../lib/events.js';
 import '../menu/input-menu.js';
 let AddColumnElement = AddColumnElement_1 = class AddColumnElement extends ClassifiedElement {

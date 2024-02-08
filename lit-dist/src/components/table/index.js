@@ -388,7 +388,7 @@ let Table = Table_1 = class Table extends ClassifiedElement {
             : html `<outerbase-tr>
                               ${this.isNonInteractive ? null : Table_1.BlankCell}
                               ${repeat(this.visibleColumns, ({ name }) => name, // use the column name as the unique identifier for each entry in this row
-            ({ name }, idx) => Table_1.BlankCell)}
+            () => Table_1.BlankCell)}
                           </outerbase-tr>`}
                     <!-- render a TableRow element for each row of data -->
                     ${this.renderRows(this.rows.filter(({ isNew }) => isNew))} ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}

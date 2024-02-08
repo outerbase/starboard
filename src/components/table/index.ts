@@ -1,5 +1,5 @@
 import { customElement, property, state } from 'lit/decorators.js'
-import { css, html, nothing, type PropertyValueMap } from 'lit'
+import { html, nothing, type PropertyValueMap } from 'lit'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { repeat } from 'lit/directives/repeat.js'
 
@@ -531,7 +531,7 @@ export class Table extends ClassifiedElement {
                               ${repeat(
                                   this.visibleColumns,
                                   ({ name }) => name, // use the column name as the unique identifier for each entry in this row
-                                  ({ name }, idx) => Table.BlankCell
+                                  () => Table.BlankCell
                               )}
                           </outerbase-tr>`}
                     <!-- render a TableRow element for each row of data -->
