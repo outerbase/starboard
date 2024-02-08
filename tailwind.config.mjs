@@ -173,6 +173,7 @@ export default {
                 primary: '0px 2px 8px rgba(5, 4, 13, 0.15)',
                 flat: '6px 6px 1px 0px #FFF;',
                 checkbox: 'inset 1em 1em',
+                ringlet: '0px 0px 0px 3px #d4d4d4;',
             },
         },
         fontFamily: {
