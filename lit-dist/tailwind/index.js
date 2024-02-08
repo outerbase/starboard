@@ -1184,6 +1184,16 @@ video {
   z-index: 10;
 }
 
+.focus\\:rounded-\\[4px\\]:focus {
+  border-radius: 4px;
+}
+
+.focus\\:shadow-ringlet:focus {
+  --tw-shadow: 0px 0px 0px 3px #d4d4d4;;
+  --tw-shadow-colored: 0px 0px 0px 3px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
 .focus\\:outline-none:focus {
   outline: 2px solid transparent;
   outline-offset: 2px;

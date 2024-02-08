@@ -49,7 +49,7 @@ let TableData = class TableData extends MutableElement {
             'px-5': this.blank,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
-            'focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none': !this.isEditing && this.isInteractive,
+            'focus:shadow-ringlet focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-white focus:outline-none': !this.isEditing && this.isInteractive,
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty && !this.hideDirt, // dirty cells
             [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
             'max-w-64': !this.maxWidth, // default max width, unless specified
@@ -120,7 +120,7 @@ let TableData = class TableData extends MutableElement {
                     return node;
                 }
                 if (node.children) {
-                    for (let child of node.children) {
+                    for (let child of Array.from(node.children)) {
                         const found = findNestedElement(child, tagName);
                         if (found) {
                             return found;
@@ -172,7 +172,7 @@ let TableData = class TableData extends MutableElement {
                 html `<span class=${contentWrapperClass}>&nbsp;<input .value=${value ?? ''} @input=${this.onChange} class=${classMap({
                     'z-10 absolute top-0 bottom-0 right-0 left-0': true,
                     'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
-                    'px-3 font-normal': true,
+                    'px-3 font-normal focus:rounded-[4px]': true,
                 })} @blur=${this.onBlur}></input></span>`
             : this.blank
                 ? html `<slot></slot>`

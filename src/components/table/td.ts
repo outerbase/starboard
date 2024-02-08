@@ -176,7 +176,7 @@ export class TableData extends MutableElement {
                     return node
                 }
                 if (node.children) {
-                    for (let child of node.children) {
+                    for (let child of Array.from(node.children)) {
                         const found = findNestedElement(child as HTMLElement, tagName)
                         if (found) {
                             return found

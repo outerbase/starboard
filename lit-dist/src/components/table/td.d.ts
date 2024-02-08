@@ -15,7 +15,7 @@ export declare class TableData extends MutableElement {
         'px-5': boolean;
         'border-theme-border dark:border-theme-border-dark': boolean;
         'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': boolean;
-        'focus:ring-2 focus:ring-black dark:focus:ring-white focus:outline-none': boolean;
+        'focus:shadow-ringlet focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-white focus:outline-none': boolean;
         'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': boolean;
         'max-w-64': boolean;
         'border-r': boolean;
