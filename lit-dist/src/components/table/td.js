@@ -65,7 +65,6 @@ let TableData = class TableData extends MutableElement {
         if (changedProperties.has('width')) {
             if (this.width && this.style) {
                 this.style.maxWidth = this.style.minWidth = `${this.width}px`;
-                // this.style.maxWidth = `${this.width}px`
             }
         }
     }
