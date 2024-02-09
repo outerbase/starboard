@@ -25,9 +25,11 @@ export class CustomCheckbox extends LitElement {
         const classes = classMap({
             'flex items-center cursor-pointer': true,
             dark: this.theme == Theme.dark,
+            'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-md focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none':
+                true,
         })
         return html`
-            <div class=${classes} @click="${this.toggleCheckbox}">
+            <div class=${classes} @click="${this.toggleCheckbox}" tabindex="0">
                 ${this.checked ? CustomCheckbox.checkedTemplate : CustomCheckbox.uncheckedTemplate}
                 <input type="checkbox" ?checked="${this.checked}" @change="${this.toggleCheckbox}" class="hidden" />
             </div>

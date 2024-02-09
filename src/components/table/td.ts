@@ -111,7 +111,7 @@ export class TableData extends MutableElement {
 
     protected willUpdate(changedProperties: PropertyValues<this>): void {
         super.willUpdate(changedProperties)
-        if (changedProperties.has('isInteractive') && this.isInteractive === true) {
+        if (changedProperties.has('isInteractive') && this.isInteractive === true && !this.blank) {
             // prevent blank rows from being selectable; i.e. the first row that is used just for padding
             this.tabIndex = 0
         }
