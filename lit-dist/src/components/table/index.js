@@ -64,6 +64,7 @@ let Table = Table_1 = class Table extends ClassifiedElement {
         };
         this.rows = [...this.rows, _row];
         this.dispatchEvent(new RowAddedEvent(_row));
+        return _row;
     }
     addNewColumn(name) {
         const column = {

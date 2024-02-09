@@ -40,8 +40,6 @@ let AddColumnElement = AddColumnElement_1 = class AddColumnElement extends Class
         // </div>`
         if (!this.columnName)
             throw new Error('Missing column name');
-        // JOHNNY listen for this event in `<OuterbaseTable />` and update the stuff
-        //        be mindful to avoid double-firing the event
         this.dispatchEvent(new ColumnAddedEvent({ name: this.columnName, data: { type: this.columnType } }));
     }
     render() {

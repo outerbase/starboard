@@ -35,7 +35,7 @@ export declare class Table extends ClassifiedElement {
     protected selectedRowUUIDs: Set<string>;
     protected removedRowUUIDs: Set<string>;
     protected closeLastMenu?: () => void;
-    addNewRow(row?: Partial<RowAsRecord>): void;
+    addNewRow(row?: Partial<RowAsRecord>): RowAsRecord;
     protected addNewColumn(name: string): void;
     toggleSelectedRow(uuid: string): void;
     clearSelection(): void;

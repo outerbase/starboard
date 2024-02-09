@@ -153,6 +153,7 @@ export class Table extends ClassifiedElement {
 
         this.rows = [...this.rows, _row]
         this.dispatchEvent(new RowAddedEvent(_row))
+        return _row
     }
 
     protected addNewColumn(name: string) {
