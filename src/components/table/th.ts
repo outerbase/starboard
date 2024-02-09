@@ -186,7 +186,7 @@ export class TH extends MutableElement {
             const body = this.isEditing
                 ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
                       'z-10 absolute top-0 bottom-0 right-0 left-0': true,
-                      'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900': true,
+                      'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
                       'px-cell-padding-x font-normal': true,
                   })} @blur=${this.onBlur}></input>`
                 : this.hasMenu
