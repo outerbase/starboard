@@ -155,15 +155,34 @@ export class TableData extends MutableElement {
 
         const { code } = event
 
-        const target = event.target
+        let target = event.target
         if (target instanceof HTMLElement && !this.isEditing) {
+            if (target.tagName.toLowerCase() === 'check-box') {
+                const parent = target.parentElement?.parentElement?.parentElement
+
+                if (code === 'ArrowDown') {
+                    event.preventDefault()
+                    ;(parent?.nextElementSibling?.querySelector('check-box') as HTMLElement | undefined)?.focus()
+                } else if (code === 'ArrowUp') {
+                    event.preventDefault()
+                    ;(parent?.previousElementSibling?.querySelector('check-box') as HTMLElement | undefined)?.focus()
+                } else if (code === 'ArrowRight') {
+                    ;(target.parentElement?.parentElement?.nextElementSibling as HTMLElement | undefined)?.focus()
+                }
+                return
+            }
+
             const parent = target.parentElement
             const index = Array.from(parent?.children ?? []).indexOf(target) // Find the index of the current element among its siblings
 
             if (code === 'ArrowRight') (target?.nextElementSibling as HTMLElement)?.focus()
-            else if (code === 'ArrowLeft') (target?.previousElementSibling as HTMLElement)?.focus()
-            else if (code === 'ArrowDown') {
+            else if (code === 'ArrowLeft') {
+                const checkbox = target?.previousElementSibling?.querySelector('check-box') as HTMLElement | undefined
+                if (checkbox) checkbox.focus()
+                else (target?.previousElementSibling as HTMLElement | undefined)?.focus()
+            } else if (code === 'ArrowDown') {
                 event.preventDefault()
+
                 const parentSibling = parent ? parent.nextElementSibling : null // Get the parent's next sibling
                 if (parentSibling && parentSibling.children.length > index) {
                     var nthChild = parentSibling.children[index] as HTMLElement | undefined // Find the nth child of the parent's sibling
@@ -173,6 +192,7 @@ export class TableData extends MutableElement {
                 }
             } else if (code === 'ArrowUp') {
                 event.preventDefault()
+
                 const parentSibling = parent ? parent.previousElementSibling : null // Get the parent's next sibling
                 if (parentSibling && parentSibling.children.length > index) {
                     var nthChild = parentSibling.children[index] as HTMLElement | undefined // Find the nth child of the parent's sibling
@@ -204,33 +224,6 @@ export class TableData extends MutableElement {
             if (menu && menu.open) {
                 menu.open = false
             }
-        }
-
-        if (code === 'Enter') {
-            // toggle row checkbox
-            function findNestedElement(node: HTMLElement, tagName: string): HTMLElement | null {
-                if (node.tagName === tagName.toUpperCase()) {
-                    return node
-                }
-                if (node.children) {
-                    for (let child of Array.from(node.children)) {
-                        const found = findNestedElement(child as HTMLElement, tagName)
-                        if (found) {
-                            return found
-                        }
-                    }
-                }
-                return null
-            }
-
-            // Then, get all nodes assigned to the slot
-            const slot = this.shadowRoot?.querySelector('slot')
-            const nodes = slot?.assignedNodes({ flatten: true })
-            const checkBox = Array.from(nodes ?? []).reduce(
-                (found: HTMLElement | null, node) => found || findNestedElement(node as HTMLElement, 'check-box'),
-                null
-            ) as HTMLInputElement | null
-            if (checkBox) checkBox.checked = !checkBox.checked
         }
     }
 

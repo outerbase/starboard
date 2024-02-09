@@ -1175,6 +1175,10 @@ video {
   border-radius: 4px;
 }
 
+.focus\\:rounded-md:focus {
+  border-radius: 0.375rem;
+}
+
 .focus\\:shadow-ringlet:focus {
   --tw-shadow: 0px 0px 0px 3px #d4d4d4;;
   --tw-shadow-colored: 0px 0px 0px 3px var(--tw-shadow-color);

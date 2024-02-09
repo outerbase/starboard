@@ -7,6 +7,11 @@ export declare class CustomCheckbox extends LitElement {
     checked: boolean;
     theme: Theme;
     toggleCheckbox(): void;
+    tabIndex: number;
+    onKeyDown({ code }: KeyboardEvent): void;
+    connectedCallback(): void;
+    disconnectedCallback(): void;
+    _class: string;
     render(): import("lit").TemplateResult<1>;
 }
 //# sourceMappingURL=check-box.d.ts.map

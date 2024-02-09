@@ -3,7 +3,6 @@ import { customElement, property } from 'lit/decorators.js'
 import { CheckMark } from '../lib/icons/check-mark.js'
 import { TWStyles } from '../../tailwind/index.js'
 import { Theme } from '../types.js'
-import { classMap } from 'lit/directives/class-map.js'
 
 @customElement('check-box')
 export class CustomCheckbox extends LitElement {
@@ -21,15 +20,28 @@ export class CustomCheckbox extends LitElement {
         this.checked = !this.checked
     }
 
+    tabIndex = 0
+    onKeyDown({ code }: KeyboardEvent) {
+        if (code === 'Enter' || code === 'Space') {
+            this.checked = !this.checked
+        }
+    }
+    connectedCallback(): void {
+        super.connectedCallback()
+        this.addEventListener('keydown', this.onKeyDown)
+    }
+    disconnectedCallback(): void {
+        super.disconnectedCallback()
+        this.removeEventListener('keydown', this.onKeyDown)
+    }
+
+    @property({ attribute: 'class', type: String, reflect: true })
+    _class =
+        'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-md focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none'
+
     render() {
-        const classes = classMap({
-            'flex items-center cursor-pointer': true,
-            dark: this.theme == Theme.dark,
-            'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-md focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none':
-                true,
-        })
         return html`
-            <div class=${classes} @click="${this.toggleCheckbox}" tabindex="0">
+            <div class="flex items-center cursor-pointer" @click="${this.toggleCheckbox}">
                 ${this.checked ? CustomCheckbox.checkedTemplate : CustomCheckbox.uncheckedTemplate}
                 <input type="checkbox" ?checked="${this.checked}" @change="${this.toggleCheckbox}" class="hidden" />
             </div>
