@@ -56,7 +56,6 @@ let TH = class TH extends MutableElement {
         this._pluginOptions = [];
         this.distanceToLeftViewport = -1;
         this.theme = Theme.light;
-        this.width = -1;
     }
     get classMap() {
         return {
@@ -94,8 +93,8 @@ let TH = class TH extends MutableElement {
         }
     }
     firstUpdated(_changedProperties) {
-        this.width = parseInt(window.getComputedStyle(this).width, 10);
-        this.style.width = `${this.width}px`;
+        const width = parseInt(window.getComputedStyle(this).width, 10);
+        this.style.width = `${width}px`;
     }
     render() {
         const name = this.originalValue ?? this.value;
@@ -279,9 +278,6 @@ __decorate([
 __decorate([
     property({ attribute: 'theme', type: String })
 ], TH.prototype, "theme", void 0);
-__decorate([
-    state()
-], TH.prototype, "width", void 0);
 TH = __decorate([
     customElement('outerbase-th')
 ], TH);

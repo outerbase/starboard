@@ -701,14 +701,6 @@ video {
   max-width: 14rem;
 }
 
-.max-w-64 {
-  max-width: 16rem;
-}
-
-.max-w-xl {
-  max-width: 36rem;
-}
-
 .cursor-col-resize {
   cursor: col-resize;
 }

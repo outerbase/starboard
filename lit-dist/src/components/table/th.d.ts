@@ -37,7 +37,6 @@ export declare class TH extends MutableElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     protected willUpdate(_changedProperties: PropertyValues<this>): void;
-    private width;
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;
     protected render(): import("lit").TemplateResult<1>;
     protected dispatchChangedEvent(): void;

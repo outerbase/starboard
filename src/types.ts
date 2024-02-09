@@ -23,9 +23,53 @@ export enum ColumnStatus {
     updated,
     deleted,
 }
+export enum DBType {
+    REAL = 'REAL',
+    INTEGER = 'INTEGER',
+    INT = 'INT',
+    TEXT = 'TEXT',
+    JSON = 'JSON',
+    SMALLINT = 'SMALLINT',
+    BIGINT = 'BIGINT',
+    DECIMAL = 'DECIMAL',
+    NUMERIC = 'NUMERIC',
+    DOUBLE_PRECISION = 'DOUBLE PRECISION',
+    SERIAL = 'SERIAL',
+    BIGSERIAL = 'BIGSERIAL',
+    MONEY = 'MONEY',
+    CHAR = 'CHAR',
+    VARCHAR = 'VARCHAR',
+    BYTEA = 'BYTEA',
+    TIMESTAMP = 'TIMESTAMP',
+    TIMESTAMP_WITH_TIME_ZONE = 'TIMESTAMP WITH TIME ZONE',
+    DATE = 'DATE',
+    DATETIME = 'DATETIME',
+    TIME = 'TIME',
+    TIME_WITH_TIME_ZONE = 'TIME WITH TIME ZONE',
+    INTERVAL = 'INTERVAL',
+    BOOLEAN = 'BOOLEAN',
+    ENUM = 'ENUM',
+    POINT = 'POINT',
+    LINE = 'LINE',
+    LSEG = 'LSEG',
+    BOX = 'BOX',
+    PATH = 'PATH',
+    POLYGON = 'POLYGON',
+    CIRCLE = 'CIRCLE',
+    CIDR = 'CIDR',
+    INET = 'INET',
+    MACADDR = 'MACADDR',
+    MACADDR8 = 'MACADDR8',
+    JSONB = 'JSONB',
+    UUID = 'UUID',
+    XML = 'XML',
+    TSVECTOR = 'TSVECTOR',
+    TSQUERY = 'TSQUERY',
+    VARYING = 'CHARACTER VARYING',
+}
 export type TableColumn = {
     model?: 'column'
-    type: TableColumnType
+    type?: DBType
     name: string
     position: number
     default?: string // has `::type` appended / casting quirks

@@ -136,11 +136,9 @@ export class TH extends MutableElement {
         }
     }
 
-    @state()
-    private width: number = -1
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        this.width = parseInt(window.getComputedStyle(this).width, 10)
-        this.style.width = `${this.width}px`
+        const width = parseInt(window.getComputedStyle(this).width, 10)
+        this.style.width = `${width}px`
     }
 
     protected override render() {

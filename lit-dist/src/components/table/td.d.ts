@@ -9,7 +9,6 @@ type PluginActionEvent = CustomEvent<{
 }>;
 export declare class TableData extends MutableElement {
     protected get classMap(): {
-        [x: string]: boolean;
         'table-cell relative': boolean;
         'px-cell-padding-x py-cell-padding-y ': boolean;
         'px-5': boolean;
@@ -17,14 +16,13 @@ export declare class TableData extends MutableElement {
         'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': boolean;
         'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none': boolean;
         'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': boolean;
-        'max-w-64': boolean;
         'border-r': boolean;
         'first:border-l': boolean;
         'border-b': boolean;
         'cursor-pointer': boolean;
     };
     pluginAttributes: String;
-    maxWidth: string;
+    width?: number;
     separateCells: boolean;
     withBottomBorder: boolean;
     sortBy?: string;

@@ -10,7 +10,7 @@ import { html, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
 import { ColumnAddedEvent, RowAddedEvent, RowRemovedEvent, RowSelectedEvent, RowUpdatedEvent, } from '../../lib/events.js';
-import { ColumnStatus, Theme, } from '../../types.js';
+import { ColumnStatus, Theme, DBType, } from '../../types.js';
 import { heightOfElement } from '../../lib/height-of-element.js';
 import { ClassifiedElement } from '../classified-element.js';
 // import subcomponents
@@ -72,7 +72,7 @@ let Table = Table_1 = class Table extends ClassifiedElement {
             name,
             position: this.columns.length,
             model: 'column',
-            type: 'string',
+            type: DBType.TEXT,
             unique: false,
             primaryKey: false,
             autoIncrement: false,
@@ -245,6 +245,34 @@ let Table = Table_1 = class Table extends ClassifiedElement {
     }
     renderRows(rows) {
         const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null;
+        const widthForColumnType = (name) => {
+            const columnType = this.visibleColumns.find(({ name: _name }) => name === _name)?.type?.toUpperCase();
+            if (!columnType)
+                return 1;
+            if ([
+                DBType.BIGINT,
+                DBType.DECIMAL,
+                DBType.DECIMAL,
+                DBType.DOUBLE_PRECISION,
+                DBType.INTEGER,
+                DBType.NUMERIC,
+                DBType.REAL,
+                DBType.SMALLINT,
+                DBType.INT,
+            ].includes(columnType))
+                return 150;
+            if ([DBType.CHAR, DBType.TEXT, DBType.VARCHAR, DBType.VARYING].includes(columnType))
+                return 200;
+            if ([DBType.TIME, DBType.DATE, DBType.TIMESTAMP].includes(columnType))
+                return 110;
+            if ([DBType.TIME_WITH_TIME_ZONE, DBType.DATETIME, DBType.TIMESTAMP_WITH_TIME_ZONE].includes(columnType))
+                return 200;
+            if ([DBType.JSON, DBType.JSONB].includes(columnType))
+                return 200;
+            if ([DBType.UUID].includes(columnType))
+                return 300;
+            return 80;
+        };
         return html `${repeat(rows, ({ id }) => id, ({ id, values, originalValues, isNew }, rowIndex) => {
             return !this.removedRowUUIDs.has(id)
                 ? html `<outerbase-tr .selected=${this.selectedRowUUIDs.has(id)} ?new=${isNew} @on-selection=${this._onRowSelection}>
@@ -292,6 +320,7 @@ let Table = Table_1 = class Table extends ClassifiedElement {
                                           .position=${{ row: id, column: name }}
                                           .value=${values[name]}
                                           .original-value=${originalValues[name]}
+                                          width=${widthForColumnType(name)}
                                           left-distance-to-viewport=${this.distanceToLeftViewport}
                                           table-bounding-rect="${tableBoundingRect}"
                                           theme=${this.theme}

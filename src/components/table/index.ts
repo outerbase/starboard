@@ -26,6 +26,7 @@ import {
     ColumnStatus,
     Theme,
     type PluginWorkspaceInstallationId,
+    DBType,
 } from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
 import { ClassifiedElement } from '../classified-element.js'
@@ -162,7 +163,7 @@ export class Table extends ClassifiedElement {
             name,
             position: this.columns.length,
             model: 'column',
-            type: 'string',
+            type: DBType.TEXT,
             unique: false,
             primaryKey: false,
             autoIncrement: false,
@@ -368,6 +369,32 @@ export class Table extends ClassifiedElement {
     protected renderRows(rows: Array<RowAsRecord>) {
         const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null
 
+        const widthForColumnType = (name: string) => {
+            const columnType = this.visibleColumns.find(({ name: _name }) => name === _name)?.type?.toUpperCase() as DBType
+            if (!columnType) return 1
+            if (
+                [
+                    DBType.BIGINT,
+                    DBType.DECIMAL,
+                    DBType.DECIMAL,
+                    DBType.DOUBLE_PRECISION,
+                    DBType.INTEGER,
+                    DBType.NUMERIC,
+                    DBType.REAL,
+                    DBType.SMALLINT,
+                    DBType.INT,
+                ].includes(columnType)
+            )
+                return 150
+            if ([DBType.CHAR, DBType.TEXT, DBType.VARCHAR, DBType.VARYING].includes(columnType)) return 200
+            if ([DBType.TIME, DBType.DATE, DBType.TIMESTAMP].includes(columnType)) return 110
+            if ([DBType.TIME_WITH_TIME_ZONE, DBType.DATETIME, DBType.TIMESTAMP_WITH_TIME_ZONE].includes(columnType)) return 200
+            if ([DBType.JSON, DBType.JSONB].includes(columnType)) return 200
+            if ([DBType.UUID].includes(columnType)) return 300
+
+            return 80
+        }
+
         return html`${repeat(
             rows,
             ({ id }) => id,
@@ -425,6 +452,7 @@ export class Table extends ClassifiedElement {
                                           .position=${{ row: id, column: name }}
                                           .value=${values[name]}
                                           .original-value=${originalValues[name]}
+                                          width=${widthForColumnType(name)}
                                           left-distance-to-viewport=${this.distanceToLeftViewport}
                                           table-bounding-rect="${tableBoundingRect}"
                                           theme=${this.theme}

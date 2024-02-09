@@ -17,8 +17,6 @@ let TableData = class TableData extends MutableElement {
     constructor() {
         super(...arguments);
         this.pluginAttributes = '';
-        // allows, for example, <outerbase-td max-width="max-w-xl" />
-        this.maxWidth = '';
         // allows, for example, <outerbase-td separate-cells="true" />
         this.separateCells = false;
         // allows, for example, <outerbase-td bottom-border="true" />
@@ -50,8 +48,6 @@ let TableData = class TableData extends MutableElement {
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
             'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none': !this.isEditing && this.isInteractive,
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty && !this.hideDirt, // dirty cells
-            [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
-            'max-w-64': !this.maxWidth, // default max width, unless specified
             'border-r': this.isInteractive ||
                 (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outerBorder) || // include last column when outerBorder
                 (this._drawRightBorder && this.separateCells && !this.isLastColumn), // internal cell walls
@@ -65,6 +61,12 @@ let TableData = class TableData extends MutableElement {
         if (changedProperties.has('isInteractive') && this.isInteractive === true) {
             // prevent blank rows from being selectable; i.e. the first row that is used just for padding
             this.tabIndex = 0;
+        }
+        if (changedProperties.has('width')) {
+            if (this.width && this.style) {
+                this.style.maxWidth = this.style.minWidth = `${this.width}px`;
+                // this.style.maxWidth = `${this.width}px`
+            }
         }
     }
     onContextMenu(event) {
@@ -263,8 +265,8 @@ __decorate([
     property({ attribute: 'plugin-attributes', type: String })
 ], TableData.prototype, "pluginAttributes", void 0);
 __decorate([
-    property({ type: String, attribute: 'max-width' })
-], TableData.prototype, "maxWidth", void 0);
+    property({ type: String, attribute: 'width' })
+], TableData.prototype, "width", void 0);
 __decorate([
     property({ type: Boolean, attribute: 'separate-cells' })
 ], TableData.prototype, "separateCells", void 0);

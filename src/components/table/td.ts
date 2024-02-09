@@ -27,8 +27,6 @@ export class TableData extends MutableElement {
                 !this.isEditing && this.isInteractive,
 
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty && !this.hideDirt, // dirty cells
-            [this.maxWidth]: this.maxWidth?.length > 0, // specified max width, if any
-            'max-w-64': !this.maxWidth, // default max width, unless specified
             'border-r':
                 this.isInteractive ||
                 (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outerBorder) || // include last column when outerBorder
@@ -42,9 +40,8 @@ export class TableData extends MutableElement {
     @property({ attribute: 'plugin-attributes', type: String })
     public pluginAttributes: String = ''
 
-    // allows, for example, <outerbase-td max-width="max-w-xl" />
-    @property({ type: String, attribute: 'max-width' })
-    public maxWidth: string = ''
+    @property({ type: String, attribute: 'width' })
+    public width?: number
 
     // allows, for example, <outerbase-td separate-cells="true" />
     @property({ type: Boolean, attribute: 'separate-cells' })
@@ -117,6 +114,12 @@ export class TableData extends MutableElement {
         if (changedProperties.has('isInteractive') && this.isInteractive === true) {
             // prevent blank rows from being selectable; i.e. the first row that is used just for padding
             this.tabIndex = 0
+        }
+
+        if (changedProperties.has('width')) {
+            if (this.width && this.style) {
+                this.style.maxWidth = this.style.minWidth = `${this.width}px`
+            }
         }
     }
 
