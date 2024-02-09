@@ -8,7 +8,7 @@ export declare class CustomCheckbox extends LitElement {
     theme: Theme;
     toggleCheckbox(): void;
     tabIndex: number;
-    onKeyDown({ code }: KeyboardEvent): void;
+    onKeyDown(event: KeyboardEvent): void;
     connectedCallback(): void;
     disconnectedCallback(): void;
     _class: string;

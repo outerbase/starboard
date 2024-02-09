@@ -21,8 +21,10 @@ let CustomCheckbox = CustomCheckbox_1 = class CustomCheckbox extends LitElement 
     toggleCheckbox() {
         this.checked = !this.checked;
     }
-    onKeyDown({ code }) {
+    onKeyDown(event) {
+        const { code } = event;
         if (code === 'Enter' || code === 'Space') {
+            event?.preventDefault();
             this.checked = !this.checked;
         }
     }

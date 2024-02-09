@@ -21,8 +21,10 @@ export class CustomCheckbox extends LitElement {
     }
 
     tabIndex = 0
-    onKeyDown({ code }: KeyboardEvent) {
+    onKeyDown(event: KeyboardEvent) {
+        const { code } = event
         if (code === 'Enter' || code === 'Space') {
+            event?.preventDefault()
             this.checked = !this.checked
         }
     }
