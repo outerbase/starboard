@@ -423,7 +423,6 @@ let Table = Table_1 = class Table extends ClassifiedElement {
                     ${this.isNonInteractive
             ? null
             : html `<outerbase-tr>
-                              ${this.isNonInteractive ? null : Table_1.BlankCell()}
                               ${repeat(this.visibleColumns, ({ name }) => name, // use the column name as the unique identifier for each entry in this row
             () => Table_1.BlankCell())}
                               ${this.blankFill ? Table_1.BlankCell(false) : null}

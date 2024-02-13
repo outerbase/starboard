@@ -93,11 +93,9 @@ let TH = class TH extends MutableElement {
                 })) ?? [];
         }
         if (_changedProperties.has('width') && this.style) {
-            console.log('this.width', this.width);
             this.style.width = this.width;
         }
         else if (this.style && !this.width) {
-            console.log('zzz', this.value, this.width);
             this.style.width = 'min-content';
         }
     }

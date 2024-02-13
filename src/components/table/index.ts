@@ -566,7 +566,6 @@ export class Table extends ClassifiedElement {
                     ${this.isNonInteractive
                         ? null
                         : html`<outerbase-tr>
-                              ${this.isNonInteractive ? null : Table.BlankCell()}
                               ${repeat(
                                   this.visibleColumns,
                                   ({ name }) => name, // use the column name as the unique identifier for each entry in this row
