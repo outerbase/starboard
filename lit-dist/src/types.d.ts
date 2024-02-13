@@ -52,7 +52,7 @@ export declare enum DBType {
 }
 export type TableColumn = {
     model?: 'column';
-    type?: DBType;
+    type?: string;
     name: string;
     position: number;
     default?: string;
