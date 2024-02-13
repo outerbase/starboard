@@ -41,7 +41,7 @@ export class TableData extends MutableElement {
     public pluginAttributes: String = ''
 
     @property({ type: String, attribute: 'width' })
-    public width?: number
+    public width?: string
 
     // allows, for example, <outerbase-td separate-cells="true" />
     @property({ type: Boolean, attribute: 'separate-cells' })
@@ -118,7 +118,7 @@ export class TableData extends MutableElement {
 
         if (changedProperties.has('width')) {
             if (this.width && this.style) {
-                this.style.maxWidth = this.style.minWidth = `${this.width}px`
+                this.style.maxWidth = this.style.minWidth = this.width
             }
         }
     }

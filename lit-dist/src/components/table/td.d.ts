@@ -22,7 +22,7 @@ export declare class TableData extends MutableElement {
         'cursor-pointer': boolean;
     };
     pluginAttributes: String;
-    width?: number;
+    width?: string;
     separateCells: boolean;
     withBottomBorder: boolean;
     sortBy?: string;

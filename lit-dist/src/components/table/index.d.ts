@@ -9,7 +9,7 @@ import './thead.js';
 import './tr.js';
 import '../check-box.js';
 export declare class Table extends ClassifiedElement {
-    static BlankCell: import("lit").TemplateResult<1>;
+    static BlankCell: (drawRightBorder?: boolean) => import("lit").TemplateResult<1>;
     selectableRows: boolean;
     keyboardShortcuts: boolean;
     schema?: Schema;
@@ -27,6 +27,7 @@ export declare class Table extends ClassifiedElement {
     theme: Theme;
     pluginAttributes: String;
     readonly: boolean;
+    blankFill: boolean;
     private _height?;
     private resizeObserver?;
     protected columns: Columns;
@@ -44,6 +45,7 @@ export declare class Table extends ClassifiedElement {
     protected _onColumnRemoved({ name }: ColumnRemovedEvent): void;
     protected _onColumnHidden({ name }: ColumnHiddenEvent): void;
     protected _onRowSelection(): void;
+    protected widthForColumnType(name: string): 150 | 200 | 110 | 300;
     protected onKeyDown_bound?: ({ shiftKey, key }: KeyboardEvent) => void;
     protected onKeyDown(event: KeyboardEvent): void;
     connectedCallback(): void;

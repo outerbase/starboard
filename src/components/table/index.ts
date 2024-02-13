@@ -45,11 +45,11 @@ import { TWStyles } from '../../../tailwind/index.js'
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
     // the blank cell is used to add padding to the top of the table so that you can focus on a cell without the edge being clipped by the header which has a higher z-index
-    static BlankCell = html`<outerbase-td
+    static BlankCell = (drawRightBorder = true) => html`<outerbase-td
     value=""
     ?blank=${true}
     ?separate-cells=${true}
-    ?draw-right-border=${true}
+    ?draw-right-border=${drawRightBorder}
     ?bottom-border=${false}
     ?outer-border=${true}
     ?is-last-row=${false}
@@ -115,6 +115,9 @@ export class Table extends ClassifiedElement {
 
     @property({ attribute: 'read-only', type: Boolean })
     public readonly = false
+
+    @property({ attribute: 'blank-fill', type: Boolean })
+    public blankFill = false
 
     @state()
     private _height?: number
@@ -235,6 +238,31 @@ export class Table extends ClassifiedElement {
         })
 
         this.dispatchEvent(new RowSelectedEvent(selectedRows))
+    }
+
+    protected widthForColumnType(name: string) {
+        const columnType = this.visibleColumns.find(({ name: _name }) => name === _name)?.type?.toUpperCase() as DBType
+        if (
+            [
+                DBType.BIGINT,
+                DBType.DECIMAL,
+                DBType.DECIMAL,
+                DBType.DOUBLE_PRECISION,
+                DBType.INTEGER,
+                DBType.NUMERIC,
+                DBType.REAL,
+                DBType.SMALLINT,
+                DBType.INT,
+            ].includes(columnType)
+        )
+            return 150
+        if ([DBType.CHAR, DBType.TEXT, DBType.VARCHAR, DBType.VARYING].includes(columnType)) return 200
+        if ([DBType.TIME, DBType.DATE, DBType.TIMESTAMP].includes(columnType)) return 110
+        if ([DBType.TIME_WITH_TIME_ZONE, DBType.DATETIME, DBType.TIMESTAMP_WITH_TIME_ZONE].includes(columnType)) return 200
+        if ([DBType.JSON, DBType.JSONB].includes(columnType)) return 200
+        if ([DBType.UUID].includes(columnType)) return 300
+
+        return 200
     }
 
     // KEYBOARD SHORTCUTS
@@ -369,32 +397,6 @@ export class Table extends ClassifiedElement {
     protected renderRows(rows: Array<RowAsRecord>) {
         const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null
 
-        const widthForColumnType = (name: string) => {
-            const columnType = this.visibleColumns.find(({ name: _name }) => name === _name)?.type?.toUpperCase() as DBType
-            if (!columnType) return 1
-            if (
-                [
-                    DBType.BIGINT,
-                    DBType.DECIMAL,
-                    DBType.DECIMAL,
-                    DBType.DOUBLE_PRECISION,
-                    DBType.INTEGER,
-                    DBType.NUMERIC,
-                    DBType.REAL,
-                    DBType.SMALLINT,
-                    DBType.INT,
-                ].includes(columnType)
-            )
-                return 150
-            if ([DBType.CHAR, DBType.TEXT, DBType.VARCHAR, DBType.VARYING].includes(columnType)) return 200
-            if ([DBType.TIME, DBType.DATE, DBType.TIMESTAMP].includes(columnType)) return 110
-            if ([DBType.TIME_WITH_TIME_ZONE, DBType.DATETIME, DBType.TIMESTAMP_WITH_TIME_ZONE].includes(columnType)) return 200
-            if ([DBType.JSON, DBType.JSONB].includes(columnType)) return 200
-            if ([DBType.UUID].includes(columnType)) return 300
-
-            return 80
-        }
-
         return html`${repeat(
             rows,
             ({ id }) => id,
@@ -452,7 +454,7 @@ export class Table extends ClassifiedElement {
                                           .position=${{ row: id, column: name }}
                                           .value=${values[name]}
                                           .original-value=${originalValues[name]}
-                                          width=${widthForColumnType(name)}
+                                          width="${this.widthForColumnType(name)}px"
                                           left-distance-to-viewport=${this.distanceToLeftViewport}
                                           table-bounding-rect="${tableBoundingRect}"
                                           theme=${this.theme}
@@ -477,6 +479,9 @@ export class Table extends ClassifiedElement {
                                   `
                               }
                           )}
+                          ${this.blankFill
+                              ? html`<outerbase-td width="100%" ?outer-border=${false} ?read-only=${true} ?separate-cells=${false} ?bottom-border=${true} ?interactive=${false} ?menu=${false} value="&nbsp;"></<outerbase-td>`
+                              : ''}
                       </outerbase-tr>`
                     : null
             }
@@ -484,10 +489,11 @@ export class Table extends ClassifiedElement {
     }
 
     protected override render() {
-        const tableContainerClasses = { dark: this.theme == Theme.dark }
+        const tableContainerClasses = { dark: this.theme == Theme.dark, 'w-full': true }
         const tableClasses = {
             'table bg-theme-table dark:bg-theme-table-dark': true,
             'text-theme-text dark:text-theme-text-dark text-sm': true,
+            'w-full': true,
         }
 
         return html`<div class=${classMap(tableContainerClasses)}>
@@ -532,6 +538,7 @@ export class Table extends ClassifiedElement {
                                     name="${this.renamedColumns[name] ?? name}"
                                     original-value="${name}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
+                                    width="${this.widthForColumnType(name)}px"
                                     ?separate-cells=${true}
                                     ?outer-border=${this.outerBorder}
                                     ?menu=${!this.isNonInteractive && !this.readonly}
@@ -549,6 +556,9 @@ export class Table extends ClassifiedElement {
                                 </outerbase-th>`
                             }
                         )}
+                        ${this.blankFill
+                            ? html`<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} width="100%"></<outerbase-td>`
+                            : ''}
                     </outerbase-tr>
                 </outerbase-thead>
 
@@ -556,12 +566,13 @@ export class Table extends ClassifiedElement {
                     ${this.isNonInteractive
                         ? null
                         : html`<outerbase-tr>
-                              ${this.isNonInteractive ? null : Table.BlankCell}
+                              ${this.isNonInteractive ? null : Table.BlankCell()}
                               ${repeat(
                                   this.visibleColumns,
                                   ({ name }) => name, // use the column name as the unique identifier for each entry in this row
-                                  () => Table.BlankCell
+                                  () => Table.BlankCell()
                               )}
+                              ${this.blankFill ? Table.BlankCell(false) : null}
                           </outerbase-tr>`}
                     <!-- render a TableRow element for each row of data -->
                     ${this.renderRows(this.rows.filter(({ isNew }) => isNew))} ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}

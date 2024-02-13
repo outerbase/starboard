@@ -101,6 +101,9 @@ export class TH extends MutableElement {
         },
     ]
 
+    @property({ attribute: 'width', type: String })
+    public width = ''
+
     @state()
     protected _options: HeaderMenuOptions = []
 
@@ -134,12 +137,23 @@ export class TH extends MutableElement {
                     value: plugin.tagName,
                 })) ?? []
         }
+
+        if (_changedProperties.has('width') && this.style) {
+            this.style.width = this.width
+        } else if (this.style && !this.width) {
+            this.style.width = 'min-content'
+        }
     }
 
-    protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        const width = parseInt(window.getComputedStyle(this).width, 10)
-        this.style.width = `${width}px`
-    }
+    // protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    //     // this.style.width = window.getComputedStyle(this).width
+    //     if (this.width) {
+    //         // console.log(this)
+    //         // console.log('window.getComputedStyle(this).width', window.getComputedStyle(this).width)
+    //         console.log('this.width', this.width)
+    //         this.style.width = this.width
+    //     }
+    // }
 
     protected override render() {
         const name = this.originalValue ?? this.value

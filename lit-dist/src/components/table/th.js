@@ -52,6 +52,7 @@ let TH = class TH extends MutableElement {
                 classes: 'text-red-600',
             },
         ];
+        this.width = '';
         this._options = [];
         this._pluginOptions = [];
         this.distanceToLeftViewport = -1;
@@ -91,11 +92,24 @@ let TH = class TH extends MutableElement {
                     value: plugin.tagName,
                 })) ?? [];
         }
+        if (_changedProperties.has('width') && this.style) {
+            console.log('this.width', this.width);
+            this.style.width = this.width;
+        }
+        else if (this.style && !this.width) {
+            console.log('zzz', this.value, this.width);
+            this.style.width = 'min-content';
+        }
     }
-    firstUpdated(_changedProperties) {
-        const width = parseInt(window.getComputedStyle(this).width, 10);
-        this.style.width = `${width}px`;
-    }
+    // protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    //     // this.style.width = window.getComputedStyle(this).width
+    //     if (this.width) {
+    //         // console.log(this)
+    //         // console.log('window.getComputedStyle(this).width', window.getComputedStyle(this).width)
+    //         console.log('this.width', this.width)
+    //         this.style.width = this.width
+    //     }
+    // }
     render() {
         const name = this.originalValue ?? this.value;
         const hasPlugin = typeof this.installedPlugins?.[name] !== 'undefined' && !this.installedPlugins?.[name]?.isDefaultPlugin;
@@ -266,6 +280,9 @@ __decorate([
 __decorate([
     property({ attribute: 'options', type: Array })
 ], TH.prototype, "options", void 0);
+__decorate([
+    property({ attribute: 'width', type: String })
+], TH.prototype, "width", void 0);
 __decorate([
     state()
 ], TH.prototype, "_options", void 0);
