@@ -46,6 +46,7 @@ export declare class TableData extends MutableElement {
         value: string;
     }[];
     protected isDisplayingPluginEditor: boolean;
+    protected firstUpdated(_changedProperties: Map<PropertyKey, unknown>): void;
     protected willUpdate(changedProperties: PropertyValues<this>): void;
     protected onContextMenu(event: MouseEvent): void;
     protected onPluginEvent({ detail: { action, value } }: PluginActionEvent): void;

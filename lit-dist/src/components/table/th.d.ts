@@ -1,4 +1,4 @@
-import { type PropertyValues } from 'lit';
+import { type PropertyValueMap, type PropertyValues } from 'lit';
 import '../column-resizer-element.js';
 import { MutableElement } from '../mutable-element.js';
 import { MenuSelectedEvent } from '../../lib/events.js';
@@ -30,7 +30,8 @@ export declare class TH extends MutableElement {
     hasMenu: boolean;
     isInteractive: boolean;
     options: HeaderMenuOptions;
-    width: string;
+    width: number;
+    private _previousWidth;
     protected _options: HeaderMenuOptions;
     protected _pluginOptions: HeaderMenuOptions;
     protected distanceToLeftViewport: number;
@@ -38,6 +39,7 @@ export declare class TH extends MutableElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     protected willUpdate(_changedProperties: PropertyValues<this>): void;
+    protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;
     protected render(): import("lit").TemplateResult<1>;
     protected dispatchChangedEvent(): void;
     protected removeColumn(): void;

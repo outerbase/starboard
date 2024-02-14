@@ -12,7 +12,6 @@ export declare class ColumnResizer extends ClassifiedElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;
-    protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;
     protected render(): import("lit").TemplateResult<1>;
 }
 //# sourceMappingURL=column-resizer-element.d.ts.map

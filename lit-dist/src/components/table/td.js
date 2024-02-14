@@ -56,6 +56,10 @@ let TableData = class TableData extends MutableElement {
             'cursor-pointer': this.isInteractive,
         };
     }
+    firstUpdated(_changedProperties) {
+        if (this.width)
+            this.style.maxWidth = this.width;
+    }
     willUpdate(changedProperties) {
         super.willUpdate(changedProperties);
         if (changedProperties.has('isInteractive') && this.isInteractive === true && !this.blank) {
@@ -64,7 +68,7 @@ let TableData = class TableData extends MutableElement {
         }
         if (changedProperties.has('width')) {
             if (this.width && this.style) {
-                this.style.maxWidth = this.style.minWidth = this.width;
+                this.style.maxWidth = this.width;
             }
         }
     }

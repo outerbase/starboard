@@ -52,7 +52,8 @@ let TH = class TH extends MutableElement {
                 classes: 'text-red-600',
             },
         ];
-        this.width = '';
+        this.width = 0;
+        this._previousWidth = 0;
         this._options = [];
         this._pluginOptions = [];
         this.distanceToLeftViewport = -1;
@@ -93,21 +94,15 @@ let TH = class TH extends MutableElement {
                 })) ?? [];
         }
         if (_changedProperties.has('width') && this.style) {
-            this.style.width = this.width;
-        }
-        else if (this.style && !this.width) {
-            this.style.width = 'min-content';
+            if (this.width) {
+                this.style.width = `${this.width}px`;
+            }
         }
     }
-    // protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-    //     // this.style.width = window.getComputedStyle(this).width
-    //     if (this.width) {
-    //         // console.log(this)
-    //         // console.log('window.getComputedStyle(this).width', window.getComputedStyle(this).width)
-    //         console.log('this.width', this.width)
-    //         this.style.width = this.width
-    //     }
-    // }
+    firstUpdated(_changedProperties) {
+        if (this.width && this.style)
+            this.style.width = `${this.width}px`;
+    }
     render() {
         const name = this.originalValue ?? this.value;
         const hasPlugin = typeof this.installedPlugins?.[name] !== 'undefined' && !this.installedPlugins?.[name]?.isDefaultPlugin;
@@ -163,7 +158,18 @@ let TH = class TH extends MutableElement {
                 ? html `<span class=${classMap(resultContainerClasses)}
                       ><slot></slot>
                       ${body}
-                      <column-resizer .column=${this} height="${ifDefined(this.tableHeight)}" theme=${this.theme}></column-resizer
+                      <column-resizer
+                          .column=${this}
+                          height="${ifDefined(this.tableHeight)}"
+                          theme=${this.theme}
+                          @resize-start=${() => {
+                    this._previousWidth = this.width;
+                }}
+                          @resize=${({ delta }) => {
+                    this.width = this._previousWidth + delta;
+                    this.style.width = `${this.width}px`;
+                }}
+                      ></column-resizer
                   ></span>`
                 : html `<span class=${classMap(resultContainerClasses)}><slot></slot>${body}</span>`;
         }
@@ -279,8 +285,11 @@ __decorate([
     property({ attribute: 'options', type: Array })
 ], TH.prototype, "options", void 0);
 __decorate([
-    property({ attribute: 'width', type: String })
+    property({ attribute: 'width', type: Number })
 ], TH.prototype, "width", void 0);
+__decorate([
+    state()
+], TH.prototype, "_previousWidth", void 0);
 __decorate([
     state()
 ], TH.prototype, "_options", void 0);
