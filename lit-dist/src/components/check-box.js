@@ -10,6 +10,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { CheckMark } from '../lib/icons/check-mark.js';
 import { TWStyles } from '../../tailwind/index.js';
 import { Theme } from '../types.js';
+import { classMap } from 'lit/directives/class-map.js';
 let CustomCheckbox = CustomCheckbox_1 = class CustomCheckbox extends LitElement {
     constructor() {
         super(...arguments);
@@ -37,8 +38,12 @@ let CustomCheckbox = CustomCheckbox_1 = class CustomCheckbox extends LitElement 
         this.removeEventListener('keydown', this.onKeyDown);
     }
     render() {
+        const classes = classMap({
+            'flex items-center cursor-pointer': true,
+            dark: this.theme == Theme.dark,
+        });
         return html `
-            <div class="flex items-center cursor-pointer" @click="${this.toggleCheckbox}">
+            <div class=${classes} @click="${this.toggleCheckbox}">
                 ${this.checked ? CustomCheckbox_1.checkedTemplate : CustomCheckbox_1.uncheckedTemplate}
                 <input type="checkbox" ?checked="${this.checked}" @change="${this.toggleCheckbox}" class="hidden" />
             </div>
