@@ -342,7 +342,7 @@ export class Table extends ClassifiedElement {
     // dynamically adjust the table's width when columns are being resized
     private _previousWidth = 0
     // this variable is utilized while updating widths on('mousemove')
-    private _onColumnResizeStart(_event: ResizeStartEvent) {
+    private _onColumnResizeStart(name: string) {
         const table = this.shadowRoot?.getElementById('table')
         if (!table) throw new Error('Unexpectedly missing a table')
 
@@ -356,7 +356,7 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    private _onColumnResized({ delta }: ResizeEvent) {
+    private _onColumnResized(name: string, delta: number) {
         const table = this.shadowRoot?.getElementById('table')
         if (!table) throw new Error('Unexpectedly missing a table')
 
@@ -422,6 +422,7 @@ export class Table extends ClassifiedElement {
                                     ?row-selector="${true}"
                                     ?read-only=${true}
                                     ?interactive=${true}
+                                    width="42px"
                                 >
                                     <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
                                     <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
@@ -480,7 +481,7 @@ export class Table extends ClassifiedElement {
                               }
                           )}
                           ${this.blankFill
-                              ? html`<outerbase-td width="100%" ?outer-border=${false} ?read-only=${true} ?separate-cells=${false} ?bottom-border=${true} ?interactive=${false} ?menu=${false} value="&nbsp;"></<outerbase-td>`
+                              ? html`<outerbase-td ?outer-border=${false} ?read-only=${true} ?separate-cells=${false} ?bottom-border=${true} ?interactive=${false} ?menu=${false} value="&nbsp;"></<outerbase-td>`
                               : ''}
                       </outerbase-tr>`
                     : null
@@ -489,11 +490,11 @@ export class Table extends ClassifiedElement {
     }
 
     protected override render() {
-        const tableContainerClasses = { dark: this.theme == Theme.dark, 'w-full': true }
+        const tableContainerClasses = { dark: this.theme == Theme.dark }
         const tableClasses = {
             'table bg-theme-table dark:bg-theme-table-dark': true,
             'text-theme-text dark:text-theme-text-dark text-sm': true,
-            'w-full': true,
+            'min-w-full': true,
         }
 
         return html`<div class=${classMap(tableContainerClasses)}>
@@ -517,6 +518,7 @@ export class Table extends ClassifiedElement {
                             ? html`<outerbase-th
                               table-height=${ifDefined(this._height)}
                               theme=${this.theme}
+                              width=${42}
                               ?separate-cells=${true}
                               ?outer-border=${this.outerBorder}
                               ?is-last=${0 === this.visibleColumns.length}
@@ -538,7 +540,7 @@ export class Table extends ClassifiedElement {
                                     name="${this.renamedColumns[name] ?? name}"
                                     original-value="${name}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
-                                    width="${this.widthForColumnType(name)}px"
+                                    width=${this.widthForColumnType(name)}
                                     ?separate-cells=${true}
                                     ?outer-border=${this.outerBorder}
                                     ?menu=${!this.isNonInteractive && !this.readonly}
@@ -548,16 +550,20 @@ export class Table extends ClassifiedElement {
                                     ?interactive=${!this.isNonInteractive}
                                     @column-hidden=${this._onColumnHidden}
                                     @column-removed=${this._onColumnRemoved}
-                                    @resize-start=${this._onColumnResizeStart}
                                     @column-plugin-deactivated=${this._onColumnPluginDeactivated}
-                                    @resize=${this._onColumnResized}
+                                    @resize-start=${() => {
+                                        this._onColumnResizeStart(name)
+                                    }}
+                                    @resize=${({ delta }: ResizeEvent) => {
+                                        this._onColumnResized(name, delta)
+                                    }}
                                     ?read-only=${this.readonly}
                                 >
                                 </outerbase-th>`
                             }
                         )}
                         ${this.blankFill
-                            ? html`<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} width="100%"></<outerbase-td>`
+                            ? html`<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} fill></<outerbase-td>`
                             : ''}
                     </outerbase-tr>
                 </outerbase-thead>

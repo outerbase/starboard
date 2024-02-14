@@ -1,4 +1,4 @@
-import { html, type PropertyValues } from 'lit'
+import { html, type PropertyValueMap, type PropertyValues } from 'lit'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
@@ -14,6 +14,7 @@ import {
     ColumnRenameEvent,
     ColumnUpdatedEvent,
     MenuSelectedEvent,
+    ResizeEvent,
 } from '../../lib/events.js'
 import '../menu/column-menu.js' // <outerbase-th-menu />
 import type { ColumnMenu } from '../menu/column-menu.js'
@@ -101,8 +102,11 @@ export class TH extends MutableElement {
         },
     ]
 
-    @property({ attribute: 'width', type: String })
-    public width = ''
+    @property({ attribute: 'width', type: Number })
+    public width = 0
+
+    @state()
+    private _previousWidth = 0
 
     @state()
     protected _options: HeaderMenuOptions = []
@@ -139,21 +143,15 @@ export class TH extends MutableElement {
         }
 
         if (_changedProperties.has('width') && this.style) {
-            this.style.width = this.width
-        } else if (this.style && !this.width) {
-            this.style.width = 'min-content'
+            if (this.width) {
+                this.style.width = `${this.width}px`
+            }
         }
     }
 
-    // protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-    //     // this.style.width = window.getComputedStyle(this).width
-    //     if (this.width) {
-    //         // console.log(this)
-    //         // console.log('window.getComputedStyle(this).width', window.getComputedStyle(this).width)
-    //         console.log('this.width', this.width)
-    //         this.style.width = this.width
-    //     }
-    // }
+    protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        if (this.width && this.style) this.style.width = `${this.width}px`
+    }
 
     protected override render() {
         const name = this.originalValue ?? this.value
@@ -217,7 +215,18 @@ export class TH extends MutableElement {
                 ? html`<span class=${classMap(resultContainerClasses)}
                       ><slot></slot>
                       ${body}
-                      <column-resizer .column=${this} height="${ifDefined(this.tableHeight)}" theme=${this.theme}></column-resizer
+                      <column-resizer
+                          .column=${this}
+                          height="${ifDefined(this.tableHeight)}"
+                          theme=${this.theme}
+                          @resize-start=${() => {
+                              this._previousWidth = this.width
+                          }}
+                          @resize=${({ delta }: ResizeEvent) => {
+                              this.width = this._previousWidth + delta
+                              this.style.width = `${this.width}px`
+                          }}
+                      ></column-resizer
                   ></span>`
                 : html`<span class=${classMap(resultContainerClasses)}><slot></slot>${body}</span>`
         }

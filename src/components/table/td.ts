@@ -109,6 +109,10 @@ export class TableData extends MutableElement {
     @state()
     protected isDisplayingPluginEditor = false
 
+    protected firstUpdated(_changedProperties: Map<PropertyKey, unknown>): void {
+        if (this.width) this.style.maxWidth = this.width
+    }
+
     protected willUpdate(changedProperties: PropertyValues<this>): void {
         super.willUpdate(changedProperties)
         if (changedProperties.has('isInteractive') && this.isInteractive === true && !this.blank) {
@@ -118,7 +122,7 @@ export class TableData extends MutableElement {
 
         if (changedProperties.has('width')) {
             if (this.width && this.style) {
-                this.style.maxWidth = this.style.minWidth = this.width
+                this.style.maxWidth = this.width
             }
         }
     }

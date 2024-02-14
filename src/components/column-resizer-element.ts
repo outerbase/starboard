@@ -37,8 +37,6 @@ export class ColumnResizer extends ClassifiedElement {
             if (!this.width) throw new Error('`width` is unset; aborting')
 
             dx = e.clientX - this.xPosition
-            this.column.style.width = `${this.width + dx}px`
-
             this.dispatchEvent(new ResizeEvent(dx))
         }
 
@@ -71,13 +69,6 @@ export class ColumnResizer extends ClassifiedElement {
 
         if (_changedProperties.has('height')) {
             // document.documentElement.style.setProperty('--table-height', `${this.height}px`)
-        }
-    }
-
-    protected override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        if (this.column) {
-            this.width = parseInt(window.getComputedStyle(this.column).width, 10)
-            this.column.style.width = `${this.width}px`
         }
     }
 
