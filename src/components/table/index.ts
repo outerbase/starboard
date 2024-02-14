@@ -10,7 +10,6 @@ import {
     ColumnRemovedEvent,
     MenuOpenEvent,
     ResizeEvent,
-    ResizeStartEvent,
     RowAddedEvent,
     RowRemovedEvent,
     RowSelectedEvent,
@@ -342,7 +341,7 @@ export class Table extends ClassifiedElement {
     // dynamically adjust the table's width when columns are being resized
     private _previousWidth = 0
     // this variable is utilized while updating widths on('mousemove')
-    private _onColumnResizeStart(name: string) {
+    private _onColumnResizeStart() {
         const table = this.shadowRoot?.getElementById('table')
         if (!table) throw new Error('Unexpectedly missing a table')
 
@@ -356,7 +355,7 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    private _onColumnResized(name: string, delta: number) {
+    private _onColumnResized({ delta }: ResizeEvent) {
         const table = this.shadowRoot?.getElementById('table')
         if (!table) throw new Error('Unexpectedly missing a table')
 
@@ -551,12 +550,8 @@ export class Table extends ClassifiedElement {
                                     @column-hidden=${this._onColumnHidden}
                                     @column-removed=${this._onColumnRemoved}
                                     @column-plugin-deactivated=${this._onColumnPluginDeactivated}
-                                    @resize-start=${() => {
-                                        this._onColumnResizeStart(name)
-                                    }}
-                                    @resize=${({ delta }: ResizeEvent) => {
-                                        this._onColumnResized(name, delta)
-                                    }}
+                                    @resize-start=${this._onColumnResizeStart}
+                                    @resize=${this._onColumnResized}
                                     ?read-only=${this.readonly}
                                 >
                                 </outerbase-th>`
