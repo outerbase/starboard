@@ -65,7 +65,10 @@ let TableData = class TableData extends MutableElement {
         }
     }
     firstUpdated(_changedProperties) {
-        if (this.width) this.style.maxWidth = this.width
+        if (this.width) {
+            this.style.minWidth = this.width;
+            this.style.maxWidth = this.width;
+        }
     }
     willUpdate(changedProperties) {
         super.willUpdate(changedProperties)
@@ -75,7 +78,8 @@ let TableData = class TableData extends MutableElement {
         }
         if (changedProperties.has('width')) {
             if (this.width && this.style) {
-                this.style.maxWidth = this.width
+                this.style.minWidth = this.width;
+                this.style.maxWidth = this.width;
             }
         }
     }
