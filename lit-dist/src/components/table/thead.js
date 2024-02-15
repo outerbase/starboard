@@ -9,7 +9,7 @@ import { ClassifiedElement } from '../classified-element.js';
 // tl;dr <thead/>, table-header-group
 let THead = class THead extends ClassifiedElement {
     get classMap() {
-        return { 'table-header-group sticky z-10 top-0': true };
+        return { 'table-header-group sticky z-20 top-0': true };
     }
 };
 THead = __decorate([

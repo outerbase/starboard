@@ -18,7 +18,7 @@ type PluginActionEvent = CustomEvent<{ action: PluginEvent.onEdit | PluginEvent.
 export class TableData extends MutableElement {
     protected override get classMap() {
         return {
-            'table-cell relative': true,
+            'table-cell relative focus:z-10': true,
             'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
             'px-5': this.blank,
             'border-theme-border dark:border-theme-border-dark': true,
@@ -279,7 +279,7 @@ export class TableData extends MutableElement {
         return this.isEditing
             ? // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
               html`<span class=${contentWrapperClass}>&nbsp;<input .value=${value ?? ''} @input=${this.onChange} class=${classMap({
-                  'z-10 absolute top-0 bottom-0 right-0 left-0': true,
+                  'z-20 absolute top-0 bottom-0 right-0 left-0': true,
                   'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
                   'px-3 font-normal focus:rounded-[4px]': true,
               })} @blur=${this.onBlur}></input></span>`

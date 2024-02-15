@@ -9,7 +9,7 @@ type PluginActionEvent = CustomEvent<{
 }>;
 export declare class TableData extends MutableElement {
     protected get classMap(): {
-        'table-cell relative': boolean;
+        'table-cell relative focus:z-10': boolean;
         'px-cell-padding-x py-cell-padding-y ': boolean;
         'px-5': boolean;
         'border-theme-border dark:border-theme-border-dark': boolean;
