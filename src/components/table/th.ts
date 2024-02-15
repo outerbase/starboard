@@ -117,7 +117,7 @@ export class TH extends MutableElement {
     @property({ attribute: 'left-distance-to-viewport', type: Number })
     protected distanceToLeftViewport = -1
 
-    @property({ attribute: 'theme', type: String })
+    @property({ attribute: 'theme', type: Number })
     public theme = Theme.light
 
     public override connectedCallback(): void {
