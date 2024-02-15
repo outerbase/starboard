@@ -300,7 +300,7 @@ __decorate([
     property({ attribute: 'left-distance-to-viewport', type: Number })
 ], TH.prototype, "distanceToLeftViewport", void 0);
 __decorate([
-    property({ attribute: 'theme', type: String })
+    property({ attribute: 'theme', type: Number })
 ], TH.prototype, "theme", void 0);
 TH = __decorate([
     customElement('outerbase-th')
