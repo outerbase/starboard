@@ -110,7 +110,10 @@ export class TableData extends MutableElement {
     protected isDisplayingPluginEditor = false
 
     protected firstUpdated(_changedProperties: Map<PropertyKey, unknown>): void {
-        if (this.width) this.style.maxWidth = this.width
+        if (this.width) {
+            this.style.minWidth = this.width
+            this.style.maxWidth = this.width
+        }
     }
 
     protected willUpdate(changedProperties: PropertyValues<this>): void {
@@ -122,6 +125,7 @@ export class TableData extends MutableElement {
 
         if (changedProperties.has('width')) {
             if (this.width && this.style) {
+                this.style.minWidth = this.width
                 this.style.maxWidth = this.width
             }
         }
