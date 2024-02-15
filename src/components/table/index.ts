@@ -318,9 +318,6 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    // this variable is incremented in `willUpdate` when our parent provies a new `rows` array
-    // it's purpose is to force all of the fields to be reset, i.e. on discard changes we want to forget changes to `value`
-    // this is accomplished by involving it in the `key` property of the `repeat` call in `render()`
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
@@ -339,8 +336,8 @@ export class Table extends ClassifiedElement {
 
     /////
     // dynamically adjust the table's width when columns are being resized
-    private _previousWidth = 0
     // this variable is utilized while updating widths on('mousemove')
+    private _previousWidth = 0
     private _onColumnResizeStart() {
         const table = this.shadowRoot?.getElementById('table')
         if (!table) throw new Error('Unexpectedly missing a table')
@@ -383,7 +380,7 @@ export class Table extends ClassifiedElement {
 
     // TODO @johnny this does not get update if the page containing the table changes
     // This is problematic when deciding which direction to render a column menu
-    // An example is toggling the navigaiton menu (where there's a list of tables, queries, etc)
+    // An example is toggling the navigation menu (where there's a list of tables, queries, etc)
     // Only once you switch tabs does the reference to `distanceToLeftViewport` get recomputed.
 
     get distanceToLeftViewport() {

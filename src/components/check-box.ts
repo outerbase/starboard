@@ -47,6 +47,7 @@ export class CustomCheckbox extends LitElement {
             'flex items-center cursor-pointer': true,
             dark: this.theme == Theme.dark,
         })
+
         return html`
             <div class=${classes} @click="${this.toggleCheckbox}">
                 ${this.checked ? CustomCheckbox.checkedTemplate : CustomCheckbox.uncheckedTemplate}
