@@ -25,7 +25,6 @@ export class TableData extends MutableElement {
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
             'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none':
                 !this.isEditing && this.isInteractive,
-
             'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty && !this.hideDirt, // dirty cells
             'border-r':
                 this.isInteractive ||
@@ -313,8 +312,6 @@ export class TableData extends MutableElement {
         switch (event.value) {
             case 'edit':
                 return (this.isEditing = true)
-            case 'edit:json':
-                return console.warn('TODO @johnny implement JSON editor')
             case 'copy':
                 return navigator.clipboard.writeText(this.value ?? '')
             case 'clear':
