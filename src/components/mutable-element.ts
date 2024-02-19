@@ -4,6 +4,7 @@ import type { Position } from '../types.js'
 import { CellUpdateEvent } from '../lib/events.js'
 import { property, state } from 'lit/decorators.js'
 import { ClassifiedElement } from './classified-element.js'
+import eventTargetIsPlugin from '../lib/event-target-is-plugin.js'
 
 export class MutableElement extends ClassifiedElement {
     // current value
@@ -97,8 +98,8 @@ export class MutableElement extends ClassifiedElement {
         }
     }
 
-    protected onDoubleClick() {
-        this.isEditing = true
+    protected onDoubleClick(event: MouseEvent) {
+        if (!eventTargetIsPlugin(event)) this.isEditing = true
     }
 
     protected onChange(event: Event) {

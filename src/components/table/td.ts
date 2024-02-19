@@ -10,6 +10,7 @@ import type { CellMenu } from '../menu/cell-menu.js'
 import { Theme, type ColumnPlugin, PluginEvent } from '../../types.js'
 import { UnsafeHTMLDirective, unsafeHTML } from 'lit/directives/unsafe-html.js'
 import type { DirectiveResult } from 'lit/async-directive.js'
+import eventTargetIsPlugin from '../../lib/event-target-is-plugin.js'
 
 type PluginActionEvent = CustomEvent<{ action: PluginEvent.onEdit | PluginEvent.onStopEdit | PluginEvent.onCancelEdit; value: any }>
 
@@ -158,14 +159,7 @@ export class TableData extends MutableElement {
 
     protected onKeyDown(event: KeyboardEvent): void {
         // ignore events being fired from a Plugin
-        const targetIsPlugin = event.composedPath().some((el) => {
-            if (el instanceof HTMLElement) {
-                if (el.tagName.toLowerCase().includes('outerbase-plugin')) {
-                    return true
-                }
-            }
-        })
-        if (targetIsPlugin) return
+        if (eventTargetIsPlugin(event)) return
 
         super.onKeyDown(event)
         const { code } = event
