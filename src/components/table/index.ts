@@ -42,23 +42,6 @@ import { TWStyles } from '../../../tailwind/index.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
-    // the blank cell is used to add padding to the top of the table so that you can focus on a cell without the edge being clipped by the header which has a higher z-index
-    static BlankCell = (drawRightBorder = true) => html`<outerbase-td
-    value=""
-    ?blank=${true}
-    ?separate-cells=${true}
-    ?draw-right-border=${drawRightBorder}
-    ?bottom-border=${false}
-    ?outer-border=${true}
-    ?is-last-row=${false}
-    ?is-last-column=${false}
-    ?menu=${false}
-    ?selectable-text=${false}
-    ?interactive=${false}
-    ?hide-dirt=${true}
-    ?read-only=${true}
-/><div class="h-0.5"></div></outerbase-td>`
-
     // STATE
     @property({ type: Boolean, attribute: 'selectable-rows' })
     public selectableRows = false
