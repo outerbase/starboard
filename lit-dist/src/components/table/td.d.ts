@@ -54,7 +54,7 @@ export declare class TableData extends MutableElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     protected render(): TemplateResult<1>;
-    protected onMenuSelection(event: MenuSelectedEvent): string | true | void | Promise<void>;
+    protected onMenuSelection(event: MenuSelectedEvent): string | true | Promise<void> | undefined;
 }
 export {};
 //# sourceMappingURL=td.d.ts.map

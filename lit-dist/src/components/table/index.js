@@ -9,7 +9,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { html, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { repeat } from 'lit/directives/repeat.js';
-import { ColumnAddedEvent, RowAddedEvent, RowRemovedEvent, RowSelectedEvent, RowUpdatedEvent, } from '../../lib/events.js';
+import { ColumnAddedEvent, RowAddedEvent, RowRemovedEvent, RowSelectedEvent, } from '../../lib/events.js';
 import { ColumnStatus, Theme, DBType, } from '../../types.js';
 import { heightOfElement } from '../../lib/height-of-element.js';
 import { ClassifiedElement } from '../classified-element.js';
@@ -334,9 +334,6 @@ let Table = Table_1 = class Table extends ClassifiedElement {
                                           ?interactive=${!this.isNonInteractive}
                                           ?hide-dirt=${isNew}
                                           ?read-only=${this.readonly}
-                                          @cell-updated=${() => {
-                        this.dispatchEvent(new RowUpdatedEvent({ id, values, originalValues, isNew }));
-                    }}
                                       >
                                       </outerbase-td>
                                   `;
@@ -413,7 +410,7 @@ let Table = Table_1 = class Table extends ClassifiedElement {
                                 </outerbase-th>`;
         })}
                         ${this.blankFill
-            ? html `<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} fill></<outerbase-td>`
+            ? html `<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} fill></<outerbase-th>`
             : ''}
                     </outerbase-tr>
                 </outerbase-thead>

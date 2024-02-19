@@ -8,8 +8,8 @@ export declare class MutableElement extends ClassifiedElement {
     label?: string;
     originalValue?: string;
     readonly: boolean;
-    private valueBeforeEdit?;
     isEditing: boolean;
+    private previousValue?;
     connectedCallback(): void;
     disconnectedCallback(): void;
     protected updated(changedProps: PropertyValues<this>): void;

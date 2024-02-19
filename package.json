@@ -1,6 +1,6 @@
 {
     "name": "starboard",
-    "version": "0.1.23",
+    "version": "0.1.24",
     "type": "module",
     "main": "lit-dist/src/components/table/index.js",
     "module": "lit-dist/src/components/table/index.js",

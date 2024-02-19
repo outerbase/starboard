@@ -8,7 +8,6 @@ import { html } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import { customElement, property, state } from 'lit/decorators.js';
 import { MutableElement } from '../mutable-element.js';
-import { CellUpdateEvent } from '../../lib/events.js';
 import '../menu/cell-menu.js'; // <outerbase-td-menu />
 import { Theme, PluginEvent } from '../../types.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
@@ -74,9 +73,6 @@ let TableData = class TableData extends MutableElement {
                 this.style.maxWidth = this.width;
             }
         }
-        // if (changedProperties.has('value') || changedProperties.has('originalValue')) {
-        //     console.log('dirty', this.dirty, 'value', this.value, 'originalValue', this.originalValue)
-        // }
     }
     onContextMenu(event) {
         const menu = this.shadowRoot?.querySelector('outerbase-td-menu');
@@ -102,14 +98,24 @@ let TableData = class TableData extends MutableElement {
         }
         else if (eventName === PluginEvent.updateCell) {
             this.value = value;
-            this.dispatchChangedEvent();
         }
     }
     onKeyDown(event) {
+        // ignore events being fired from a Plugin
+        const targetIsPlugin = event.composedPath().some((el) => {
+            if (el instanceof HTMLElement) {
+                if (el.tagName.toLowerCase().includes('outerbase-plugin')) {
+                    return true;
+                }
+            }
+        });
+        if (targetIsPlugin)
+            return;
         super.onKeyDown(event);
         const { code } = event;
         let target = event.target;
         if (target instanceof HTMLElement && !this.isEditing) {
+            // handle events from a <check-box />
             if (target.tagName.toLowerCase() === 'check-box') {
                 const parent = target.parentElement?.parentElement?.parentElement;
                 if (code === 'ArrowDown') {
@@ -202,10 +208,10 @@ let TableData = class TableData extends MutableElement {
         let cellEditorContents;
         if (this.plugin) {
             const { config, tagName } = this.plugin;
-            const pluginAsString = unsafeHTML(`<${tagName} cellvalue=${value} configuration=${config} ${this.pluginAttributes}></${tagName}>`);
+            const pluginAsString = unsafeHTML(`<${tagName} cellvalue='${value}' configuration='${config}' ${this.pluginAttributes}></${tagName}>`);
             cellContents = html `${pluginAsString}`;
             if (this.isDisplayingPluginEditor) {
-                cellEditorContents = unsafeHTML(`<${tagName.replace('outerbase-plugin-cell', 'outerbase-plugin-editor')} cellvalue=${value} configuration=${config} ${this.pluginAttributes}></${tagName}>`);
+                cellEditorContents = unsafeHTML(`<${tagName.replace('outerbase-plugin-cell', 'outerbase-plugin-editor')} cellvalue='${value}' configuration='${config}' ${this.pluginAttributes}></${tagName}>`);
             }
         }
         else {
@@ -247,23 +253,11 @@ let TableData = class TableData extends MutableElement {
         switch (event.value) {
             case 'edit':
                 return (this.isEditing = true);
-            case 'edit:json':
-                return console.warn('TODO @johnny implement JSON editor');
             case 'copy':
                 return navigator.clipboard.writeText(this.value ?? '');
             case 'clear':
-                this.dispatchEvent(new CellUpdateEvent({
-                    position: this.position,
-                    previousValue: this.value,
-                    value: '',
-                }));
                 return (this.value = '');
             case 'reset':
-                this.dispatchEvent(new CellUpdateEvent({
-                    position: this.position,
-                    previousValue: this.value,
-                    value: this.originalValue,
-                }));
                 return (this.value = this.originalValue);
         }
     }
