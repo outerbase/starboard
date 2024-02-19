@@ -318,22 +318,8 @@ export class TableData extends MutableElement {
             case 'copy':
                 return navigator.clipboard.writeText(this.value ?? '')
             case 'clear':
-                this.dispatchEvent(
-                    new CellUpdateEvent({
-                        position: this.position,
-                        previousValue: this.value,
-                        value: '',
-                    })
-                )
                 return (this.value = '')
             case 'reset':
-                this.dispatchEvent(
-                    new CellUpdateEvent({
-                        position: this.position,
-                        previousValue: this.value,
-                        value: this.originalValue,
-                    })
-                )
                 return (this.value = this.originalValue)
         }
     }

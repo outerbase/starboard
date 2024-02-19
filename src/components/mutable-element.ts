@@ -28,10 +28,10 @@ export class MutableElement extends ClassifiedElement {
     @property({ attribute: 'read-only', type: Boolean })
     public readonly = false
 
-    private valueBeforeEdit?: string
-
     @state()
     public isEditing = false
+
+    private previousValue?: string
 
     public override connectedCallback() {
         super.connectedCallback()
@@ -64,18 +64,9 @@ export class MutableElement extends ClassifiedElement {
             this.originalValue = this.value
         }
 
-        // when editing starts, track it's initial value
-        if (changedProperties.has('isEditing') && this.isEditing) {
-            this.valueBeforeEdit = this.value
-        }
-
-        // after initial load, after editing, when the value has been changed
-        // isEditing is `undefined` on the initial run -> therefore we ignore that round
-        if (changedProperties.get('isEditing') && !this.isEditing && this.value !== this.valueBeforeEdit) {
-            if (this.valueBeforeEdit !== this.value) {
-                this.dispatchChangedEvent()
-            }
-            delete this.valueBeforeEdit
+        if (changedProperties.get('value') && this.previousValue !== this.value) {
+            this.previousValue = this.value
+            this.dispatchChangedEvent()
         }
     }
 
@@ -119,7 +110,7 @@ export class MutableElement extends ClassifiedElement {
         this.dispatchEvent(
             new CellUpdateEvent({
                 position: this.position,
-                previousValue: this.valueBeforeEdit ?? this.originalValue,
+                previousValue: this.originalValue,
                 value: this.value,
                 label: this.label,
             })
