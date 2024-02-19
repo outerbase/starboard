@@ -158,12 +158,22 @@ export class TableData extends MutableElement {
     }
 
     protected onKeyDown(event: KeyboardEvent): void {
-        super.onKeyDown(event)
+        // ignore events being fired from a Plugin
+        const targetIsPlugin = event.composedPath().some((el) => {
+            if (el instanceof HTMLElement) {
+                if (el.tagName.toLowerCase().includes('outerbase-plugin')) {
+                    return true
+                }
+            }
+        })
+        if (targetIsPlugin) return
 
+        super.onKeyDown(event)
         const { code } = event
 
         let target = event.target
         if (target instanceof HTMLElement && !this.isEditing) {
+            // handle events from a <check-box />
             if (target.tagName.toLowerCase() === 'check-box') {
                 const parent = target.parentElement?.parentElement?.parentElement
 
