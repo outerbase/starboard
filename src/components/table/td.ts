@@ -3,7 +3,7 @@ import { classMap } from 'lit/directives/class-map.js'
 import { customElement, property, state } from 'lit/decorators.js'
 
 import { MutableElement } from '../mutable-element.js'
-import { CellUpdateEvent, type MenuSelectedEvent } from '../../lib/events.js'
+import { type MenuSelectedEvent } from '../../lib/events.js'
 
 import '../menu/cell-menu.js' // <outerbase-td-menu />
 import type { CellMenu } from '../menu/cell-menu.js'
