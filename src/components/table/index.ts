@@ -13,7 +13,6 @@ import {
     RowAddedEvent,
     RowRemovedEvent,
     RowSelectedEvent,
-    RowUpdatedEvent,
 } from '../../lib/events.js'
 import {
     type Columns,
