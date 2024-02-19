@@ -7,6 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 import { CellUpdateEvent } from '../lib/events.js';
 import { property, state } from 'lit/decorators.js';
 import { ClassifiedElement } from './classified-element.js';
+import eventTargetIsPlugin from '../lib/event-target-is-plugin.js';
 export class MutableElement extends ClassifiedElement {
     constructor() {
         super(...arguments);
@@ -72,8 +73,9 @@ export class MutableElement extends ClassifiedElement {
             this.isEditing = true;
         }
     }
-    onDoubleClick() {
-        this.isEditing = true;
+    onDoubleClick(event) {
+        if (!eventTargetIsPlugin(event))
+            this.isEditing = true;
     }
     onChange(event) {
         const { value } = event.target;

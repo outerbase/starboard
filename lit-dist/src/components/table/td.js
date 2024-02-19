@@ -11,6 +11,7 @@ import { MutableElement } from '../mutable-element.js';
 import '../menu/cell-menu.js'; // <outerbase-td-menu />
 import { Theme, PluginEvent } from '../../types.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
+import eventTargetIsPlugin from '../../lib/event-target-is-plugin.js';
 // tl;dr <td/>, table-cell
 let TableData = class TableData extends MutableElement {
     constructor() {
@@ -102,14 +103,7 @@ let TableData = class TableData extends MutableElement {
     }
     onKeyDown(event) {
         // ignore events being fired from a Plugin
-        const targetIsPlugin = event.composedPath().some((el) => {
-            if (el instanceof HTMLElement) {
-                if (el.tagName.toLowerCase().includes('outerbase-plugin')) {
-                    return true;
-                }
-            }
-        });
-        if (targetIsPlugin)
+        if (eventTargetIsPlugin(event))
             return;
         super.onKeyDown(event);
         const { code } = event;
