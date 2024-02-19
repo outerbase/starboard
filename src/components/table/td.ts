@@ -153,7 +153,6 @@ export class TableData extends MutableElement {
             this.isDisplayingPluginEditor = false
         } else if (eventName === PluginEvent.updateCell) {
             this.value = value
-            this.dispatchChangedEvent()
         }
     }
 
