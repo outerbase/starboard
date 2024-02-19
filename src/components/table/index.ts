@@ -555,7 +555,7 @@ export class Table extends ClassifiedElement {
                             }
                         )}
                         ${this.blankFill
-                            ? html`<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} fill></<outerbase-td>`
+                            ? html`<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} fill></<outerbase-th>`
                             : ''}
                     </outerbase-tr>
                 </outerbase-thead>
