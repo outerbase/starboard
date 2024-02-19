@@ -468,9 +468,6 @@ export class Table extends ClassifiedElement {
                                           ?interactive=${!this.isNonInteractive}
                                           ?hide-dirt=${isNew}
                                           ?read-only=${this.readonly}
-                                          @cell-updated=${() => {
-                                              this.dispatchEvent(new RowUpdatedEvent({ id, values, originalValues, isNew }))
-                                          }}
                                       >
                                       </outerbase-td>
                                   `
