@@ -178,3 +178,9 @@ export class MenuOpenEvent extends BubblyEvent {
         this.close = close
     }
 }
+
+export class CheckEvent extends BubblyEvent {
+    constructor() {
+        super('toggle-check')
+    }
+}

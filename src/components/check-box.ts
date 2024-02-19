@@ -4,6 +4,7 @@ import { CheckMark } from '../lib/icons/check-mark.js'
 import { TWStyles } from '../../tailwind/index.js'
 import { Theme } from '../types.js'
 import { classMap } from 'lit/directives/class-map.js'
+import { CheckEvent } from '../lib/events.js'
 
 @customElement('check-box')
 export class CustomCheckbox extends LitElement {
@@ -17,16 +18,17 @@ export class CustomCheckbox extends LitElement {
     @property({ type: Boolean }) checked = false
     @property({ type: String }) theme = Theme.light
 
-    toggleCheckbox() {
+    toggleCheckbox(event: Event) {
+        event.preventDefault()
         this.checked = !this.checked
+        this.dispatchEvent(new CheckEvent())
     }
 
     tabIndex = 0
     onKeyDown(event: KeyboardEvent) {
         const { code } = event
         if (code === 'Enter' || code === 'Space') {
-            event?.preventDefault()
-            this.checked = !this.checked
+            this.toggleCheckbox(event)
         }
     }
     connectedCallback(): void {

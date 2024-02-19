@@ -4,6 +4,7 @@ import { ifDefined } from 'lit/directives/if-defined.js'
 import { repeat } from 'lit/directives/repeat.js'
 
 import {
+    CheckEvent,
     ColumnAddedEvent,
     ColumnHiddenEvent,
     ColumnPluginDeactivatedEvent,
@@ -406,7 +407,7 @@ export class Table extends ClassifiedElement {
                                     <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
                                         <check-box
                                             ?checked="${this.selectedRowUUIDs.has(id)}"
-                                            @click="${() => this.toggleSelectedRow(id)}"
+                                            @toggle-check="${() => this.toggleSelectedRow(id)}"
                                             theme=${this.theme}
                                         />
                                     </div>
