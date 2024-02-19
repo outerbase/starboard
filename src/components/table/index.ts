@@ -557,16 +557,6 @@ export class Table extends ClassifiedElement {
                 </outerbase-thead>
 
                 <outerbase-rowgroup>
-                    ${this.isNonInteractive
-                        ? null
-                        : html`<outerbase-tr>
-                              ${repeat(
-                                  this.visibleColumns,
-                                  ({ name }) => name, // use the column name as the unique identifier for each entry in this row
-                                  () => Table.BlankCell()
-                              )}
-                              ${this.blankFill ? Table.BlankCell(false) : null}
-                          </outerbase-tr>`}
                     <!-- render a TableRow element for each row of data -->
                     ${this.renderRows(this.rows.filter(({ isNew }) => isNew))} ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}
                 </outerbase-rowgroup>
