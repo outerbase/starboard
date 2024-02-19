@@ -260,15 +260,16 @@ export class TableData extends MutableElement {
         if (this.plugin) {
             const { config, tagName } = this.plugin
             const pluginAsString = unsafeHTML(
-                `<${tagName} cellvalue=${value} configuration=${config} ${this.pluginAttributes}></${tagName}>`
+                `<${tagName} cellvalue='${value}' configuration='${config}' ${this.pluginAttributes}></${tagName}>`
             )
             cellContents = html`${pluginAsString}`
 
             if (this.isDisplayingPluginEditor) {
                 cellEditorContents = unsafeHTML(
-                    `<${tagName.replace('outerbase-plugin-cell', 'outerbase-plugin-editor')} cellvalue=${value} configuration=${config} ${
-                        this.pluginAttributes
-                    }></${tagName}>`
+                    `<${tagName.replace(
+                        'outerbase-plugin-cell',
+                        'outerbase-plugin-editor'
+                    )} cellvalue='${value}' configuration='${config}' ${this.pluginAttributes}></${tagName}>`
                 )
             }
         } else {
