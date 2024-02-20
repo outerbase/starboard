@@ -109,6 +109,7 @@ export class TableData extends MutableElement {
     protected options = [
         { label: 'Edit', value: 'edit' },
         { label: 'Copy', value: 'copy' },
+        { label: 'Paste', value: 'paste' },
         { label: 'Clear', value: 'clear' },
     ]
 
@@ -320,12 +321,15 @@ export class TableData extends MutableElement {
                     >`
     }
 
-    protected onMenuSelection(event: MenuSelectedEvent) {
+    protected async onMenuSelection(event: MenuSelectedEvent) {
         switch (event.value) {
             case 'edit':
                 return (this.isEditing = true)
             case 'copy':
                 return navigator.clipboard.writeText(this.value ?? '')
+            case 'paste':
+                this.value = await navigator.clipboard.readText()
+                return
             case 'clear':
                 return (this.value = '')
             case 'reset':
