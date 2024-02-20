@@ -167,7 +167,7 @@ export class TableData extends MutableElement {
         }
     }
 
-    protected async onKeyDown(event: KeyboardEvent): void {
+    protected async onKeyDown(event: KeyboardEvent): Promise<void> {
         // ignore events being fired from a Plugin
         if (eventTargetIsPlugin(event)) return
 
@@ -233,8 +233,6 @@ export class TableData extends MutableElement {
                 if (event.target instanceof HTMLElement && !this.isEditing) {
                     this.moveFocusToPreviousRow(event.target)
                 }
-            } else if (code === 'Backspace' || code === 'Delete') {
-                this.value = undefined
             }
 
             // copy/paste focused cells
@@ -256,6 +254,10 @@ export class TableData extends MutableElement {
             if (menu && menu.open) {
                 menu.open = false
             }
+        }
+
+        if (code === 'Backspace' || code === 'Delete') {
+            this.value = undefined
         }
     }
 
@@ -320,7 +322,9 @@ export class TableData extends MutableElement {
                                   ...this.options,
                                   {
                                       label: html`Revert to
-                                          <span class="pointer-events-none italic whitespace-nowrap">${this.originalValue}</span>`,
+                                          <span class="pointer-events-none italic whitespace-nowrap"
+                                              >${this.originalValue ?? 'NULL'}</span
+                                          >`,
                                       value: 'reset',
                                   },
                               ]
