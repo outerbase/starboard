@@ -167,7 +167,7 @@ export class TableData extends MutableElement {
         }
     }
 
-    protected onKeyDown(event: KeyboardEvent): void {
+    protected async onKeyDown(event: KeyboardEvent): void {
         // ignore events being fired from a Plugin
         if (eventTargetIsPlugin(event)) return
 
@@ -194,7 +194,8 @@ export class TableData extends MutableElement {
 
             // begin editing if keys are ASCII-ish
             const isInputTriggering = event.key.length === 1 && isAlphanumericOrSpecial(event.key)
-            if (isInputTriggering) {
+            const noMetaKeys = !(event.metaKey || event.shiftKey)
+            if (isInputTriggering && noMetaKeys) {
                 event.preventDefault()
 
                 // toggle editing mode
@@ -213,6 +214,7 @@ export class TableData extends MutableElement {
                 return
             }
 
+            // navigating around the table
             if (code === 'ArrowRight') {
                 event.preventDefault()
                 ;(target?.nextElementSibling as HTMLElement)?.focus()
@@ -233,6 +235,17 @@ export class TableData extends MutableElement {
                 }
             } else if (code === 'Backspace' || code === 'Delete') {
                 this.value = undefined
+            }
+
+            // copy/paste focused cells
+            if (code === 'KeyC') {
+                event.preventDefault()
+                navigator.clipboard.writeText(this.value ?? '')
+            }
+
+            if (code === 'KeyV') {
+                event.preventDefault()
+                this.value = await navigator.clipboard.readText()
             }
         }
 
