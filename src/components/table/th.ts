@@ -172,7 +172,7 @@ export class TH extends MutableElement {
                 0,
                 hasPlugin
                     ? {
-                          label: html`<span class="italic">Remove Plugin</span> `,
+                          label: html`<span class="">Remove Plugin</span> `,
                           value: 'uninstall-column-plugin',
                       }
                     : {
