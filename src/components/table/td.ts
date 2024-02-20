@@ -10,9 +10,15 @@ import type { CellMenu } from '../menu/cell-menu.js'
 import { Theme, type ColumnPlugin, PluginEvent } from '../../types.js'
 import { UnsafeHTMLDirective, unsafeHTML } from 'lit/directives/unsafe-html.js'
 import type { DirectiveResult } from 'lit/async-directive.js'
-import eventTargetIsPlugin from '../../lib/event-target-is-plugin.js'
+import { eventTargetIsPluginEditor } from '../../lib/event-target-is-plugin.js'
 
 type PluginActionEvent = CustomEvent<{ action: PluginEvent.onEdit | PluginEvent.onStopEdit | PluginEvent.onCancelEdit; value: any }>
+
+const isAlphanumericOrSpecial = (key: string): boolean => {
+    // Regular expression to match alphanumeric characters and specified special characters
+    // const regex = /^[a-zA-Z0-9`~!@#\$%\^&\*\+\?\(\)\[\],<\.>]+$/
+    return /^[a-zA-Z0-9 \.,]+$/.test(key)
+}
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
@@ -132,6 +138,9 @@ export class TableData extends MutableElement {
     }
 
     protected onContextMenu(event: MouseEvent) {
+        const isPlugin = eventTargetIsPluginEditor(event)
+        if (isPlugin) return
+
         const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
         if (menu) {
             event.preventDefault()
@@ -182,6 +191,28 @@ export class TableData extends MutableElement {
                 return
             }
 
+            // begin editing if keys are ASCII-ish
+            const isInputTriggering = event.key.length === 1 && isAlphanumericOrSpecial(event.key)
+            if (isInputTriggering) {
+                event.preventDefault()
+
+                // toggle editing mode
+                this.isEditing = true
+
+                // append this character
+                this.value += event.key
+
+                // set the cursor input to the end
+                setTimeout(() => {
+                    const input = this.shadowRoot?.querySelector('input')
+                    input?.focus()
+                    input?.setSelectionRange(input.value.length, input.value.length)
+                }, 0)
+
+                return
+            }
+
+            // handle keyboard navigation
             const parent = target.parentElement
             const index = Array.from(parent?.children ?? []).indexOf(target) // Find the index of the current element among its siblings
 
@@ -210,20 +241,8 @@ export class TableData extends MutableElement {
                         nthChild.focus() // Set focus on the nth child
                     }
                 }
-            }
-        }
-
-        // toggle menu on 'Space' key, unless typing input
-        if (code === 'Space' && !this.isEditing) {
-            event.preventDefault()
-            const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
-            if (menu) {
-                if (menu.open) {
-                    menu.open = false
-                } else {
-                    menu.focus()
-                    menu.open = true
-                }
+            } else if (code === 'Backspace' || code === 'Delete') {
+                this.value = undefined
             }
         }
 
