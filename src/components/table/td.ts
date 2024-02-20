@@ -136,6 +136,19 @@ export class TableData extends MutableElement {
                 this.style.maxWidth = this.width
             }
         }
+
+        if (changedProperties.has('readonly')) {
+            if (this.readonly) {
+                this.options = [{ label: 'Copy', value: 'copy' }]
+            } else {
+                this.options = [
+                    { label: 'Edit', value: 'edit' },
+                    { label: 'Copy', value: 'copy' },
+                    { label: 'Paste', value: 'paste' },
+                    { label: 'Clear', value: 'clear' },
+                ]
+            }
+        }
     }
 
     protected onContextMenu(event: MouseEvent) {
