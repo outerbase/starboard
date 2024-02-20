@@ -39,12 +39,12 @@ export class MutableElement extends ClassifiedElement {
 
     public override connectedCallback() {
         super.connectedCallback()
-        this.addEventListener('dblclick', this.onDoubleClick)
+        if (this.isInteractive) this.addEventListener('dblclick', this.onDoubleClick)
     }
 
     public override disconnectedCallback() {
         super.disconnectedCallback()
-        this.removeEventListener('dblclick', this.onDoubleClick)
+        if (this.isInteractive) this.removeEventListener('dblclick', this.onDoubleClick)
     }
 
     protected override updated(changedProps: PropertyValues<this>) {
