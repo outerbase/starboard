@@ -10,7 +10,7 @@ import type { CellMenu } from '../menu/cell-menu.js'
 import { Theme, type ColumnPlugin, PluginEvent } from '../../types.js'
 import { UnsafeHTMLDirective, unsafeHTML } from 'lit/directives/unsafe-html.js'
 import type { DirectiveResult } from 'lit/async-directive.js'
-import { eventTargetIsPluginEditor } from '../../lib/event-target-is-plugin.js'
+import { eventTargetIsPlugin, eventTargetIsPluginEditor } from '../../lib/event-target-is-plugin.js'
 
 type PluginActionEvent = CustomEvent<{ action: PluginEvent.onEdit | PluginEvent.onStopEdit | PluginEvent.onCancelEdit; value: any }>
 
@@ -212,34 +212,23 @@ export class TableData extends MutableElement {
                 return
             }
 
-            // handle keyboard navigation
-            const parent = target.parentElement
-            const index = Array.from(parent?.children ?? []).indexOf(target) // Find the index of the current element among its siblings
-
-            if (code === 'ArrowRight') (target?.nextElementSibling as HTMLElement)?.focus()
-            else if (code === 'ArrowLeft') {
+            if (code === 'ArrowRight') {
+                event.preventDefault()
+                ;(target?.nextElementSibling as HTMLElement)?.focus()
+            } else if (code === 'ArrowLeft') {
+                event.preventDefault()
                 const checkbox = target?.previousElementSibling?.querySelector('check-box') as HTMLElement | undefined
                 if (checkbox) checkbox.focus()
                 else (target?.previousElementSibling as HTMLElement | undefined)?.focus()
             } else if (code === 'ArrowDown') {
                 event.preventDefault()
-
-                const parentSibling = parent ? parent.nextElementSibling : null // Get the parent's next sibling
-                if (parentSibling && parentSibling.children.length > index) {
-                    var nthChild = parentSibling.children[index] as HTMLElement | undefined // Find the nth child of the parent's sibling
-                    if (nthChild) {
-                        nthChild.focus() // Set focus on the nth child
-                    }
+                if (event.target instanceof HTMLElement && !this.isEditing) {
+                    this.moveFocusToNextRow(event.target)
                 }
             } else if (code === 'ArrowUp') {
                 event.preventDefault()
-
-                const parentSibling = parent ? parent.previousElementSibling : null // Get the parent's next sibling
-                if (parentSibling && parentSibling.children.length > index) {
-                    var nthChild = parentSibling.children[index] as HTMLElement | undefined // Find the nth child of the parent's sibling
-                    if (nthChild) {
-                        nthChild.focus() // Set focus on the nth child
-                    }
+                if (event.target instanceof HTMLElement && !this.isEditing) {
+                    this.moveFocusToPreviousRow(event.target)
                 }
             } else if (code === 'Backspace' || code === 'Delete') {
                 this.value = undefined

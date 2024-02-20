@@ -94,12 +94,21 @@ export class MutableElement extends ClassifiedElement {
         }
 
         if (event.code === 'Enter' && !this.isEditing && !this.readonly) {
-            this.isEditing = true
+            if (event.target instanceof HTMLElement && !this.isEditing) {
+                this.moveFocusToNextRow(event.target)
+            }
         }
     }
 
     protected onDoubleClick(event: MouseEvent) {
-        if (!eventTargetIsPlugin(event)) this.isEditing = true
+        if (!eventTargetIsPlugin(event)) {
+            this.isEditing = true
+            setTimeout(() => {
+                const input = this.shadowRoot?.querySelector('input')
+                input?.focus()
+                input?.setSelectionRange(input.value.length, input.value.length)
+            }, 0)
+        }
     }
 
     protected onChange(event: Event) {
@@ -120,5 +129,29 @@ export class MutableElement extends ClassifiedElement {
 
     protected onBlur() {
         this.isEditing = false
+    }
+
+    protected moveFocusToNextRow(target: HTMLElement) {
+        const parent = target?.parentElement
+        const index = Array.from(parent?.children ?? []).indexOf(target) // Find the index of the current element among its siblings
+        const parentSibling = parent ? parent.nextElementSibling : null // Get the parent's next sibling
+        if (parentSibling && parentSibling.children.length > index) {
+            var nthChild = parentSibling.children[index] as HTMLElement | undefined // Find the nth child of the parent's sibling
+            if (nthChild) {
+                nthChild.focus() // Set focus on the nth child
+            }
+        }
+    }
+
+    protected moveFocusToPreviousRow(target: HTMLElement) {
+        const parent = target?.parentElement
+        const index = Array.from(parent?.children ?? []).indexOf(target) // Find the index of the current element among its siblings
+        const parentSibling = parent ? parent.previousElementSibling : null // Get the parent's next sibling
+        if (parentSibling && parentSibling.children.length > index) {
+            var nthChild = parentSibling.children[index] as HTMLElement | undefined // Find the nth child of the parent's sibling
+            if (nthChild) {
+                nthChild.focus() // Set focus on the nth child
+            }
+        }
     }
 }
