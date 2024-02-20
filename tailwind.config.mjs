@@ -47,10 +47,10 @@ export default {
                     'column-text-dark': 'var(--column-header-text-color-dark, #ffffff)',
 
                     // rows
-                    'row-even': 'var(--table-row-even-background-color, rgba(250,250,250))',
-                    'row-even-dark': 'var(--table-row-even-background-color-dark, rgba(10,10,10))',
-                    'row-odd': 'var(--table-row-even-background-color, rgba(250,250,250))',
-                    'row-odd-dark': 'var(--table-row-even-background-color-dark, rgba(10,10,10))',
+                    'row-even': 'var(--table-row-even-background-color, rgba(255,255,255))',
+                    'row-even-dark': 'var(--table-row-even-background-color-dark, rgba(0,0,0))',
+                    'row-odd': 'var(--table-row-even-background-color, rgba(255,255,255))',
+                    'row-odd-dark': 'var(--table-row-even-background-color-dark, rgba(0,0,0))',
                     'row-hover': 'var(--hover-background-color, rgba(0,0,0,0.03))',
                     'row-hover-dark': 'var(--hover-background-color-dark, rgba(255,255,255,0.03))',
                     'row-selected': 'var(--table-row-selected-background-color, rgba(245, 245, 245, 1))',
