@@ -72,9 +72,6 @@ export class TableData extends MutableElement {
     @property({ type: Boolean, attribute: 'draw-right-border' })
     private _drawRightBorder = false
 
-    @property({ attribute: 'interactive', type: Boolean })
-    isInteractive = false
-
     @property({ type: Boolean, attribute: 'menu' })
     private hasMenu = false
 

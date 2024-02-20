@@ -74,9 +74,6 @@ export class TH extends MutableElement {
     @property({ attribute: 'menu', type: Boolean })
     hasMenu = false
 
-    @property({ attribute: 'interactive', type: Boolean })
-    isInteractive = false
-
     @property({ attribute: 'options', type: Array })
     options: HeaderMenuOptions = [
         {

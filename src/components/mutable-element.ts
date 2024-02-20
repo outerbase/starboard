@@ -29,6 +29,9 @@ export class MutableElement extends ClassifiedElement {
     @property({ attribute: 'read-only', type: Boolean })
     public readonly = false
 
+    @property({ attribute: 'interactive', type: Boolean })
+    isInteractive = false
+
     @state()
     public isEditing = false
 
