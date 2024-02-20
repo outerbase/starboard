@@ -11,7 +11,12 @@ import { MutableElement } from '../mutable-element.js';
 import '../menu/cell-menu.js'; // <outerbase-td-menu />
 import { Theme, PluginEvent } from '../../types.js';
 import { unsafeHTML } from 'lit/directives/unsafe-html.js';
-import eventTargetIsPlugin from '../../lib/event-target-is-plugin.js';
+import { eventTargetIsPlugin, eventTargetIsPluginEditor } from '../../lib/event-target-is-plugin.js';
+const isAlphanumericOrSpecial = (key) => {
+    // Regular expression to match alphanumeric characters and specified special characters
+    // const regex = /^[a-zA-Z0-9`~!@#\$%\^&\*\+\?\(\)\[\],<\.>]+$/
+    return /^[a-zA-Z0-9 \.,]+$/.test(key);
+};
 // tl;dr <td/>, table-cell
 let TableData = class TableData extends MutableElement {
     constructor() {
@@ -76,6 +81,9 @@ let TableData = class TableData extends MutableElement {
         }
     }
     onContextMenu(event) {
+        const isPlugin = eventTargetIsPluginEditor(event);
+        if (isPlugin)
+            return;
         const menu = this.shadowRoot?.querySelector('outerbase-td-menu');
         if (menu) {
             event.preventDefault();
@@ -126,11 +134,28 @@ let TableData = class TableData extends MutableElement {
                 }
                 return;
             }
-            const parent = target.parentElement;
-            const index = Array.from(parent?.children ?? []).indexOf(target); // Find the index of the current element among its siblings
-            if (code === 'ArrowRight')
+            // begin editing if keys are ASCII-ish
+            const isInputTriggering = event.key.length === 1 && isAlphanumericOrSpecial(event.key);
+            if (isInputTriggering) {
+                event.preventDefault();
+                // toggle editing mode
+                this.isEditing = true;
+                // append this character
+                this.value += event.key;
+                // set the cursor input to the end
+                setTimeout(() => {
+                    const input = this.shadowRoot?.querySelector('input');
+                    input?.focus();
+                    input?.setSelectionRange(input.value.length, input.value.length);
+                }, 0);
+                return;
+            }
+            if (code === 'ArrowRight') {
+                event.preventDefault();
                 target?.nextElementSibling?.focus();
+            }
             else if (code === 'ArrowLeft') {
+                event.preventDefault();
                 const checkbox = target?.previousElementSibling?.querySelector('check-box');
                 if (checkbox)
                     checkbox.focus();
@@ -139,37 +164,18 @@ let TableData = class TableData extends MutableElement {
             }
             else if (code === 'ArrowDown') {
                 event.preventDefault();
-                const parentSibling = parent ? parent.nextElementSibling : null; // Get the parent's next sibling
-                if (parentSibling && parentSibling.children.length > index) {
-                    var nthChild = parentSibling.children[index]; // Find the nth child of the parent's sibling
-                    if (nthChild) {
-                        nthChild.focus(); // Set focus on the nth child
-                    }
+                if (event.target instanceof HTMLElement && !this.isEditing) {
+                    this.moveFocusToNextRow(event.target);
                 }
             }
             else if (code === 'ArrowUp') {
                 event.preventDefault();
-                const parentSibling = parent ? parent.previousElementSibling : null; // Get the parent's next sibling
-                if (parentSibling && parentSibling.children.length > index) {
-                    var nthChild = parentSibling.children[index]; // Find the nth child of the parent's sibling
-                    if (nthChild) {
-                        nthChild.focus(); // Set focus on the nth child
-                    }
+                if (event.target instanceof HTMLElement && !this.isEditing) {
+                    this.moveFocusToPreviousRow(event.target);
                 }
             }
-        }
-        // toggle menu on 'Space' key, unless typing input
-        if (code === 'Space' && !this.isEditing) {
-            event.preventDefault();
-            const menu = this.shadowRoot?.querySelector('outerbase-td-menu');
-            if (menu) {
-                if (menu.open) {
-                    menu.open = false;
-                }
-                else {
-                    menu.focus();
-                    menu.open = true;
-                }
+            else if (code === 'Backspace' || code === 'Delete') {
+                this.value = undefined;
             }
         }
         // close menu on 'Escape' key

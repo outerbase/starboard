@@ -11,6 +11,7 @@ import { CheckMark } from '../lib/icons/check-mark.js';
 import { TWStyles } from '../../tailwind/index.js';
 import { Theme } from '../types.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { CheckEvent } from '../lib/events.js';
 let CustomCheckbox = CustomCheckbox_1 = class CustomCheckbox extends LitElement {
     constructor() {
         super(...arguments);
@@ -19,14 +20,15 @@ let CustomCheckbox = CustomCheckbox_1 = class CustomCheckbox extends LitElement 
         this.tabIndex = 0;
         this._class = 'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-md focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none';
     }
-    toggleCheckbox() {
+    toggleCheckbox(event) {
+        event.preventDefault();
         this.checked = !this.checked;
+        this.dispatchEvent(new CheckEvent());
     }
     onKeyDown(event) {
         const { code } = event;
         if (code === 'Enter' || code === 'Space') {
-            event?.preventDefault();
-            this.checked = !this.checked;
+            this.toggleCheckbox(event);
         }
     }
     connectedCallback() {

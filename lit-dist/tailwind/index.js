@@ -661,14 +661,6 @@ video {
   display: none;
 }
 
-.h-0 {
-  height: 0px;
-}
-
-.h-0\\.5 {
-  height: 0.125rem;
-}
-
 .h-4 {
   height: 1rem;
 }

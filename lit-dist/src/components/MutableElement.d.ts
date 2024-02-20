@@ -16,10 +16,5 @@ export declare class MutableElement extends ClassifiedElement {
     protected willUpdate(changedProperties: PropertyValues<this>): void;
     protected onKeyDown(event: KeyboardEvent): void;
     protected onDoubleClick(event: MouseEvent): void;
-    protected onChange(event: Event): void;
-    protected dispatchChangedEvent(): void;
-    protected onBlur(): void;
-    protected moveFocusToNextRow(target: HTMLElement): void;
-    protected moveFocusToPreviousRow(target: HTMLElement): void;
 }
-//# sourceMappingURL=mutable-element.d.ts.map
+//# sourceMappingURL=MutableElement.d.ts.map

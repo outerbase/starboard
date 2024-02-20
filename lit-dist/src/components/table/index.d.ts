@@ -9,7 +9,6 @@ import './thead.js';
 import './tr.js';
 import '../check-box.js';
 export declare class Table extends ClassifiedElement {
-    static BlankCell: (drawRightBorder?: boolean) => import("lit").TemplateResult<1>;
     selectableRows: boolean;
     keyboardShortcuts: boolean;
     schema?: Schema;

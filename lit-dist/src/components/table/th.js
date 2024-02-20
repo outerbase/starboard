@@ -118,7 +118,7 @@ let TH = class TH extends MutableElement {
         if (this._pluginOptions.length > 0) {
             options.splice(2, 0, hasPlugin
                 ? {
-                    label: html `<span class="italic">Remove Plugin</span> `,
+                    label: html `<span class="">Remove Plugin</span> `,
                     value: 'uninstall-column-plugin',
                 }
                 : {

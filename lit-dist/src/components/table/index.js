@@ -4,7 +4,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-var Table_1;
 import { customElement, property, state } from 'lit/decorators.js';
 import { html, nothing } from 'lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -22,7 +21,7 @@ import './tr.js';
 import '../check-box.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { TWStyles } from '../../../tailwind/index.js';
-let Table = Table_1 = class Table extends ClassifiedElement {
+let Table = class Table extends ClassifiedElement {
     constructor() {
         super(...arguments);
         // STATE
@@ -297,7 +296,7 @@ let Table = Table_1 = class Table extends ClassifiedElement {
                                     <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
                                         <check-box
                                             ?checked="${this.selectedRowUUIDs.has(id)}"
-                                            @click="${() => this.toggleSelectedRow(id)}"
+                                            @toggle-check="${() => this.toggleSelectedRow(id)}"
                                             theme=${this.theme}
                                         />
                                     </div>
@@ -416,13 +415,6 @@ let Table = Table_1 = class Table extends ClassifiedElement {
                 </outerbase-thead>
 
                 <outerbase-rowgroup>
-                    ${this.isNonInteractive
-            ? null
-            : html `<outerbase-tr>
-                              ${repeat(this.visibleColumns, ({ name }) => name, // use the column name as the unique identifier for each entry in this row
-            () => Table_1.BlankCell())}
-                              ${this.blankFill ? Table_1.BlankCell(false) : null}
-                          </outerbase-tr>`}
                     <!-- render a TableRow element for each row of data -->
                     ${this.renderRows(this.rows.filter(({ isNew }) => isNew))} ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}
                 </outerbase-rowgroup>
@@ -430,22 +422,6 @@ let Table = Table_1 = class Table extends ClassifiedElement {
         </div>`;
     }
 };
-// the blank cell is used to add padding to the top of the table so that you can focus on a cell without the edge being clipped by the header which has a higher z-index
-Table.BlankCell = (drawRightBorder = true) => html `<outerbase-td
-    value=""
-    ?blank=${true}
-    ?separate-cells=${true}
-    ?draw-right-border=${drawRightBorder}
-    ?bottom-border=${false}
-    ?outer-border=${true}
-    ?is-last-row=${false}
-    ?is-last-column=${false}
-    ?menu=${false}
-    ?selectable-text=${false}
-    ?interactive=${false}
-    ?hide-dirt=${true}
-    ?read-only=${true}
-/><div class="h-0.5"></div></outerbase-td>`;
 Table.styles = [TWStyles];
 __decorate([
     property({ type: Boolean, attribute: 'selectable-rows' })
@@ -519,7 +495,7 @@ __decorate([
 __decorate([
     state()
 ], Table.prototype, "removedRowUUIDs", void 0);
-Table = Table_1 = __decorate([
+Table = __decorate([
     customElement('outerbase-table')
 ], Table);
 export { Table };

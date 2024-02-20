@@ -4,10 +4,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { CellUpdateEvent } from '../lib/events.js';
 import { property, state } from 'lit/decorators.js';
 import { ClassifiedElement } from './classified-element.js';
-import { eventTargetIsPlugin } from '../lib/event-target-is-plugin.js';
+import eventTargetIsPlugin from '../lib/event-target-is-plugin.js';
 export class MutableElement extends ClassifiedElement {
     constructor() {
         super(...arguments);
@@ -70,57 +69,17 @@ export class MutableElement extends ClassifiedElement {
             }, 0);
         }
         if (event.code === 'Enter' && !this.isEditing && !this.readonly) {
-            if (event.target instanceof HTMLElement && !this.isEditing) {
-                this.moveFocusToNextRow(event.target);
-            }
+            this.isEditing = true;
         }
     }
     onDoubleClick(event) {
         if (!eventTargetIsPlugin(event)) {
             this.isEditing = true;
-            setTimeout(() => {
-                const input = this.shadowRoot?.querySelector('input');
-                input?.focus();
-                input?.setSelectionRange(input.value.length, input.value.length);
-            }, 0);
+            // setTimeout(() => {
+            const input = this.shadowRoot?.querySelector('input');
+            input?.setSelectionRange(this.value?.length ?? 0, this.value?.length ?? 0);
         }
-    }
-    onChange(event) {
-        const { value } = event.target;
-        this.value = value;
-    }
-    dispatchChangedEvent() {
-        this.dispatchEvent(new CellUpdateEvent({
-            position: this.position,
-            previousValue: this.originalValue,
-            value: this.value,
-            label: this.label,
-        }));
-    }
-    onBlur() {
-        this.isEditing = false;
-    }
-    moveFocusToNextRow(target) {
-        const parent = target?.parentElement;
-        const index = Array.from(parent?.children ?? []).indexOf(target); // Find the index of the current element among its siblings
-        const parentSibling = parent ? parent.nextElementSibling : null; // Get the parent's next sibling
-        if (parentSibling && parentSibling.children.length > index) {
-            var nthChild = parentSibling.children[index]; // Find the nth child of the parent's sibling
-            if (nthChild) {
-                nthChild.focus(); // Set focus on the nth child
-            }
-        }
-    }
-    moveFocusToPreviousRow(target) {
-        const parent = target?.parentElement;
-        const index = Array.from(parent?.children ?? []).indexOf(target); // Find the index of the current element among its siblings
-        const parentSibling = parent ? parent.previousElementSibling : null; // Get the parent's next sibling
-        if (parentSibling && parentSibling.children.length > index) {
-            var nthChild = parentSibling.children[index]; // Find the nth child of the parent's sibling
-            if (nthChild) {
-                nthChild.focus(); // Set focus on the nth child
-            }
-        }
+        0;
     }
 }
 __decorate([

@@ -6,7 +6,7 @@ export declare class CustomCheckbox extends LitElement {
     static uncheckedTemplate: import("lit").TemplateResult<1>;
     checked: boolean;
     theme: Theme;
-    toggleCheckbox(): void;
+    toggleCheckbox(event: Event): void;
     tabIndex: number;
     onKeyDown(event: KeyboardEvent): void;
     connectedCallback(): void;
