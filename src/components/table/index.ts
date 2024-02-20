@@ -494,7 +494,7 @@ export class Table extends ClassifiedElement {
                             ? html`<outerbase-th
                               table-height=${ifDefined(this._height)}
                               theme=${this.theme}
-                              width=${42}
+                              width="42px"
                               ?separate-cells=${true}
                               ?outer-border=${this.outerBorder}
                               ?is-last=${0 === this.visibleColumns.length}
@@ -516,7 +516,7 @@ export class Table extends ClassifiedElement {
                                     name="${this.renamedColumns[name] ?? name}"
                                     original-value="${name}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
-                                    width=${this.widthForColumnType(name)}
+                                    width="${this.widthForColumnType(name)}px"
                                     ?separate-cells=${true}
                                     ?outer-border=${this.outerBorder}
                                     ?menu=${!this.isNonInteractive && !this.readonly}

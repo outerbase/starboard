@@ -46,9 +46,6 @@ export class TableData extends MutableElement {
     @property({ attribute: 'plugin-attributes', type: String })
     public pluginAttributes: String = ''
 
-    @property({ type: String, attribute: 'width' })
-    public width?: string
-
     // allows, for example, <outerbase-td separate-cells="true" />
     @property({ type: Boolean, attribute: 'separate-cells' })
     public separateCells: boolean = false

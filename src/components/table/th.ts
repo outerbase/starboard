@@ -99,9 +99,6 @@ export class TH extends MutableElement {
         },
     ]
 
-    @property({ attribute: 'width', type: Number })
-    public width = 0
-
     @state()
     private _previousWidth = 0
 
@@ -127,6 +124,13 @@ export class TH extends MutableElement {
         this.removeEventListener('contextmenu', this.onContextMenu)
     }
 
+    protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        if (this.width && this.style) {
+            this.style.minWidth = this.width
+            this.style.maxWidth = this.width
+        }
+    }
+
     protected override willUpdate(_changedProperties: PropertyValues<this>) {
         super.willUpdate(_changedProperties)
 
@@ -141,13 +145,16 @@ export class TH extends MutableElement {
 
         if (_changedProperties.has('width') && this.style) {
             if (this.width) {
-                this.style.width = `${this.width}px`
+                this.style.width = this.width
             }
         }
-    }
 
-    protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        if (this.width && this.style) this.style.width = `${this.width}px`
+        if (_changedProperties.has('width')) {
+            if (this.width && this.style) {
+                this.style.minWidth = this.width
+                this.style.maxWidth = this.width
+            }
+        }
     }
 
     protected override render() {
@@ -217,11 +224,13 @@ export class TH extends MutableElement {
                           height="${ifDefined(this.tableHeight)}"
                           theme=${this.theme}
                           @resize-start=${() => {
-                              this._previousWidth = this.width
+                              // remove the suffix `px` from width and convert to a number
+                              // JOHNNY probably revert to storing the number??
+                              this._previousWidth = this.width ? +this.width.slice(0, -2) : 0
                           }}
                           @resize=${({ delta }: ResizeEvent) => {
-                              this.width = this._previousWidth + delta
-                              this.style.width = `${this.width}px`
+                              this.width = `${this._previousWidth + delta}px`
+                              this.style.width = this.width
                           }}
                       ></column-resizer
                   ></span>`
