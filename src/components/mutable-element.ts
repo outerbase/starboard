@@ -36,12 +36,12 @@ export class MutableElement extends ClassifiedElement {
 
     public override connectedCallback() {
         super.connectedCallback()
-        if (!this.readonly) this.addEventListener('dblclick', this.onDoubleClick)
+        this.addEventListener('dblclick', this.onDoubleClick)
     }
 
     public override disconnectedCallback() {
         super.disconnectedCallback()
-        if (!this.readonly) this.removeEventListener('dblclick', this.onDoubleClick)
+        this.removeEventListener('dblclick', this.onDoubleClick)
     }
 
     protected override updated(changedProps: PropertyValues<this>) {
@@ -105,8 +105,14 @@ export class MutableElement extends ClassifiedElement {
             this.isEditing = true
             setTimeout(() => {
                 const input = this.shadowRoot?.querySelector('input')
-                input?.focus()
-                input?.setSelectionRange(input.value.length, input.value.length)
+
+                if (input) {
+                    input.readOnly = this.readonly
+                    input.focus()
+
+                    // set cursor to end if writable
+                    if (!this.readonly) input.setSelectionRange(input.value.length, input.value.length)
+                }
             }, 0)
         }
     }
