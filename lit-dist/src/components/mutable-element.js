@@ -24,7 +24,7 @@ export class MutableElement extends ClassifiedElement {
         this.isEditing = false;
     }
     get dirty() {
-        return this.originalValue !== undefined && isEqual(this.value, this.originalValue);
+        return this.originalValue !== undefined && !isEqual(this.value, this.originalValue);
     }
     connectedCallback() {
         super.connectedCallback();

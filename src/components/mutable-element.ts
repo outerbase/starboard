@@ -14,7 +14,7 @@ export class MutableElement extends ClassifiedElement {
 
     @property({ type: String })
     public get dirty() {
-        return this.originalValue !== undefined && isEqual(this.value, this.originalValue)
+        return this.originalValue !== undefined && !isEqual(this.value, this.originalValue)
     }
 
     // the cell's row's uuid and column name
