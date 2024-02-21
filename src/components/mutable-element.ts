@@ -79,6 +79,11 @@ export class MutableElement extends ClassifiedElement {
         if (changedProperties.has('value') && this.originalValue === undefined && this.originalValue !== this.value) {
             this.originalValue = this.value
         }
+
+        // dispatch changes when the user stops editing
+        if (changedProperties.get('isEditing') === true && this.isEditing === false) {
+            this.dispatchChangedEvent()
+        }
     }
 
     protected onKeyDown(event: KeyboardEvent) {
