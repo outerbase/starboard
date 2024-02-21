@@ -2,14 +2,14 @@ import { type PropertyValues, type TemplateResult } from 'lit';
 import { MutableElement } from '../mutable-element.js';
 import { type MenuSelectedEvent } from '../../lib/events.js';
 import '../menu/cell-menu.js';
-import { Theme, type ColumnPlugin, PluginEvent } from '../../types.js';
+import { type ColumnPlugin, PluginEvent } from '../../types.js';
 type PluginActionEvent = CustomEvent<{
     action: PluginEvent.onEdit | PluginEvent.onStopEdit | PluginEvent.onCancelEdit;
     value: any;
 }>;
 export declare class TableData extends MutableElement {
     protected get classMap(): {
-        'table-cell relative focus:z-10': boolean;
+        'table-cell relative focus:z-[1]': boolean;
         'px-cell-padding-x py-cell-padding-y ': boolean;
         'px-5': boolean;
         'border-theme-border dark:border-theme-border-dark': boolean;
@@ -22,22 +22,17 @@ export declare class TableData extends MutableElement {
         'cursor-pointer': boolean;
     };
     pluginAttributes: String;
-    separateCells: boolean;
     withBottomBorder: boolean;
-    sortBy?: string;
-    orderBy?: 'ascending' | 'descending';
     blank: boolean;
-    protected isOdd?: boolean;
-    private _drawRightBorder;
-    private hasMenu;
+    isOdd?: boolean;
+    _drawRightBorder: boolean;
+    hasMenu: boolean;
     isRowSelector: boolean;
-    outerBorder: boolean;
-    protected isLastColumn: boolean;
-    protected isLastRow: boolean;
-    protected leftDistanceToViewport: number;
-    protected tableBoundingRect: string | undefined;
+    isLastColumn: boolean;
+    isLastRow: boolean;
+    leftDistanceToViewport: number;
+    tableBoundingRect: string | undefined;
     hideDirt: boolean;
-    theme: Theme;
     plugin?: ColumnPlugin;
     protected options: {
         label: string;
@@ -51,7 +46,9 @@ export declare class TableData extends MutableElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     protected render(): TemplateResult<1>;
-    protected onMenuSelection(event: MenuSelectedEvent): Promise<string | true | void>;
+    protected onMenuSelection(event: MenuSelectedEvent): Promise<string | number | bigint | boolean | void | import("../../types.js").Serializable[] | {
+        [key: string]: import("../../types.js").Serializable | import("../../types.js").Serializable[];
+    } | null>;
 }
 export {};
 //# sourceMappingURL=td.d.ts.map

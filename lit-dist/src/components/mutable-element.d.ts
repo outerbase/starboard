@@ -1,15 +1,18 @@
 import type { PropertyValues } from 'lit';
-import type { Position } from '../types.js';
+import { Theme, type Position, type Serializable } from '../types.js';
 import { ClassifiedElement } from './classified-element.js';
 export declare class MutableElement extends ClassifiedElement {
-    value?: string;
+    value?: Serializable;
     get dirty(): boolean;
     position: Position;
     label?: string;
-    originalValue?: string;
+    originalValue?: Serializable;
     readonly: boolean;
     width?: string;
     isInteractive: boolean;
+    outerBorder: boolean;
+    theme: Theme;
+    separateCells: boolean;
     isEditing: boolean;
     private previousValue?;
     connectedCallback(): void;

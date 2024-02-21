@@ -20,13 +20,10 @@ let TH = class TH extends MutableElement {
     constructor() {
         super(...arguments);
         this.withResizer = false;
-        this.outerBorder = false;
         this.value = '';
         this.installedPlugins = {};
         this.blank = false;
         this.isLastColumn = false;
-        // allows, for example, <outerbase-td separate-cells="true" />
-        this.separateCells = false;
         this.hasMenu = false;
         this.options = [
             {
@@ -51,11 +48,10 @@ let TH = class TH extends MutableElement {
                 classes: 'text-red-600',
             },
         ];
+        this.distanceToLeftViewport = -1;
         this._previousWidth = 0;
         this._options = [];
         this._pluginOptions = [];
-        this.distanceToLeftViewport = -1;
-        this.theme = Theme.light;
     }
     get classMap() {
         return {
@@ -138,7 +134,7 @@ let TH = class TH extends MutableElement {
         else {
             const body = this.isEditing
                 ? html `<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
-                    'z-10 absolute top-0 bottom-0 right-0 left-0': true,
+                    'z-[1] absolute top-0 bottom-0 right-0 left-0': true,
                     'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
                     'px-cell-padding-x font-normal': true,
                 })} @blur=${this.onBlur}></input>`
@@ -253,11 +249,11 @@ __decorate([
     property({ attribute: 'with-resizer', type: Boolean })
 ], TH.prototype, "withResizer", void 0);
 __decorate([
-    property({ attribute: 'outer-border', type: Boolean })
-], TH.prototype, "outerBorder", void 0);
-__decorate([
-    property({ attribute: 'name', type: String })
+    property({ attribute: 'value', type: String })
 ], TH.prototype, "value", void 0);
+__decorate([
+    property({ attribute: 'original-value', type: String })
+], TH.prototype, "originalValue", void 0);
 __decorate([
     property({ attribute: 'plugins', type: Array })
 ], TH.prototype, "plugins", void 0);
@@ -271,14 +267,14 @@ __decorate([
     property({ attribute: 'is-last', type: Boolean })
 ], TH.prototype, "isLastColumn", void 0);
 __decorate([
-    property({ type: Boolean, attribute: 'separate-cells' })
-], TH.prototype, "separateCells", void 0);
-__decorate([
     property({ attribute: 'menu', type: Boolean })
 ], TH.prototype, "hasMenu", void 0);
 __decorate([
     property({ attribute: 'options', type: Array })
 ], TH.prototype, "options", void 0);
+__decorate([
+    property({ attribute: 'left-distance-to-viewport', type: Number })
+], TH.prototype, "distanceToLeftViewport", void 0);
 __decorate([
     state()
 ], TH.prototype, "_previousWidth", void 0);
@@ -288,12 +284,6 @@ __decorate([
 __decorate([
     state()
 ], TH.prototype, "_pluginOptions", void 0);
-__decorate([
-    property({ attribute: 'left-distance-to-viewport', type: Number })
-], TH.prototype, "distanceToLeftViewport", void 0);
-__decorate([
-    property({ attribute: 'theme', type: Number })
-], TH.prototype, "theme", void 0);
 TH = __decorate([
     customElement('outerbase-th')
 ], TH);

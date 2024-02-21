@@ -4,7 +4,6 @@ import { MutableElement } from '../mutable-element.js';
 import { MenuSelectedEvent } from '../../lib/events.js';
 import '../menu/column-menu.js';
 import type { HeaderMenuOptions, ColumnPlugin, PluginWorkspaceInstallationId } from '../../types.js';
-import { Theme } from '../../types.js';
 export declare class TH extends MutableElement {
     protected get classMap(): {
         'table-cell relative whitespace-nowrap h-[38px]': boolean;
@@ -20,20 +19,18 @@ export declare class TH extends MutableElement {
     };
     tableHeight?: number;
     withResizer: boolean;
-    outerBorder: boolean;
     value: string;
+    originalValue?: string;
     plugins?: Array<ColumnPlugin>;
     installedPlugins: Record<string, PluginWorkspaceInstallationId | undefined>;
     blank: boolean;
     protected isLastColumn: boolean;
-    separateCells: boolean;
     hasMenu: boolean;
     options: HeaderMenuOptions;
+    protected distanceToLeftViewport: number;
     private _previousWidth;
     protected _options: HeaderMenuOptions;
     protected _pluginOptions: HeaderMenuOptions;
-    protected distanceToLeftViewport: number;
-    theme: Theme;
     connectedCallback(): void;
     disconnectedCallback(): void;
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;

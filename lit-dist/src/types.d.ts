@@ -91,8 +91,8 @@ export type Position = {
 export type CellDetail = {
     position: Position;
     label?: string;
-    previousValue: ColumnType;
-    value: ColumnType;
+    previousValue: Serializable;
+    value: Serializable;
 };
 export type HeaderMenuOptions = Array<{
     label: string | TemplateResult<1>;
@@ -147,4 +147,7 @@ export declare enum PluginEvent {
     pageNext = "page_next",
     cellValue = "cellvalue"
 }
+export type Serializable = string | number | bigint | boolean | null | undefined | Array<Serializable> | {
+    [key: string]: Array<Serializable> | Serializable | string | number | bigint | boolean | null | undefined;
+};
 //# sourceMappingURL=types.d.ts.map

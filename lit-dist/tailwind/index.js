@@ -601,12 +601,12 @@ video {
   top: 2rem;
 }
 
-.z-10 {
-  z-index: 10;
+.z-\\[1\\] {
+  z-index: 1;
 }
 
-.z-20 {
-  z-index: 20;
+.z-\\[2\\] {
+  z-index: 2;
 }
 
 .m-12 {
@@ -1167,8 +1167,8 @@ video {
   background-color: var(--table-row-selected-hover-background-color, rgba(229, 229, 229, 1));
 }
 
-.focus\\:z-10:focus {
-  z-index: 10;
+.focus\\:z-\\[1\\]:focus {
+  z-index: 1;
 }
 
 .focus\\:rounded-\\[4px\\]:focus {

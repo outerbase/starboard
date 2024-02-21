@@ -45,12 +45,12 @@ let CellMenu = class CellMenu extends Menu {
         // @click shows/hides the menu
         // @dblclick prevents parent's dblclick
         // @keydown navigates the menu
-        // const trigger = this.hasMenu ? html`<span class="font-bold focus:z-10">{}</span>` : null
+        // const trigger = this.hasMenu ? html`<span class="font-bold focus:z-[1]">{}</span>` : null
         return html `
             <span
                 class=${classMap({
             'whitespace-nowrap text-ellipsis': true,
-            'overflow-hidden w-full focus:z-10 ': true,
+            'overflow-hidden w-full focus:z-[1] ': true,
         })}
                 ><slot></slot
             ></span>

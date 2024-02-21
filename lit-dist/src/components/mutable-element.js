@@ -4,6 +4,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+import { isEqual } from 'lodash';
+import { Theme } from '../types.js';
 import { CellUpdateEvent } from '../lib/events.js';
 import { property, state } from 'lit/decorators.js';
 import { ClassifiedElement } from './classified-element.js';
@@ -15,6 +17,10 @@ export class MutableElement extends ClassifiedElement {
         this.position = { column: '', row: '' }; // TODO let this be undefined?
         this.readonly = false;
         this.isInteractive = false;
+        this.outerBorder = false;
+        this.theme = Theme.light;
+        // allows, for example, <outerbase-td separate-cells="true" />
+        this.separateCells = false;
         this.isEditing = false;
     }
     get dirty() {
@@ -44,10 +50,10 @@ export class MutableElement extends ClassifiedElement {
         super.willUpdate(changedProperties);
         // set initial `originalValue`
         // this is done here instead of, say, connectedCallback() because of a quirk with SSR
-        if (changedProperties.has('value') && this.originalValue === undefined) {
+        if (changedProperties.has('value') && this.originalValue === undefined && this.originalValue !== this.value) {
             this.originalValue = this.value;
         }
-        if (changedProperties.get('value') && this.previousValue !== this.value) {
+        if (changedProperties.get('value') && !isEqual(this.value, this.originalValue)) {
             this.previousValue = this.value;
             this.dispatchChangedEvent();
         }
@@ -63,16 +69,21 @@ export class MutableElement extends ClassifiedElement {
             // disabling restoring the original value
             // this.value = this.originalValue
         }
-        if (event.code === 'Enter' && this.isEditing) {
+        if (event.code === 'Enter' && this.isEditing && event.target instanceof HTMLElement) {
+            const target = event.target;
             // without this setTimeout, something sets `isEditing` back and re-renders immediately, negating the effect entirely
             setTimeout(() => {
                 this.isEditing = false;
                 this.focus();
-            }, 0);
+                // wait until the prev commands have processed
+                setTimeout(() => {
+                    this.moveFocusToNextRow(target);
+                }, 0);
+            });
         }
         if (event.code === 'Enter' && !this.isEditing && !this.readonly) {
             if (event.target instanceof HTMLElement && !this.isEditing) {
-                this.moveFocusToNextRow(event.target);
+                this.isEditing = true;
             }
         }
     }
@@ -98,7 +109,7 @@ export class MutableElement extends ClassifiedElement {
     dispatchChangedEvent() {
         this.dispatchEvent(new CellUpdateEvent({
             position: this.position,
-            previousValue: this.originalValue,
+            previousValue: this.originalValue, // TODO @johnny remove this cast / handle types better
             value: this.value,
             label: this.label,
         }));
@@ -153,6 +164,15 @@ __decorate([
 __decorate([
     property({ attribute: 'interactive', type: Boolean })
 ], MutableElement.prototype, "isInteractive", void 0);
+__decorate([
+    property({ attribute: 'outer-border', type: Boolean })
+], MutableElement.prototype, "outerBorder", void 0);
+__decorate([
+    property({ attribute: 'theme', type: Number })
+], MutableElement.prototype, "theme", void 0);
+__decorate([
+    property({ type: Boolean, attribute: 'separate-cells' })
+], MutableElement.prototype, "separateCells", void 0);
 __decorate([
     state()
 ], MutableElement.prototype, "isEditing", void 0);

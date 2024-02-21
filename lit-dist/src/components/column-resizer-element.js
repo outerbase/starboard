@@ -58,7 +58,7 @@ let ColumnResizer = class ColumnResizer extends ClassifiedElement {
     }
     render() {
         const classes = classMap({
-            'absolute z-10 top-0 bottom-0 -right-[7px] w-4': true,
+            'absolute z-[1] top-0 bottom-0 -right-[7px] w-4': true,
             'flex justify-center': true,
             'cursor-col-resize group': true,
             dark: this.theme === Theme.dark,

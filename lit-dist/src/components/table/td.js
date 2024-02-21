@@ -22,20 +22,16 @@ let TableData = class TableData extends MutableElement {
     constructor() {
         super(...arguments);
         this.pluginAttributes = '';
-        // allows, for example, <outerbase-td separate-cells="true" />
-        this.separateCells = false;
         // allows, for example, <outerbase-td bottom-border="true" />
         this.withBottomBorder = false;
         this.blank = false;
         this._drawRightBorder = false;
         this.hasMenu = false;
         this.isRowSelector = false;
-        this.outerBorder = false;
         this.isLastColumn = false;
         this.isLastRow = false;
         this.leftDistanceToViewport = -1;
         this.hideDirt = false;
-        this.theme = Theme.light;
         this.options = [
             { label: 'Edit', value: 'edit' },
             { label: 'Copy', value: 'copy' },
@@ -46,7 +42,7 @@ let TableData = class TableData extends MutableElement {
     }
     get classMap() {
         return {
-            'table-cell relative focus:z-10': true,
+            'table-cell relative focus:z-[1]': true,
             'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
             'px-5': this.blank,
             'border-theme-border dark:border-theme-border-dark': true,
@@ -180,7 +176,7 @@ let TableData = class TableData extends MutableElement {
             // copy/paste focused cells
             if (code === 'KeyC') {
                 event.preventDefault();
-                navigator.clipboard.writeText(this.value ?? '');
+                navigator.clipboard.writeText(this.value?.toString() ?? '');
             }
             if (code === 'KeyV') {
                 event.preventDefault();
@@ -233,7 +229,7 @@ let TableData = class TableData extends MutableElement {
         return this.isEditing
             ? // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
                 html `<span class=${contentWrapperClass}>&nbsp;<input .value=${value ?? ''} @input=${this.onChange} class=${classMap({
-                    'z-20 absolute top-0 bottom-0 right-0 left-0': true,
+                    'z-[2] absolute top-0 bottom-0 right-0 left-0': true,
                     'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
                     'px-3 font-normal focus:rounded-[4px]': true,
                 })} @blur=${this.onBlur}></input></span>`
@@ -250,7 +246,11 @@ let TableData = class TableData extends MutableElement {
                         {
                             label: html `Revert to
                                           <span class="pointer-events-none italic whitespace-nowrap"
-                                              >${this.originalValue ?? 'NULL'}</span
+                                              >${typeof this.originalValue === 'object'
+                                ? JSON.stringify(this.originalValue)
+                                : this.originalValue !== null || this.originalValue !== undefined
+                                    ? this.originalValue
+                                    : 'NULL'}</span
                                           >`,
                             value: 'reset',
                         },
@@ -269,7 +269,7 @@ let TableData = class TableData extends MutableElement {
             case 'edit':
                 return (this.isEditing = true);
             case 'copy':
-                return navigator.clipboard.writeText(this.value ?? '');
+                return navigator.clipboard.writeText(this.value?.toString() ?? '');
             case 'paste':
                 this.value = await navigator.clipboard.readText();
                 return;
@@ -284,17 +284,8 @@ __decorate([
     property({ attribute: 'plugin-attributes', type: String })
 ], TableData.prototype, "pluginAttributes", void 0);
 __decorate([
-    property({ type: Boolean, attribute: 'separate-cells' })
-], TableData.prototype, "separateCells", void 0);
-__decorate([
     property({ type: Boolean, attribute: 'bottom-border' })
 ], TableData.prototype, "withBottomBorder", void 0);
-__decorate([
-    property({ type: String, attribute: 'sort-by' })
-], TableData.prototype, "sortBy", void 0);
-__decorate([
-    property({ type: String, attribute: 'order-by' })
-], TableData.prototype, "orderBy", void 0);
 __decorate([
     property({ type: Boolean, attribute: 'blank' })
 ], TableData.prototype, "blank", void 0);
@@ -311,9 +302,6 @@ __decorate([
     property({ type: Boolean, attribute: 'row-selector' })
 ], TableData.prototype, "isRowSelector", void 0);
 __decorate([
-    property({ attribute: 'outer-border', type: Boolean })
-], TableData.prototype, "outerBorder", void 0);
-__decorate([
     property({ attribute: 'is-last-column', type: Boolean })
 ], TableData.prototype, "isLastColumn", void 0);
 __decorate([
@@ -328,9 +316,6 @@ __decorate([
 __decorate([
     property({ attribute: 'hide-dirt', type: Boolean })
 ], TableData.prototype, "hideDirt", void 0);
-__decorate([
-    property({ attribute: 'theme', type: String })
-], TableData.prototype, "theme", void 0);
 __decorate([
     property({ attribute: 'plugin', type: String })
 ], TableData.prototype, "plugin", void 0);
