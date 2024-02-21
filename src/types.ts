@@ -88,14 +88,13 @@ export type Schema = {
     columns: Columns
 }
 export type Columns = Array<TableColumn>
-export type ColumnType = string | number | boolean | null | undefined
 export type RowAsRecord = {
     id: string
-    values: Record<string, ColumnType>
-    originalValues: Record<string, ColumnType>
+    values: Record<string, Serializable>
+    originalValues: Record<string, Serializable>
     isNew: boolean
 }
-export type Data = { [key: string]: ColumnType | Data }
+
 // API Response:
 export type Queryd = {
     name: string
@@ -183,7 +182,8 @@ export type Serializable =
     | boolean
     | null
     | undefined
-    | Array<Serializable>
-    | {
-          [key: string]: Array<Serializable> | Serializable | string | number | bigint | boolean | null | undefined
-      }
+    | Date // Note: Dates are not inherently JSON serializable without conversion to string
+    | SerializableArray
+    | SerializableRecord
+export interface SerializableArray extends Array<Serializable> {}
+export interface SerializableRecord extends Record<string, Serializable> {}
