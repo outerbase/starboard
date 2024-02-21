@@ -1,5 +1,5 @@
 import type { PropertyValues } from 'lit'
-import { isEqual } from 'lodash'
+import { isEqual } from 'lodash-es'
 
 import { Theme, type Position, type Serializable } from '../types.js'
 import { CellUpdateEvent } from '../lib/events.js'
@@ -49,8 +49,6 @@ export class MutableElement extends ClassifiedElement {
     @state()
     public isEditing = false
 
-    private previousValue?: Serializable
-
     public override connectedCallback() {
         super.connectedCallback()
         if (this.isInteractive) this.addEventListener('dblclick', this.onDoubleClick)
@@ -80,11 +78,6 @@ export class MutableElement extends ClassifiedElement {
         // this is done here instead of, say, connectedCallback() because of a quirk with SSR
         if (changedProperties.has('value') && this.originalValue === undefined && this.originalValue !== this.value) {
             this.originalValue = this.value
-        }
-
-        if (changedProperties.get('value') && !isEqual(this.value, this.originalValue)) {
-            this.previousValue = this.value
-            this.dispatchChangedEvent()
         }
     }
 

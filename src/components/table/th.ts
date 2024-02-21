@@ -18,7 +18,7 @@ import {
 } from '../../lib/events.js'
 import '../menu/column-menu.js' // <outerbase-th-menu />
 import type { ColumnMenu } from '../menu/column-menu.js'
-import type { HeaderMenuOptions, ColumnPlugin, PluginWorkspaceInstallationId, Serializable } from '../../types.js'
+import type { HeaderMenuOptions, ColumnPlugin, PluginWorkspaceInstallationId } from '../../types.js'
 import { Theme } from '../../types.js'
 import { CaretRight } from '../../lib/icons/caret-right.js'
 
