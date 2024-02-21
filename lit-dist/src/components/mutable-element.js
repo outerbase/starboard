@@ -4,7 +4,6 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { isEqual } from 'lodash';
 import { Theme } from '../types.js';
 import { CellUpdateEvent } from '../lib/events.js';
 import { property, state } from 'lit/decorators.js';
@@ -52,10 +51,6 @@ export class MutableElement extends ClassifiedElement {
         // this is done here instead of, say, connectedCallback() because of a quirk with SSR
         if (changedProperties.has('value') && this.originalValue === undefined && this.originalValue !== this.value) {
             this.originalValue = this.value;
-        }
-        if (changedProperties.get('value') && !isEqual(this.value, this.originalValue)) {
-            this.previousValue = this.value;
-            this.dispatchChangedEvent();
         }
     }
     onKeyDown(event) {
