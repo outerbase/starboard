@@ -46,9 +46,7 @@ export declare class TableData extends MutableElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     protected render(): TemplateResult<1>;
-    protected onMenuSelection(event: MenuSelectedEvent): Promise<string | number | bigint | boolean | void | import("../../types.js").Serializable[] | {
-        [key: string]: import("../../types.js").Serializable | import("../../types.js").Serializable[];
-    } | null>;
+    protected onMenuSelection(event: MenuSelectedEvent): Promise<string | number | bigint | boolean | void | Date | import("../../types.js").SerializableArray | import("../../types.js").SerializableRecord | null>;
 }
 export {};
 //# sourceMappingURL=td.d.ts.map

@@ -68,15 +68,11 @@ export type Schema = {
     columns: Columns;
 };
 export type Columns = Array<TableColumn>;
-export type ColumnType = string | number | boolean | null | undefined;
 export type RowAsRecord = {
     id: string;
-    values: Record<string, ColumnType>;
-    originalValues: Record<string, ColumnType>;
+    values: Record<string, Serializable>;
+    originalValues: Record<string, Serializable>;
     isNew: boolean;
-};
-export type Data = {
-    [key: string]: ColumnType | Data;
 };
 export type Queryd = {
     name: string;
@@ -147,7 +143,9 @@ export declare enum PluginEvent {
     pageNext = "page_next",
     cellValue = "cellvalue"
 }
-export type Serializable = string | number | bigint | boolean | null | undefined | Array<Serializable> | {
-    [key: string]: Array<Serializable> | Serializable | string | number | bigint | boolean | null | undefined;
-};
+export type Serializable = string | number | bigint | boolean | null | undefined | Date | SerializableArray | SerializableRecord;
+export interface SerializableArray extends Array<Serializable> {
+}
+export interface SerializableRecord extends Record<string, Serializable> {
+}
 //# sourceMappingURL=types.d.ts.map

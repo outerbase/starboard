@@ -1,7 +1,7 @@
-import type { CellDetail, Data, RowAsRecord, ColumnPlugin, PluginWorkspaceInstallationId } from '../types.js';
+import type { CellDetail, RowAsRecord, ColumnPlugin, PluginWorkspaceInstallationId, Serializable } from '../types.js';
 type ColumnAttributes = {
     name: string;
-    data?: Data;
+    data?: Serializable;
 };
 declare class BubblyEvent extends Event {
     constructor(name: string);
@@ -11,7 +11,7 @@ export declare class CellUpdateEvent extends BubblyEvent {
     constructor(detail: CellDetail);
 }
 export declare class ColumnEvent extends BubblyEvent {
-    data?: Data;
+    data?: Serializable;
     name: string;
     constructor(type: string, { data, name }: ColumnAttributes);
 }

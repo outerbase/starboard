@@ -4,6 +4,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+import { isEqual } from 'lodash-es';
 import { Theme } from '../types.js';
 import { CellUpdateEvent } from '../lib/events.js';
 import { property, state } from 'lit/decorators.js';
@@ -23,7 +24,7 @@ export class MutableElement extends ClassifiedElement {
         this.isEditing = false;
     }
     get dirty() {
-        return this.originalValue !== undefined && this.value !== this.originalValue;
+        return this.originalValue !== undefined && isEqual(this.value, this.originalValue);
     }
     connectedCallback() {
         super.connectedCallback();
@@ -61,8 +62,6 @@ export class MutableElement extends ClassifiedElement {
             // abort changes
             this.isEditing = false;
             this.focus();
-            // disabling restoring the original value
-            // this.value = this.originalValue
         }
         if (event.code === 'Enter' && this.isEditing && event.target instanceof HTMLElement) {
             const target = event.target;
