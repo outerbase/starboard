@@ -4,7 +4,6 @@ import { ifDefined } from 'lit/directives/if-defined.js'
 import { repeat } from 'lit/directives/repeat.js'
 
 import {
-    CheckEvent,
     ColumnAddedEvent,
     ColumnHiddenEvent,
     ColumnPluginDeactivatedEvent,
@@ -39,7 +38,6 @@ import './tr.js'
 import '../check-box.js'
 
 import { classMap } from 'lit/directives/class-map.js'
-import { TWStyles } from '../../../tailwind/index.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -100,6 +98,9 @@ export class Table extends ClassifiedElement {
 
     @property({ attribute: 'blank-fill', type: Boolean })
     public blankFill = false
+
+    @property({ attribute: 'column-width-offsets', type: Object })
+    public columnWidthOffsets: Record<string, number | undefined> = {}
 
     @state()
     private _height?: number
@@ -222,7 +223,7 @@ export class Table extends ClassifiedElement {
         this.dispatchEvent(new RowSelectedEvent(selectedRows))
     }
 
-    protected widthForColumnType(name: string) {
+    protected widthForColumnType(name: string, offset = 0) {
         const columnType = this.visibleColumns.find(({ name: _name }) => name === _name)?.type?.toUpperCase() as DBType
         if (
             [
@@ -237,14 +238,14 @@ export class Table extends ClassifiedElement {
                 DBType.INT,
             ].includes(columnType)
         )
-            return 150
-        if ([DBType.CHAR, DBType.TEXT, DBType.VARCHAR, DBType.VARYING].includes(columnType)) return 200
-        if ([DBType.TIME, DBType.DATE, DBType.TIMESTAMP].includes(columnType)) return 110
-        if ([DBType.TIME_WITH_TIME_ZONE, DBType.DATETIME, DBType.TIMESTAMP_WITH_TIME_ZONE].includes(columnType)) return 200
-        if ([DBType.JSON, DBType.JSONB].includes(columnType)) return 200
-        if ([DBType.UUID].includes(columnType)) return 300
+            return 150 + offset
+        if ([DBType.CHAR, DBType.TEXT, DBType.VARCHAR, DBType.VARYING].includes(columnType)) return 200 + offset
+        if ([DBType.TIME, DBType.DATE, DBType.TIMESTAMP].includes(columnType)) return 110 + offset
+        if ([DBType.TIME_WITH_TIME_ZONE, DBType.DATETIME, DBType.TIMESTAMP_WITH_TIME_ZONE].includes(columnType)) return 200 + offset
+        if ([DBType.JSON, DBType.JSONB].includes(columnType)) return 200 + offset
+        if ([DBType.UUID].includes(columnType)) return 300 + offset
 
-        return 200
+        return 200 + offset
     }
 
     // KEYBOARD SHORTCUTS
@@ -299,6 +300,12 @@ export class Table extends ClassifiedElement {
             this.onKeyDown_bound = this.onKeyDown.bind(this)
             document.addEventListener('keydown', this.onKeyDown_bound)
         }
+
+        const table = this.shadowRoot?.getElementById('table')
+        if (!table) throw new Error('Unexpectedly missing a table')
+
+        this._previousWidth = table.clientWidth
+        table.style.width = `${this._previousWidth}px`
     }
 
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -328,18 +335,18 @@ export class Table extends ClassifiedElement {
         this._previousWidth = table.clientWidth
     }
 
+    private _onColumnResized({ delta, name }: ResizeEvent) {
+        const table = this.shadowRoot?.getElementById('table')
+        if (!table) throw new Error('Unexpectedly missing a table')
+
+        table.style.width = `${this._previousWidth + delta}px`
+    }
+
     private _onColumnPluginDeactivated({ column }: ColumnPluginDeactivatedEvent) {
         if (this.installedPlugins) {
             delete this.installedPlugins[column]
             this.requestUpdate('installedPlugins')
         }
-    }
-
-    private _onColumnResized({ delta }: ResizeEvent) {
-        const table = this.shadowRoot?.getElementById('table')
-        if (!table) throw new Error('Unexpectedly missing a table')
-
-        table.style.width = `${this._previousWidth + delta}px`
     }
 
     private setCssVariablesForPlugin(theme: Theme) {
@@ -370,8 +377,6 @@ export class Table extends ClassifiedElement {
         if (typeof window === 'undefined') return -1
         return this.getBoundingClientRect().left
     }
-
-    static override styles = [TWStyles]
 
     protected renderRows(rows: Array<RowAsRecord>) {
         const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null
@@ -434,7 +439,7 @@ export class Table extends ClassifiedElement {
                                           .position=${{ row: id, column: name }}
                                           .value=${values[name]}
                                           .original-value=${originalValues[name]}
-                                          width="${this.widthForColumnType(name)}px"
+                                          width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
                                           left-distance-to-viewport=${this.distanceToLeftViewport}
                                           table-bounding-rect="${tableBoundingRect}"
                                           theme=${this.theme}
@@ -468,7 +473,7 @@ export class Table extends ClassifiedElement {
     protected override render() {
         const tableContainerClasses = { dark: this.theme == Theme.dark }
         const tableClasses = {
-            'table bg-theme-table dark:bg-theme-table-dark': true,
+            'table table-fixed bg-theme-table dark:bg-theme-table-dark': true,
             'text-theme-text dark:text-theme-text-dark text-sm': true,
             'min-w-full': true,
         }
@@ -516,7 +521,7 @@ export class Table extends ClassifiedElement {
                                     name="${this.renamedColumns[name] ?? name}"
                                     original-value="${name}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
-                                    width="${this.widthForColumnType(name)}px"
+                                    width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
                                     ?separate-cells=${true}
                                     ?outer-border=${this.outerBorder}
                                     ?menu=${!this.isNonInteractive && !this.readonly}

@@ -27,7 +27,7 @@ import { CaretRight } from '../../lib/icons/caret-right.js'
 export class TH extends MutableElement {
     protected override get classMap() {
         return {
-            'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
+            'table-cell relative whitespace-nowrap overflow-hidden h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
             'border-b border-theme-border dark:border-theme-border-dark': true,
             'first:border-l border-t': this.outerBorder,
             'px-cell-padding-x py-cell-padding-y': true,
@@ -126,8 +126,7 @@ export class TH extends MutableElement {
 
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         if (this.width && this.style) {
-            this.style.minWidth = this.width
-            this.style.maxWidth = this.width
+            this.style.width = this.width
         }
     }
 
@@ -143,17 +142,8 @@ export class TH extends MutableElement {
                 })) ?? []
         }
 
-        if (_changedProperties.has('width') && this.style) {
-            if (this.width) {
-                this.style.width = this.width
-            }
-        }
-
-        if (_changedProperties.has('width')) {
-            if (this.width && this.style) {
-                this.style.minWidth = this.width
-                this.style.maxWidth = this.width
-            }
+        if (_changedProperties.has('width') && this.width && this.style) {
+            this.style.width = this.width
         }
     }
 
@@ -230,7 +220,6 @@ export class TH extends MutableElement {
                           }}
                           @resize=${({ delta }: ResizeEvent) => {
                               this.width = `${this._previousWidth + delta}px`
-                              this.style.width = this.width
                           }}
                       ></column-resizer
                   ></span>`

@@ -142,23 +142,32 @@ export class MenuSelectedEvent extends BubblyEvent {
 }
 
 export class ResizeStartEvent extends BubblyEvent {
-    constructor() {
+    name: string
+
+    constructor(name: string) {
         super('resize-start')
+        this.name = name
     }
 }
 
 export class ResizeEndEvent extends BubblyEvent {
+    name: string
     delta: number // a +/- number denoting number of pixels change in column width
-    constructor(delta: number) {
+
+    constructor(name: string, delta: number) {
         super('resize-end')
+        this.name = name
         this.delta = delta
     }
 }
 
 export class ResizeEvent extends BubblyEvent {
+    name: string
     delta: number // a +/- number denoting number of pixels change in column width
-    constructor(delta: number) {
+
+    constructor(name: string, delta: number) {
         super('resize')
+        this.name = name
         this.delta = delta
     }
 }
