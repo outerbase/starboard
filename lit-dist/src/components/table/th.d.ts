@@ -28,9 +28,7 @@ export declare class TH extends MutableElement {
     protected isLastColumn: boolean;
     separateCells: boolean;
     hasMenu: boolean;
-    isInteractive: boolean;
     options: HeaderMenuOptions;
-    width: number;
     private _previousWidth;
     protected _options: HeaderMenuOptions;
     protected _pluginOptions: HeaderMenuOptions;
@@ -38,8 +36,8 @@ export declare class TH extends MutableElement {
     theme: Theme;
     connectedCallback(): void;
     disconnectedCallback(): void;
-    protected willUpdate(_changedProperties: PropertyValues<this>): void;
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;
+    protected willUpdate(_changedProperties: PropertyValues<this>): void;
     protected render(): import("lit").TemplateResult<1>;
     protected dispatchChangedEvent(): void;
     protected removeColumn(): void;

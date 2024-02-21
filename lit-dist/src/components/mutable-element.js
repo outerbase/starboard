@@ -14,6 +14,7 @@ export class MutableElement extends ClassifiedElement {
         // the cell's row's uuid and column name
         this.position = { column: '', row: '' }; // TODO let this be undefined?
         this.readonly = false;
+        this.isInteractive = false;
         this.isEditing = false;
     }
     get dirty() {
@@ -21,12 +22,12 @@ export class MutableElement extends ClassifiedElement {
     }
     connectedCallback() {
         super.connectedCallback();
-        if (!this.readonly)
+        if (this.isInteractive)
             this.addEventListener('dblclick', this.onDoubleClick);
     }
     disconnectedCallback() {
         super.disconnectedCallback();
-        if (!this.readonly)
+        if (this.isInteractive)
             this.removeEventListener('dblclick', this.onDoubleClick);
     }
     updated(changedProps) {
@@ -80,8 +81,13 @@ export class MutableElement extends ClassifiedElement {
             this.isEditing = true;
             setTimeout(() => {
                 const input = this.shadowRoot?.querySelector('input');
-                input?.focus();
-                input?.setSelectionRange(input.value.length, input.value.length);
+                if (input) {
+                    input.readOnly = this.readonly;
+                    input.focus();
+                    // set cursor to end if writable
+                    if (!this.readonly)
+                        input.setSelectionRange(input.value.length, input.value.length);
+                }
             }, 0);
         }
     }
@@ -141,6 +147,12 @@ __decorate([
 __decorate([
     property({ attribute: 'read-only', type: Boolean })
 ], MutableElement.prototype, "readonly", void 0);
+__decorate([
+    property({ type: String, attribute: 'width' })
+], MutableElement.prototype, "width", void 0);
+__decorate([
+    property({ attribute: 'interactive', type: Boolean })
+], MutableElement.prototype, "isInteractive", void 0);
 __decorate([
     state()
 ], MutableElement.prototype, "isEditing", void 0);

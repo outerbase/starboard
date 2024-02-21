@@ -22,7 +22,6 @@ export declare class TableData extends MutableElement {
         'cursor-pointer': boolean;
     };
     pluginAttributes: String;
-    width?: string;
     separateCells: boolean;
     withBottomBorder: boolean;
     sortBy?: string;
@@ -30,7 +29,6 @@ export declare class TableData extends MutableElement {
     blank: boolean;
     protected isOdd?: boolean;
     private _drawRightBorder;
-    isInteractive: boolean;
     private hasMenu;
     isRowSelector: boolean;
     outerBorder: boolean;
@@ -46,15 +44,14 @@ export declare class TableData extends MutableElement {
         value: string;
     }[];
     protected isDisplayingPluginEditor: boolean;
-    protected firstUpdated(_changedProperties: Map<PropertyKey, unknown>): void;
     protected willUpdate(changedProperties: PropertyValues<this>): void;
     protected onContextMenu(event: MouseEvent): void;
     protected onPluginEvent({ detail: { action, value } }: PluginActionEvent): void;
-    protected onKeyDown(event: KeyboardEvent): void;
+    protected onKeyDown(event: KeyboardEvent): Promise<void>;
     connectedCallback(): void;
     disconnectedCallback(): void;
     protected render(): TemplateResult<1>;
-    protected onMenuSelection(event: MenuSelectedEvent): string | true | Promise<void> | undefined;
+    protected onMenuSelection(event: MenuSelectedEvent): Promise<string | true | void>;
 }
 export {};
 //# sourceMappingURL=td.d.ts.map

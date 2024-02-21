@@ -28,7 +28,6 @@ let TableData = class TableData extends MutableElement {
         this.withBottomBorder = false;
         this.blank = false;
         this._drawRightBorder = false;
-        this.isInteractive = false;
         this.hasMenu = false;
         this.isRowSelector = false;
         this.outerBorder = false;
@@ -40,6 +39,7 @@ let TableData = class TableData extends MutableElement {
         this.options = [
             { label: 'Edit', value: 'edit' },
             { label: 'Copy', value: 'copy' },
+            { label: 'Paste', value: 'paste' },
             { label: 'Clear', value: 'clear' },
         ];
         this.isDisplayingPluginEditor = false;
@@ -61,22 +61,23 @@ let TableData = class TableData extends MutableElement {
             'cursor-pointer': this.isInteractive,
         };
     }
-    firstUpdated(_changedProperties) {
-        if (this.width) {
-            this.style.minWidth = this.width;
-            this.style.maxWidth = this.width;
-        }
-    }
     willUpdate(changedProperties) {
         super.willUpdate(changedProperties);
         if (changedProperties.has('isInteractive') && this.isInteractive === true && !this.blank) {
             // prevent blank rows from being selectable; i.e. the first row that is used just for padding
             this.tabIndex = 0;
         }
-        if (changedProperties.has('width')) {
-            if (this.width && this.style) {
-                this.style.minWidth = this.width;
-                this.style.maxWidth = this.width;
+        if (changedProperties.has('readonly')) {
+            if (this.readonly) {
+                this.options = [{ label: 'Copy', value: 'copy' }];
+            }
+            else {
+                this.options = [
+                    { label: 'Edit', value: 'edit' },
+                    { label: 'Copy', value: 'copy' },
+                    { label: 'Paste', value: 'paste' },
+                    { label: 'Clear', value: 'clear' },
+                ];
             }
         }
     }
@@ -109,7 +110,7 @@ let TableData = class TableData extends MutableElement {
             this.value = value;
         }
     }
-    onKeyDown(event) {
+    async onKeyDown(event) {
         // ignore events being fired from a Plugin
         if (eventTargetIsPlugin(event))
             return;
@@ -136,7 +137,8 @@ let TableData = class TableData extends MutableElement {
             }
             // begin editing if keys are ASCII-ish
             const isInputTriggering = event.key.length === 1 && isAlphanumericOrSpecial(event.key);
-            if (isInputTriggering) {
+            const noMetaKeys = !(event.metaKey || event.shiftKey);
+            if (isInputTriggering && noMetaKeys) {
                 event.preventDefault();
                 // toggle editing mode
                 this.isEditing = true;
@@ -150,6 +152,7 @@ let TableData = class TableData extends MutableElement {
                 }, 0);
                 return;
             }
+            // navigating around the table
             if (code === 'ArrowRight') {
                 event.preventDefault();
                 target?.nextElementSibling?.focus();
@@ -174,8 +177,14 @@ let TableData = class TableData extends MutableElement {
                     this.moveFocusToPreviousRow(event.target);
                 }
             }
-            else if (code === 'Backspace' || code === 'Delete') {
-                this.value = undefined;
+            // copy/paste focused cells
+            if (code === 'KeyC') {
+                event.preventDefault();
+                navigator.clipboard.writeText(this.value ?? '');
+            }
+            if (code === 'KeyV') {
+                event.preventDefault();
+                this.value = await navigator.clipboard.readText();
             }
         }
         // close menu on 'Escape' key
@@ -185,6 +194,9 @@ let TableData = class TableData extends MutableElement {
             if (menu && menu.open) {
                 menu.open = false;
             }
+        }
+        if (code === 'Backspace' || code === 'Delete') {
+            this.value = undefined;
         }
     }
     connectedCallback() {
@@ -236,7 +248,9 @@ let TableData = class TableData extends MutableElement {
                         ...this.options,
                         {
                             label: html `Revert to
-                                          <span class="pointer-events-none italic whitespace-nowrap">${this.originalValue}</span>`,
+                                          <span class="pointer-events-none italic whitespace-nowrap"
+                                              >${this.originalValue ?? 'NULL'}</span
+                                          >`,
                             value: 'reset',
                         },
                     ]
@@ -249,12 +263,15 @@ let TableData = class TableData extends MutableElement {
                         ><span class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
                     >`;
     }
-    onMenuSelection(event) {
+    async onMenuSelection(event) {
         switch (event.value) {
             case 'edit':
                 return (this.isEditing = true);
             case 'copy':
                 return navigator.clipboard.writeText(this.value ?? '');
+            case 'paste':
+                this.value = await navigator.clipboard.readText();
+                return;
             case 'clear':
                 return (this.value = '');
             case 'reset':
@@ -265,9 +282,6 @@ let TableData = class TableData extends MutableElement {
 __decorate([
     property({ attribute: 'plugin-attributes', type: String })
 ], TableData.prototype, "pluginAttributes", void 0);
-__decorate([
-    property({ type: String, attribute: 'width' })
-], TableData.prototype, "width", void 0);
 __decorate([
     property({ type: Boolean, attribute: 'separate-cells' })
 ], TableData.prototype, "separateCells", void 0);
@@ -289,9 +303,6 @@ __decorate([
 __decorate([
     property({ type: Boolean, attribute: 'draw-right-border' })
 ], TableData.prototype, "_drawRightBorder", void 0);
-__decorate([
-    property({ attribute: 'interactive', type: Boolean })
-], TableData.prototype, "isInteractive", void 0);
 __decorate([
     property({ type: Boolean, attribute: 'menu' })
 ], TableData.prototype, "hasMenu", void 0);

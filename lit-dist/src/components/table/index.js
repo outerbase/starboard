@@ -20,7 +20,6 @@ import './thead.js';
 import './tr.js';
 import '../check-box.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { TWStyles } from '../../../tailwind/index.js';
 let Table = class Table extends ClassifiedElement {
     constructor() {
         super(...arguments);
@@ -38,6 +37,7 @@ let Table = class Table extends ClassifiedElement {
         this.pluginAttributes = '';
         this.readonly = false;
         this.blankFill = false;
+        this.columnWidthOffsets = {};
         this.columns = [];
         this.visibleColumns = [];
         this.selectedRowUUIDs = new Set();
@@ -138,7 +138,7 @@ let Table = class Table extends ClassifiedElement {
         });
         this.dispatchEvent(new RowSelectedEvent(selectedRows));
     }
-    widthForColumnType(name) {
+    widthForColumnType(name, offset = 0) {
         const columnType = this.visibleColumns.find(({ name: _name }) => name === _name)?.type?.toUpperCase();
         if ([
             DBType.BIGINT,
@@ -151,18 +151,18 @@ let Table = class Table extends ClassifiedElement {
             DBType.SMALLINT,
             DBType.INT,
         ].includes(columnType))
-            return 150;
+            return 150 + offset;
         if ([DBType.CHAR, DBType.TEXT, DBType.VARCHAR, DBType.VARYING].includes(columnType))
-            return 200;
+            return 200 + offset;
         if ([DBType.TIME, DBType.DATE, DBType.TIMESTAMP].includes(columnType))
-            return 110;
+            return 110 + offset;
         if ([DBType.TIME_WITH_TIME_ZONE, DBType.DATETIME, DBType.TIMESTAMP_WITH_TIME_ZONE].includes(columnType))
-            return 200;
+            return 200 + offset;
         if ([DBType.JSON, DBType.JSONB].includes(columnType))
-            return 200;
+            return 200 + offset;
         if ([DBType.UUID].includes(columnType))
-            return 300;
-        return 200;
+            return 300 + offset;
+        return 200 + offset;
     }
     onKeyDown(event) {
         const actualTarget = event.composedPath()[0];
@@ -207,6 +207,11 @@ let Table = class Table extends ClassifiedElement {
             this.onKeyDown_bound = this.onKeyDown.bind(this);
             document.addEventListener('keydown', this.onKeyDown_bound);
         }
+        const table = this.shadowRoot?.getElementById('table');
+        if (!table)
+            throw new Error('Unexpectedly missing a table');
+        this._previousWidth = table.clientWidth;
+        table.style.width = `${this._previousWidth}px`;
     }
     willUpdate(_changedProperties) {
         super.willUpdate(_changedProperties);
@@ -227,17 +232,17 @@ let Table = class Table extends ClassifiedElement {
             throw new Error('Unexpectedly missing a table');
         this._previousWidth = table.clientWidth;
     }
+    _onColumnResized({ delta, name }) {
+        const table = this.shadowRoot?.getElementById('table');
+        if (!table)
+            throw new Error('Unexpectedly missing a table');
+        table.style.width = `${this._previousWidth + delta}px`;
+    }
     _onColumnPluginDeactivated({ column }) {
         if (this.installedPlugins) {
             delete this.installedPlugins[column];
             this.requestUpdate('installedPlugins');
         }
-    }
-    _onColumnResized({ delta }) {
-        const table = this.shadowRoot?.getElementById('table');
-        if (!table)
-            throw new Error('Unexpectedly missing a table');
-        table.style.width = `${this._previousWidth + delta}px`;
     }
     setCssVariablesForPlugin(theme) {
         if (typeof document === 'undefined')
@@ -316,7 +321,7 @@ let Table = class Table extends ClassifiedElement {
                                           .position=${{ row: id, column: name }}
                                           .value=${values[name]}
                                           .original-value=${originalValues[name]}
-                                          width="${this.widthForColumnType(name)}px"
+                                          width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
                                           left-distance-to-viewport=${this.distanceToLeftViewport}
                                           table-bounding-rect="${tableBoundingRect}"
                                           theme=${this.theme}
@@ -347,7 +352,7 @@ let Table = class Table extends ClassifiedElement {
     render() {
         const tableContainerClasses = { dark: this.theme == Theme.dark };
         const tableClasses = {
-            'table bg-theme-table dark:bg-theme-table-dark': true,
+            'table table-fixed bg-theme-table dark:bg-theme-table-dark': true,
             'text-theme-text dark:text-theme-text-dark text-sm': true,
             'min-w-full': true,
         };
@@ -372,7 +377,7 @@ let Table = class Table extends ClassifiedElement {
             ? html `<outerbase-th
                               table-height=${ifDefined(this._height)}
                               theme=${this.theme}
-                              width=${42}
+                              width="42px"
                               ?separate-cells=${true}
                               ?outer-border=${this.outerBorder}
                               ?is-last=${0 === this.visibleColumns.length}
@@ -391,7 +396,7 @@ let Table = class Table extends ClassifiedElement {
                                     name="${this.renamedColumns[name] ?? name}"
                                     original-value="${name}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
-                                    width=${this.widthForColumnType(name)}
+                                    width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
                                     ?separate-cells=${true}
                                     ?outer-border=${this.outerBorder}
                                     ?menu=${!this.isNonInteractive && !this.readonly}
@@ -422,7 +427,6 @@ let Table = class Table extends ClassifiedElement {
         </div>`;
     }
 };
-Table.styles = [TWStyles];
 __decorate([
     property({ type: Boolean, attribute: 'selectable-rows' })
 ], Table.prototype, "selectableRows", void 0);
@@ -477,6 +481,9 @@ __decorate([
 __decorate([
     property({ attribute: 'blank-fill', type: Boolean })
 ], Table.prototype, "blankFill", void 0);
+__decorate([
+    property({ attribute: 'column-width-offsets', type: Object })
+], Table.prototype, "columnWidthOffsets", void 0);
 __decorate([
     state()
 ], Table.prototype, "_height", void 0);

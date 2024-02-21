@@ -697,6 +697,10 @@ video {
   max-width: 14rem;
 }
 
+.table-fixed {
+  table-layout: fixed;
+}
+
 .cursor-col-resize {
   cursor: col-resize;
 }
@@ -1138,11 +1142,11 @@ video {
 }
 
 .odd\\:bg-theme-row-odd:nth-child(odd) {
-  background-color: var(--table-row-even-background-color, rgba(250,250,250));
+  background-color: var(--table-row-even-background-color, rgba(255,255,255));
 }
 
 .even\\:bg-theme-row-even:nth-child(even) {
-  background-color: var(--table-row-even-background-color, rgba(250,250,250));
+  background-color: var(--table-row-even-background-color, rgba(255,255,255));
 }
 
 .hover\\:bg-neutral-100:hover {
@@ -1362,11 +1366,11 @@ video {
 }
 
 :is(.dark .dark\\:odd\\:bg-theme-row-odd-dark:nth-child(odd)) {
-  background-color: var(--table-row-even-background-color-dark, rgba(10,10,10));
+  background-color: var(--table-row-even-background-color-dark, rgba(0,0,0));
 }
 
 :is(.dark .dark\\:even\\:bg-theme-row-even-dark:nth-child(even)) {
-  background-color: var(--table-row-even-background-color-dark, rgba(10,10,10));
+  background-color: var(--table-row-even-background-color-dark, rgba(0,0,0));
 }
 
 :is(.dark .dark\\:hover\\:bg-neutral-700:hover) {

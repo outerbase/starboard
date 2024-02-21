@@ -28,7 +28,6 @@ let TH = class TH extends MutableElement {
         // allows, for example, <outerbase-td separate-cells="true" />
         this.separateCells = false;
         this.hasMenu = false;
-        this.isInteractive = false;
         this.options = [
             {
                 label: 'Sort A-Z',
@@ -52,7 +51,6 @@ let TH = class TH extends MutableElement {
                 classes: 'text-red-600',
             },
         ];
-        this.width = 0;
         this._previousWidth = 0;
         this._options = [];
         this._pluginOptions = [];
@@ -83,6 +81,11 @@ let TH = class TH extends MutableElement {
         super.disconnectedCallback;
         this.removeEventListener('contextmenu', this.onContextMenu);
     }
+    firstUpdated(_changedProperties) {
+        if (this.width && this.style) {
+            this.style.width = this.width;
+        }
+    }
     willUpdate(_changedProperties) {
         super.willUpdate(_changedProperties);
         if (_changedProperties.has('plugins')) {
@@ -93,15 +96,9 @@ let TH = class TH extends MutableElement {
                     value: plugin.tagName,
                 })) ?? [];
         }
-        if (_changedProperties.has('width') && this.style) {
-            if (this.width) {
-                this.style.width = `${this.width}px`;
-            }
+        if (_changedProperties.has('width') && this.width && this.style) {
+            this.style.width = this.width;
         }
-    }
-    firstUpdated(_changedProperties) {
-        if (this.width && this.style)
-            this.style.width = `${this.width}px`;
     }
     render() {
         const name = this.originalValue ?? this.value;
@@ -163,11 +160,12 @@ let TH = class TH extends MutableElement {
                           height="${ifDefined(this.tableHeight)}"
                           theme=${this.theme}
                           @resize-start=${() => {
-                    this._previousWidth = this.width;
+                    // remove the suffix `px` from width and convert to a number
+                    // JOHNNY probably revert to storing the number??
+                    this._previousWidth = this.width ? +this.width.slice(0, -2) : 0;
                 }}
                           @resize=${({ delta }) => {
-                    this.width = this._previousWidth + delta;
-                    this.style.width = `${this.width}px`;
+                    this.width = `${this._previousWidth + delta}px`;
                 }}
                       ></column-resizer
                   ></span>`
@@ -279,14 +277,8 @@ __decorate([
     property({ attribute: 'menu', type: Boolean })
 ], TH.prototype, "hasMenu", void 0);
 __decorate([
-    property({ attribute: 'interactive', type: Boolean })
-], TH.prototype, "isInteractive", void 0);
-__decorate([
     property({ attribute: 'options', type: Array })
 ], TH.prototype, "options", void 0);
-__decorate([
-    property({ attribute: 'width', type: Number })
-], TH.prototype, "width", void 0);
 __decorate([
     state()
 ], TH.prototype, "_previousWidth", void 0);

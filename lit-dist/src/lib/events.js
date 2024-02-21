@@ -104,19 +104,22 @@ export class MenuSelectedEvent extends BubblyEvent {
     }
 }
 export class ResizeStartEvent extends BubblyEvent {
-    constructor() {
+    constructor(name) {
         super('resize-start');
+        this.name = name;
     }
 }
 export class ResizeEndEvent extends BubblyEvent {
-    constructor(delta) {
+    constructor(name, delta) {
         super('resize-end');
+        this.name = name;
         this.delta = delta;
     }
 }
 export class ResizeEvent extends BubblyEvent {
-    constructor(delta) {
+    constructor(name, delta) {
         super('resize');
+        this.name = name;
         this.delta = delta;
     }
 }

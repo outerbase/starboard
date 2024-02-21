@@ -8,6 +8,8 @@ export declare class MutableElement extends ClassifiedElement {
     label?: string;
     originalValue?: string;
     readonly: boolean;
+    width?: string;
+    isInteractive: boolean;
     isEditing: boolean;
     private previousValue?;
     connectedCallback(): void;

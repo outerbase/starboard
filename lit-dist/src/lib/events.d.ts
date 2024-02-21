@@ -67,15 +67,18 @@ export declare class MenuSelectedEvent extends BubblyEvent {
     constructor(value: string);
 }
 export declare class ResizeStartEvent extends BubblyEvent {
-    constructor();
+    name: string;
+    constructor(name: string);
 }
 export declare class ResizeEndEvent extends BubblyEvent {
+    name: string;
     delta: number;
-    constructor(delta: number);
+    constructor(name: string, delta: number);
 }
 export declare class ResizeEvent extends BubblyEvent {
+    name: string;
     delta: number;
-    constructor(delta: number);
+    constructor(name: string, delta: number);
 }
 export declare class ChangeEvent extends BubblyEvent {
     value: string;

@@ -335,7 +335,7 @@ export class Table extends ClassifiedElement {
         this._previousWidth = table.clientWidth
     }
 
-    private _onColumnResized({ delta, name }: ResizeEvent) {
+    private _onColumnResized({ delta }: ResizeEvent) {
         const table = this.shadowRoot?.getElementById('table')
         if (!table) throw new Error('Unexpectedly missing a table')
 

@@ -18,7 +18,7 @@ let ColumnResizer = class ColumnResizer extends ClassifiedElement {
     _mouseDown(e) {
         if (!this.column)
             throw new Error('`column` is unset; aborting');
-        this.dispatchEvent(new ResizeStartEvent());
+        this.dispatchEvent(new ResizeStartEvent(this.column.value));
         let dx;
         const _mouseMove = (e) => {
             if (!this.column)
@@ -28,12 +28,14 @@ let ColumnResizer = class ColumnResizer extends ClassifiedElement {
             if (!this.width)
                 throw new Error('`width` is unset; aborting');
             dx = e.clientX - this.xPosition;
-            this.dispatchEvent(new ResizeEvent(dx));
+            this.dispatchEvent(new ResizeEvent(this.column.value, dx));
         };
         const _mouseUp = (_e) => {
             document.removeEventListener('mouseup', _mouseUp);
             document.removeEventListener('mousemove', _mouseMove);
-            this.dispatchEvent(new ResizeEndEvent(dx));
+            if (!this.column)
+                throw new Error('`column` is unset; aborting');
+            this.dispatchEvent(new ResizeEndEvent(this.column.value, dx));
         };
         document.addEventListener('mousemove', _mouseMove);
         document.addEventListener('mouseup', _mouseUp);

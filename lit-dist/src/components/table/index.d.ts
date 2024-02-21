@@ -27,6 +27,7 @@ export declare class Table extends ClassifiedElement {
     pluginAttributes: String;
     readonly: boolean;
     blankFill: boolean;
+    columnWidthOffsets: Record<string, number | undefined>;
     private _height?;
     private resizeObserver?;
     protected columns: Columns;
@@ -44,7 +45,7 @@ export declare class Table extends ClassifiedElement {
     protected _onColumnRemoved({ name }: ColumnRemovedEvent): void;
     protected _onColumnHidden({ name }: ColumnHiddenEvent): void;
     protected _onRowSelection(): void;
-    protected widthForColumnType(name: string): 150 | 200 | 110 | 300;
+    protected widthForColumnType(name: string, offset?: number): number;
     protected onKeyDown_bound?: ({ shiftKey, key }: KeyboardEvent) => void;
     protected onKeyDown(event: KeyboardEvent): void;
     connectedCallback(): void;
@@ -53,11 +54,10 @@ export declare class Table extends ClassifiedElement {
     protected willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;
     private _previousWidth;
     private _onColumnResizeStart;
-    private _onColumnPluginDeactivated;
     private _onColumnResized;
+    private _onColumnPluginDeactivated;
     private setCssVariablesForPlugin;
     get distanceToLeftViewport(): number;
-    static styles: import("lit").CSSResult[];
     protected renderRows(rows: Array<RowAsRecord>): import("lit").TemplateResult<1>;
     protected render(): import("lit").TemplateResult<1>;
 }
