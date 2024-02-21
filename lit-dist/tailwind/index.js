@@ -904,8 +904,8 @@ video {
   background-color: var(--page-background-color, rgb(245,245,245));
 }
 
-.bg-theme-row-hover-dark {
-  background-color: var(--hover-background-color-dark, rgba(255,255,255,0.03));
+.bg-theme-row-even-dark {
+  background-color: var(--table-row-even-background-color-dark, rgba(0,0,0));
 }
 
 .bg-theme-row-new {
@@ -1159,10 +1159,6 @@ video {
   background-color: rgb(38 38 38 / var(--tw-bg-opacity));
 }
 
-.hover\\:bg-theme-row-hover:hover {
-  background-color: var(--hover-background-color, rgba(0,0,0,0.03));
-}
-
 .hover\\:bg-theme-row-selected-hover:hover {
   background-color: var(--table-row-selected-hover-background-color, rgba(229, 229, 229, 1));
 }
@@ -1239,6 +1235,14 @@ video {
 .group:hover .group-hover\\:bg-blue-400 {
   --tw-bg-opacity: 1;
   background-color: rgb(96 165 250 / var(--tw-bg-opacity));
+}
+
+.group:hover .group-hover\\:bg-theme-row-hover {
+  background-color: var(--hover-background-color, rgba(0,0,0,0.03));
+}
+
+.group:hover .group-hover\\:bg-theme-row-hover-dark {
+  background-color: var(--hover-background-color-dark, rgba(255,255,255,0.03));
 }
 
 .group:active .group-active\\:w-1 {
@@ -1383,10 +1387,6 @@ video {
   background-color: rgb(23 23 23 / var(--tw-bg-opacity));
 }
 
-:is(.dark .dark\\:hover\\:bg-theme-row-hover-dark:hover) {
-  background-color: var(--hover-background-color-dark, rgba(255,255,255,0.03));
-}
-
 :is(.dark .dark\\:hover\\:bg-theme-row-selected-hover-dark:hover) {
   background-color: var(--table-row-selected-hover-background-color-dark, rgb(38 38 38));
 }
@@ -1435,6 +1435,10 @@ video {
 :is(.dark .group:hover .dark\\:group-hover\\:bg-blue-900) {
   --tw-bg-opacity: 1;
   background-color: rgb(30 58 138 / var(--tw-bg-opacity));
+}
+
+:is(.dark .group:hover .dark\\:group-hover\\:bg-theme-row-hover-dark) {
+  background-color: var(--hover-background-color-dark, rgba(255,255,255,0.03));
 }
 
 :is(.dark .group:active .dark\\:group-active\\:bg-blue-800) {
