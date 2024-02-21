@@ -22,7 +22,7 @@ export declare class Table extends ClassifiedElement {
     outerBorder: boolean;
     hiddenColumnNames: Array<string>;
     deletedColumnNames: Array<string>;
-    renamedColumns: Record<string, string>;
+    renamedColumnNames: Record<string, string | undefined>;
     theme: Theme;
     pluginAttributes: String;
     readonly: boolean;

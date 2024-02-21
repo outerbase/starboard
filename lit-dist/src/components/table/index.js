@@ -32,7 +32,7 @@ let Table = class Table extends ClassifiedElement {
         // TODO @johnny make this a Set
         this.hiddenColumnNames = [];
         this.deletedColumnNames = [];
-        this.renamedColumns = {};
+        this.renamedColumnNames = {};
         this.theme = Theme.light;
         this.pluginAttributes = '';
         this.readonly = false;
@@ -393,7 +393,7 @@ let Table = class Table extends ClassifiedElement {
                                     installed-plugins=${JSON.stringify(this.installedPlugins)}
                                     table-height=${ifDefined(this._height)}
                                     theme=${this.theme}
-                                    value="${this.renamedColumns[name] ?? name}"
+                                    value="${this.renamedColumnNames[name] ?? name}"
                                     original-value="${name}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
                                     width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
@@ -468,7 +468,7 @@ __decorate([
 ], Table.prototype, "deletedColumnNames", void 0);
 __decorate([
     property({ attribute: 'renamed-columns', type: Object })
-], Table.prototype, "renamedColumns", void 0);
+], Table.prototype, "renamedColumnNames", void 0);
 __decorate([
     property({ attribute: 'theme', type: String })
 ], Table.prototype, "theme", void 0);
