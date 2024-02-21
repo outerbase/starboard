@@ -102,17 +102,24 @@ export class MutableElement extends ClassifiedElement {
             // this.value = this.originalValue
         }
 
-        if (event.code === 'Enter' && this.isEditing) {
+        if (event.code === 'Enter' && this.isEditing && event.target instanceof HTMLElement) {
+            const target = event.target
+
             // without this setTimeout, something sets `isEditing` back and re-renders immediately, negating the effect entirely
             setTimeout(() => {
                 this.isEditing = false
                 this.focus()
-            }, 0)
+
+                // wait until the prev commands have processed
+                setTimeout(() => {
+                    this.moveFocusToNextRow(target)
+                }, 0)
+            })
         }
 
         if (event.code === 'Enter' && !this.isEditing && !this.readonly) {
             if (event.target instanceof HTMLElement && !this.isEditing) {
-                this.moveFocusToNextRow(event.target)
+                this.isEditing = true
             }
         }
     }
