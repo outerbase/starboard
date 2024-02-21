@@ -14,7 +14,7 @@ export class MutableElement extends ClassifiedElement {
 
     @property({ type: String })
     public get dirty() {
-        return this.originalValue !== undefined && this.value !== this.originalValue
+        return this.originalValue !== undefined && isEqual(this.value, this.originalValue)
     }
 
     // the cell's row's uuid and column name
@@ -91,8 +91,6 @@ export class MutableElement extends ClassifiedElement {
             // abort changes
             this.isEditing = false
             this.focus()
-            // disabling restoring the original value
-            // this.value = this.originalValue
         }
 
         if (event.code === 'Enter' && this.isEditing && event.target instanceof HTMLElement) {
