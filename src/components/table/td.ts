@@ -238,6 +238,10 @@ export class TableData extends MutableElement {
                 event.preventDefault()
                 this.value = await navigator.clipboard.readText()
             }
+
+            if (code === 'Backspace' || code === 'Delete') {
+                this.value = undefined
+            }
         }
 
         // close menu on 'Escape' key
@@ -247,10 +251,6 @@ export class TableData extends MutableElement {
             if (menu && menu.open) {
                 menu.open = false
             }
-        }
-
-        if (code === 'Backspace' || code === 'Delete') {
-            this.value = undefined
         }
     }
 

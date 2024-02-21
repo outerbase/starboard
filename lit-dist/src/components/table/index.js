@@ -232,7 +232,7 @@ let Table = class Table extends ClassifiedElement {
             throw new Error('Unexpectedly missing a table');
         this._previousWidth = table.clientWidth;
     }
-    _onColumnResized({ delta, name }) {
+    _onColumnResized({ delta }) {
         const table = this.shadowRoot?.getElementById('table');
         if (!table)
             throw new Error('Unexpectedly missing a table');
