@@ -8,7 +8,7 @@ import { ClassifiedElement } from '../classified-element.js'
 export class TableRow extends ClassifiedElement {
     protected override get classMap() {
         return {
-            'table-row': true,
+            'table-row group': true,
 
             // when a header
             'text-theme-column-text dark:text-theme-column-text-dark': this.isHeaderRow,
@@ -17,7 +17,7 @@ export class TableRow extends ClassifiedElement {
             'bg-theme-row-new dark:bg-theme-row-new-dark': this.new && !this.selected,
 
             // not selected, not new, not a header
-            'odd:bg-theme-row-odd dark:odd:bg-theme-row-odd-dark even:bg-theme-row-even dark:even:bg-theme-row-even-dark hover:bg-theme-row-hover dark:hover:bg-theme-row-hover-dark':
+            'odd:bg-theme-row-odd dark:odd:bg-theme-row-odd-dark even:bg-theme-row-even dark:even:bg-theme-row-even-dark':
                 !this.new && !this.isHeaderRow && !this.selected,
 
             // when selected

@@ -25,7 +25,7 @@ const isAlphanumericOrSpecial = (key: string): boolean => {
 export class TableData extends MutableElement {
     protected override get classMap() {
         return {
-            'table-cell relative focus:z-[1]': true,
+            'table-cell relative focus:z-[1] group-hover:bg-theme-row-hover dark:group-hover:bg-theme-row-hover-dark': true,
             'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
             'px-5': this.blank,
             'border-theme-border dark:border-theme-border-dark': true,
