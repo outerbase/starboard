@@ -85,7 +85,7 @@ export class Table extends ClassifiedElement {
     public deletedColumnNames: Array<string> = []
 
     @property({ attribute: 'renamed-columns', type: Object })
-    public renamedColumns: Record<string, string> = {}
+    public renamedColumnNames: Record<string, string | undefined> = {}
 
     @property({ attribute: 'theme', type: String })
     public theme = Theme.light
@@ -518,7 +518,7 @@ export class Table extends ClassifiedElement {
                                     installed-plugins=${JSON.stringify(this.installedPlugins)}
                                     table-height=${ifDefined(this._height)}
                                     theme=${this.theme}
-                                    value="${this.renamedColumns[name] ?? name}"
+                                    value="${this.renamedColumnNames[name] ?? name}"
                                     original-value="${name}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
                                     width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
