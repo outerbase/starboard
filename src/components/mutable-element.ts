@@ -1,6 +1,7 @@
 import type { PropertyValues } from 'lit'
+import { isEqual } from 'lodash'
 
-import type { Position } from '../types.js'
+import { Theme, type Position, type Serializable } from '../types.js'
 import { CellUpdateEvent } from '../lib/events.js'
 import { property, state } from 'lit/decorators.js'
 import { ClassifiedElement } from './classified-element.js'
@@ -9,7 +10,7 @@ import { eventTargetIsPlugin } from '../lib/event-target-is-plugin.js'
 export class MutableElement extends ClassifiedElement {
     // current value
     @property({ type: String })
-    public value?: string
+    public value?: Serializable
 
     @property({ type: String })
     public get dirty() {
@@ -24,7 +25,7 @@ export class MutableElement extends ClassifiedElement {
     public label?: string
 
     @property({ attribute: 'original-value', type: String })
-    public originalValue?: string
+    public originalValue?: Serializable
 
     @property({ attribute: 'read-only', type: Boolean })
     public readonly = false
@@ -33,12 +34,22 @@ export class MutableElement extends ClassifiedElement {
     public width?: string
 
     @property({ attribute: 'interactive', type: Boolean })
-    isInteractive = false
+    public isInteractive = false
+
+    @property({ attribute: 'outer-border', type: Boolean })
+    public outerBorder = false
+
+    @property({ attribute: 'theme', type: Number })
+    public theme = Theme.light
+
+    // allows, for example, <outerbase-td separate-cells="true" />
+    @property({ type: Boolean, attribute: 'separate-cells' })
+    public separateCells: boolean = false
 
     @state()
     public isEditing = false
 
-    private previousValue?: string
+    private previousValue?: Serializable
 
     public override connectedCallback() {
         super.connectedCallback()
@@ -67,11 +78,11 @@ export class MutableElement extends ClassifiedElement {
 
         // set initial `originalValue`
         // this is done here instead of, say, connectedCallback() because of a quirk with SSR
-        if (changedProperties.has('value') && this.originalValue === undefined) {
+        if (changedProperties.has('value') && this.originalValue === undefined && this.originalValue !== this.value) {
             this.originalValue = this.value
         }
 
-        if (changedProperties.get('value') && this.previousValue !== this.value) {
+        if (changedProperties.get('value') && !isEqual(this.value, this.originalValue)) {
             this.previousValue = this.value
             this.dispatchChangedEvent()
         }
@@ -132,7 +143,7 @@ export class MutableElement extends ClassifiedElement {
         this.dispatchEvent(
             new CellUpdateEvent({
                 position: this.position,
-                previousValue: this.originalValue,
+                previousValue: this.originalValue as string | undefined, // TODO @johnny remove this cast / handle types better
                 value: this.value,
                 label: this.label,
             })

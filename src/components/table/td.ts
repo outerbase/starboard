@@ -46,55 +46,39 @@ export class TableData extends MutableElement {
     @property({ attribute: 'plugin-attributes', type: String })
     public pluginAttributes: String = ''
 
-    // allows, for example, <outerbase-td separate-cells="true" />
-    @property({ type: Boolean, attribute: 'separate-cells' })
-    public separateCells: boolean = false
-
     // allows, for example, <outerbase-td bottom-border="true" />
     @property({ type: Boolean, attribute: 'bottom-border' })
     public withBottomBorder: boolean = false
-
-    @property({ type: String, attribute: 'sort-by' })
-    public sortBy?: string
-
-    @property({ type: String, attribute: 'order-by' })
-    public orderBy?: 'ascending' | 'descending'
 
     @property({ type: Boolean, attribute: 'blank' })
     public blank = false
 
     @property({ type: Boolean, attribute: 'odd' })
-    protected isOdd?: boolean
+    public isOdd?: boolean
 
     @property({ type: Boolean, attribute: 'draw-right-border' })
-    private _drawRightBorder = false
+    public _drawRightBorder = false
 
     @property({ type: Boolean, attribute: 'menu' })
-    private hasMenu = false
+    public hasMenu = false
 
     @property({ type: Boolean, attribute: 'row-selector' })
-    isRowSelector = false
-
-    @property({ attribute: 'outer-border', type: Boolean })
-    public outerBorder = false
+    public isRowSelector = false
 
     @property({ attribute: 'is-last-column', type: Boolean })
-    protected isLastColumn = false
+    public isLastColumn = false
 
     @property({ attribute: 'is-last-row', type: Boolean })
-    protected isLastRow = false
+    public isLastRow = false
 
     @property({ attribute: 'left-distance-to-viewport', type: Number })
-    protected leftDistanceToViewport = -1
+    public leftDistanceToViewport = -1
 
     @property({ attribute: 'table-bounding-rect', type: String })
-    protected tableBoundingRect: string | undefined // we skip having `JSON.parse` run by treating it as a string
+    public tableBoundingRect: string | undefined // we skip having `JSON.parse` run by treating it as a string
 
     @property({ attribute: 'hide-dirt', type: Boolean })
     public hideDirt = false
-
-    @property({ attribute: 'theme', type: String })
-    public theme = Theme.light
 
     @property({ attribute: 'plugin', type: String })
     public plugin?: ColumnPlugin
@@ -232,7 +216,7 @@ export class TableData extends MutableElement {
             // copy/paste focused cells
             if (code === 'KeyC') {
                 event.preventDefault()
-                navigator.clipboard.writeText(this.value ?? '')
+                navigator.clipboard.writeText(this.value?.toString() ?? '')
             }
 
             if (code === 'KeyV') {
@@ -318,7 +302,11 @@ export class TableData extends MutableElement {
                                   {
                                       label: html`Revert to
                                           <span class="pointer-events-none italic whitespace-nowrap"
-                                              >${this.originalValue ?? 'NULL'}</span
+                                              >${typeof this.originalValue === 'object'
+                                                  ? JSON.stringify(this.originalValue)
+                                                  : this.originalValue !== null || this.originalValue !== undefined
+                                                    ? this.originalValue
+                                                    : 'NULL'}</span
                                           >`,
                                       value: 'reset',
                                   },
@@ -338,7 +326,7 @@ export class TableData extends MutableElement {
             case 'edit':
                 return (this.isEditing = true)
             case 'copy':
-                return navigator.clipboard.writeText(this.value ?? '')
+                return navigator.clipboard.writeText(this.value?.toString() ?? '')
             case 'paste':
                 this.value = await navigator.clipboard.readText()
                 return

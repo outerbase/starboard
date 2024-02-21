@@ -518,7 +518,7 @@ export class Table extends ClassifiedElement {
                                     installed-plugins=${JSON.stringify(this.installedPlugins)}
                                     table-height=${ifDefined(this._height)}
                                     theme=${this.theme}
-                                    name="${this.renamedColumns[name] ?? name}"
+                                    value="${this.renamedColumns[name] ?? name}"
                                     original-value="${name}"
                                     left-distance-to-viewport=${this.distanceToLeftViewport}
                                     width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"

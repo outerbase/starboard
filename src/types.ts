@@ -109,8 +109,8 @@ export type Position = { column: string; row: string } // column name, row uuid
 export type CellDetail = {
     position: Position
     label?: string
-    previousValue: ColumnType
-    value: ColumnType
+    previousValue: Serializable
+    value: Serializable
 }
 
 // <th />
@@ -175,3 +175,15 @@ export enum PluginEvent {
     // DEPRECATED: Use `updateCell` instead
     cellValue = 'cellvalue',
 }
+
+export type Serializable =
+    | string
+    | number
+    | bigint
+    | boolean
+    | null
+    | undefined
+    | Array<Serializable>
+    | {
+          [key: string]: Array<Serializable> | Serializable | string | number | bigint | boolean | null | undefined
+      }

@@ -18,7 +18,7 @@ import {
 } from '../../lib/events.js'
 import '../menu/column-menu.js' // <outerbase-th-menu />
 import type { ColumnMenu } from '../menu/column-menu.js'
-import type { HeaderMenuOptions, ColumnPlugin, PluginWorkspaceInstallationId } from '../../types.js'
+import type { HeaderMenuOptions, ColumnPlugin, PluginWorkspaceInstallationId, Serializable } from '../../types.js'
 import { Theme } from '../../types.js'
 import { CaretRight } from '../../lib/icons/caret-right.js'
 
@@ -49,11 +49,11 @@ export class TH extends MutableElement {
     @property({ attribute: 'with-resizer', type: Boolean })
     public withResizer = false
 
-    @property({ attribute: 'outer-border', type: Boolean })
-    public outerBorder = false
+    @property({ attribute: 'value', type: String })
+    public override value: string = ''
 
-    @property({ attribute: 'name', type: String })
-    public override value = ''
+    @property({ attribute: 'original-value', type: String })
+    public override originalValue?: string
 
     @property({ attribute: 'plugins', type: Array })
     public plugins?: Array<ColumnPlugin>
@@ -66,10 +66,6 @@ export class TH extends MutableElement {
 
     @property({ attribute: 'is-last', type: Boolean })
     protected isLastColumn = false
-
-    // allows, for example, <outerbase-td separate-cells="true" />
-    @property({ type: Boolean, attribute: 'separate-cells' })
-    public separateCells: boolean = false
 
     @property({ attribute: 'menu', type: Boolean })
     hasMenu = false
@@ -99,6 +95,9 @@ export class TH extends MutableElement {
         },
     ]
 
+    @property({ attribute: 'left-distance-to-viewport', type: Number })
+    protected distanceToLeftViewport = -1
+
     @state()
     private _previousWidth = 0
 
@@ -107,12 +106,6 @@ export class TH extends MutableElement {
 
     @state()
     protected _pluginOptions: HeaderMenuOptions = []
-
-    @property({ attribute: 'left-distance-to-viewport', type: Number })
-    protected distanceToLeftViewport = -1
-
-    @property({ attribute: 'theme', type: Number })
-    public theme = Theme.light
 
     public override connectedCallback(): void {
         super.connectedCallback()
