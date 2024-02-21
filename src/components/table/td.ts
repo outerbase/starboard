@@ -180,6 +180,7 @@ export class TableData extends MutableElement {
                     event.preventDefault()
                     ;(parent?.previousElementSibling?.querySelector('check-box') as HTMLElement | undefined)?.focus()
                 } else if (code === 'ArrowRight') {
+                    event.preventDefault()
                     ;(target.parentElement?.parentElement?.nextElementSibling as HTMLElement | undefined)?.focus()
                 }
                 return

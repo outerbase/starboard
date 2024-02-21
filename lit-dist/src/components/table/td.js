@@ -130,7 +130,7 @@ let TableData = class TableData extends MutableElement {
                     parent?.previousElementSibling?.querySelector('check-box')?.focus();
                 }
                 else if (code === 'ArrowRight') {
-                    ;
+                    event.preventDefault();
                     target.parentElement?.parentElement?.nextElementSibling?.focus();
                 }
                 return;
