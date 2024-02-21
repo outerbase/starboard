@@ -300,14 +300,15 @@ export class TableData extends MutableElement {
                             ? [
                                   ...this.options,
                                   {
-                                      label: html`Revert to
-                                          <span class="pointer-events-none italic whitespace-nowrap"
-                                              >${typeof this.originalValue === 'object'
-                                                  ? JSON.stringify(this.originalValue)
-                                                  : this.originalValue !== null || this.originalValue !== undefined
-                                                    ? this.originalValue
-                                                    : 'NULL'}</span
-                                          >`,
+                                      label:
+                                          typeof this.originalValue === 'object'
+                                              ? 'Revert'
+                                              : html`Revert to
+                                                    <span class="pointer-events-none italic whitespace-nowrap"
+                                                        >${this.originalValue !== null || this.originalValue !== undefined
+                                                            ? this.originalValue
+                                                            : 'NULL'}</span
+                                                    >`,
                                       value: 'reset',
                                   },
                               ]
