@@ -27,7 +27,7 @@ import { CaretRight } from '../../lib/icons/caret-right.js'
 export class TH extends MutableElement {
     protected override get classMap() {
         return {
-            'table-cell relative whitespace-nowrap overflow-hidden h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
+            'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
             'border-b border-theme-border dark:border-theme-border-dark': true,
             'first:border-l border-t': this.outerBorder,
             'px-cell-padding-x py-cell-padding-y': true,
