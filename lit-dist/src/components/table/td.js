@@ -187,6 +187,7 @@ let TableData = class TableData extends MutableElement {
                 this.value = await navigator.clipboard.readText();
             }
             if (code === 'Backspace' || code === 'Delete') {
+                event.preventDefault();
                 this.value = undefined;
             }
         }

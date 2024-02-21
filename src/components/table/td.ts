@@ -240,6 +240,7 @@ export class TableData extends MutableElement {
             }
 
             if (code === 'Backspace' || code === 'Delete') {
+                event.preventDefault()
                 this.value = undefined
             }
         }
