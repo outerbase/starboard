@@ -31,4 +31,12 @@ export declare class AddColumnElement extends ClassifiedElement {
     protected onSubmit(event: Event): void;
     render(): TemplateResult<1>;
 }
+export declare class AddColumnTriggerElement extends ClassifiedElement {
+    protected get classMap(): {
+        'p-0.5 rounded-md cursor-pointer': boolean;
+        'dark:bg-neutral-950 hover:bg-neutral-100 dark:hover:bg-neutral-900': boolean;
+        'border border-transparent active:border-neutral-200 dark:active:border-neutral-800': boolean;
+    };
+    protected render(): TemplateResult<1>;
+}
 //# sourceMappingURL=add-column.d.ts.map

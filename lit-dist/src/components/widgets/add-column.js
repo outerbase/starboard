@@ -13,6 +13,7 @@ import { classMap } from 'lit/directives/class-map.js';
 // import { WarningOctagon } from '../../lib/icons/warning-octagon.js'
 import { ColumnAddedEvent } from '../../lib/events.js';
 import '../menu/input-menu.js';
+import { Plus } from '../../lib/icons/plus.js';
 let AddColumnElement = AddColumnElement_1 = class AddColumnElement extends ClassifiedElement {
     constructor() {
         super(...arguments);
@@ -118,3 +119,20 @@ AddColumnElement = AddColumnElement_1 = __decorate([
     customElement('outerbase-add-column')
 ], AddColumnElement);
 export { AddColumnElement };
+let AddColumnTriggerElement = class AddColumnTriggerElement extends ClassifiedElement {
+    get classMap() {
+        return {
+            'p-0.5 rounded-md cursor-pointer': true,
+            'dark:bg-neutral-950 hover:bg-neutral-100 dark:hover:bg-neutral-900': true,
+            'border border-transparent active:border-neutral-200 dark:active:border-neutral-800': true,
+            ...super.classMap,
+        };
+    }
+    render() {
+        return html `${Plus(16)}`;
+    }
+};
+AddColumnTriggerElement = __decorate([
+    customElement('outerbase-add-column-trigger')
+], AddColumnTriggerElement);
+export { AddColumnTriggerElement };

@@ -19,6 +19,7 @@ import './th.js';
 import './thead.js';
 import './tr.js';
 import '../check-box.js';
+import '../widgets/add-column.js';
 import { classMap } from 'lit/directives/class-map.js';
 let Table = class Table extends ClassifiedElement {
     constructor() {
@@ -38,6 +39,7 @@ let Table = class Table extends ClassifiedElement {
         this.readonly = false;
         this.blankFill = false;
         this.columnWidthOffsets = {};
+        this.addableColumns = false;
         this.allRowsSelected = false;
         this.columns = [];
         this.visibleColumns = [];
@@ -444,7 +446,13 @@ let Table = class Table extends ClassifiedElement {
                                 </outerbase-th>`;
         })}
                         ${this.blankFill
-            ? html `<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} fill></<outerbase-th>`
+            ? html `<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} fill>
+                            ${this.isNonInteractive || !this.addableColumns
+                ? ''
+                : html `<span class="flex items-center absolute top-0 left-2 bottom-0 right-0">
+                                          <outerbase-add-column-trigger></outerbase-add-column-trigger>
+                                      </span>`}
+                            </<outerbase-th>`
             : ''}
                     </outerbase-tr>
                 </outerbase-thead>
@@ -514,6 +522,9 @@ __decorate([
 __decorate([
     property({ attribute: 'column-width-offsets', type: Object })
 ], Table.prototype, "columnWidthOffsets", void 0);
+__decorate([
+    property({ attribute: 'addable-columns', type: Boolean })
+], Table.prototype, "addableColumns", void 0);
 __decorate([
     state()
 ], Table.prototype, "allRowsSelected", void 0);

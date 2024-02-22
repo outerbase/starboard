@@ -8,6 +8,7 @@ import './th.js';
 import './thead.js';
 import './tr.js';
 import '../check-box.js';
+import '../widgets/add-column.js';
 export declare class Table extends ClassifiedElement {
     selectableRows: boolean;
     keyboardShortcuts: boolean;
@@ -28,6 +29,7 @@ export declare class Table extends ClassifiedElement {
     readonly: boolean;
     blankFill: boolean;
     columnWidthOffsets: Record<string, number | undefined>;
+    addableColumns: boolean;
     allRowsSelected: boolean;
     private _height?;
     private resizeObserver?;
