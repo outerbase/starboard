@@ -13,6 +13,7 @@ export declare class MutableElement extends ClassifiedElement {
     outerBorder: boolean;
     theme: Theme;
     separateCells: boolean;
+    blank: boolean;
     isEditing: boolean;
     connectedCallback(): void;
     disconnectedCallback(): void;

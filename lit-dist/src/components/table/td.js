@@ -24,7 +24,6 @@ let TableData = class TableData extends MutableElement {
         this.pluginAttributes = '';
         // allows, for example, <outerbase-td bottom-border="true" />
         this.withBottomBorder = false;
-        this.blank = false;
         this._drawRightBorder = false;
         this.hasMenu = false;
         this.isRowSelector = false;
@@ -286,9 +285,6 @@ __decorate([
 __decorate([
     property({ type: Boolean, attribute: 'bottom-border' })
 ], TableData.prototype, "withBottomBorder", void 0);
-__decorate([
-    property({ type: Boolean, attribute: 'blank' })
-], TableData.prototype, "blank", void 0);
 __decorate([
     property({ type: Boolean, attribute: 'odd' })
 ], TableData.prototype, "isOdd", void 0);

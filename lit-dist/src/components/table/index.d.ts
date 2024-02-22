@@ -28,6 +28,7 @@ export declare class Table extends ClassifiedElement {
     readonly: boolean;
     blankFill: boolean;
     columnWidthOffsets: Record<string, number | undefined>;
+    allRowsSelected: boolean;
     private _height?;
     private resizeObserver?;
     protected columns: Columns;

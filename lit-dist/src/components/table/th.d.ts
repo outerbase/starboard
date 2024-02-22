@@ -23,7 +23,6 @@ export declare class TH extends MutableElement {
     originalValue?: string;
     plugins?: Array<ColumnPlugin>;
     installedPlugins: Record<string, PluginWorkspaceInstallationId | undefined>;
-    blank: boolean;
     protected isLastColumn: boolean;
     hasMenu: boolean;
     options: HeaderMenuOptions;

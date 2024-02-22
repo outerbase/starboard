@@ -23,7 +23,6 @@ export declare class TableData extends MutableElement {
     };
     pluginAttributes: String;
     withBottomBorder: boolean;
-    blank: boolean;
     isOdd?: boolean;
     _drawRightBorder: boolean;
     hasMenu: boolean;

@@ -21,6 +21,7 @@ export class MutableElement extends ClassifiedElement {
         this.theme = Theme.light;
         // allows, for example, <outerbase-td separate-cells="true" />
         this.separateCells = false;
+        this.blank = false;
         this.isEditing = false;
     }
     get dirty() {
@@ -171,6 +172,9 @@ __decorate([
 __decorate([
     property({ type: Boolean, attribute: 'separate-cells' })
 ], MutableElement.prototype, "separateCells", void 0);
+__decorate([
+    property({ type: Boolean, attribute: 'blank' })
+], MutableElement.prototype, "blank", void 0);
 __decorate([
     state()
 ], MutableElement.prototype, "isEditing", void 0);

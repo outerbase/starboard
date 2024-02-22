@@ -22,7 +22,6 @@ let TH = class TH extends MutableElement {
         this.withResizer = false;
         this.value = '';
         this.installedPlugins = {};
-        this.blank = false;
         this.isLastColumn = false;
         this.hasMenu = false;
         this.options = [
@@ -129,7 +128,7 @@ let TH = class TH extends MutableElement {
         };
         if (this.blank) {
             // an element to preserve the right-border
-            return html `<div class=${classMap(blankElementClasses)}></div> `;
+            return html `<div class=${classMap(blankElementClasses)}><slot></slot></div> `;
         }
         else {
             const body = this.isEditing
@@ -260,9 +259,6 @@ __decorate([
 __decorate([
     property({ attribute: 'installed-plugins', type: Object })
 ], TH.prototype, "installedPlugins", void 0);
-__decorate([
-    property({ type: Boolean, attribute: 'blank' })
-], TH.prototype, "blank", void 0);
 __decorate([
     property({ attribute: 'is-last', type: Boolean })
 ], TH.prototype, "isLastColumn", void 0);
