@@ -103,6 +103,9 @@ export class Table extends ClassifiedElement {
     public columnWidthOffsets: Record<string, number | undefined> = {}
 
     @state()
+    public allRowsSelected = false
+
+    @state()
     private _height?: number
 
     @state()
@@ -322,6 +325,14 @@ export class Table extends ClassifiedElement {
         if (_changedProperties.has('theme')) {
             this.setCssVariablesForPlugin(this.theme)
         }
+
+        if (_changedProperties.has('selectedRowUUIDs')) {
+            if (this.selectedRowUUIDs.size !== this.rows.length && this.allRowsSelected) {
+                this.allRowsSelected = false
+            } else if (this.selectedRowUUIDs.size === this.rows.length && !this.allRowsSelected) {
+                this.allRowsSelected = true
+            }
+        }
     }
 
     /////
@@ -408,7 +419,6 @@ export class Table extends ClassifiedElement {
                                     ?interactive=${true}
                                     width="42px"
                                 >
-                                    <!-- intentionally @click instead of @change because otherwise we end up in an infinite loop reacting to changes -->
                                     <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
                                         <check-box
                                             ?checked="${this.selectedRowUUIDs.has(id)}"
@@ -505,7 +515,27 @@ export class Table extends ClassifiedElement {
                               ?is-last=${0 === this.visibleColumns.length}
                               ?blank=${true}
                               ?read-only=${this.readonly}
-                          /></outerbase-th>`
+                          /><div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
+                          <check-box theme=${this.theme} ?checked=${this.allRowsSelected}
+                            @click=${(event: MouseEvent) => {
+                                event.preventDefault()
+                            }}
+                            @toggle-check=${() => {
+                                const everyRowIsChecked = this.rows.length === this.selectedRowUUIDs.size
+
+                                if (everyRowIsChecked) {
+                                    this.selectedRowUUIDs = new Set()
+                                    this.allRowsSelected = false
+                                } else {
+                                    this.selectedRowUUIDs = new Set(this.rows.map(({ id }) => id))
+                                    this.allRowsSelected = true
+                                }
+
+                                //   dispatch event that row selection changed
+                                this._onRowSelection()
+                            }}
+                          />
+                      </div></outerbase-th>`
                             : null}
                         ${repeat(
                             this.visibleColumns,
