@@ -124,6 +124,8 @@ export class MutableElement extends ClassifiedElement {
     }
 
     protected onDoubleClick(event: MouseEvent) {
+        if (this.isEditing) return // allow double-clicking to select text while editing
+
         if (!eventTargetIsPlugin(event)) {
             this.isEditing = true
             setTimeout(() => {
