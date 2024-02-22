@@ -8,6 +8,7 @@ import { classMap } from 'lit/directives/class-map.js'
 import { ChangeEvent, ColumnAddedEvent, MenuSelectedEvent } from '../../lib/events.js'
 
 import '../menu/input-menu.js'
+import { Plus } from '../../lib/icons/plus.js'
 @customElement('outerbase-add-column')
 export class AddColumnElement extends ClassifiedElement {
     protected get classMap() {
@@ -110,5 +111,21 @@ export class AddColumnElement extends ClassifiedElement {
                 Create Column
             </button>
         </form>`
+    }
+}
+
+@customElement('outerbase-add-column-trigger')
+export class AddColumnTriggerElement extends ClassifiedElement {
+    protected get classMap() {
+        return {
+            'p-0.5 rounded-md cursor-pointer': true,
+            'dark:bg-neutral-950 hover:bg-neutral-100 dark:hover:bg-neutral-900': true,
+            'border border-transparent active:border-neutral-200 dark:active:border-neutral-800': true,
+            ...super.classMap,
+        }
+    }
+
+    protected render() {
+        return html`${Plus(16)}`
     }
 }

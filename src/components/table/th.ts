@@ -213,7 +213,7 @@ export class TH extends MutableElement {
                           }}
                       ></column-resizer
                   ></span>`
-                : html`<span class=${classMap(resultContainerClasses)}><slot></slot>${body}</span>`
+                : html`<div class=${classMap(resultContainerClasses)}><slot></slot>${body}</div>`
         }
     }
 

@@ -36,6 +36,7 @@ import './th.js'
 import './thead.js'
 import './tr.js'
 import '../check-box.js'
+import '../widgets/add-column.js'
 
 import { classMap } from 'lit/directives/class-map.js'
 
@@ -573,7 +574,15 @@ export class Table extends ClassifiedElement {
                             }
                         )}
                         ${this.blankFill
-                            ? html`<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} fill></<outerbase-th>`
+                            ? html`<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} fill>
+                            ${
+                                this.isNonInteractive
+                                    ? ''
+                                    : html`<span class="flex items-center absolute top-0 left-2 bottom-0 right-0">
+                                          <outerbase-add-column-trigger></outerbase-add-column-trigger>
+                                      </span>`
+                            }
+                            </<outerbase-th>`
                             : ''}
                     </outerbase-tr>
                 </outerbase-thead>
