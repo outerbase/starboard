@@ -177,7 +177,7 @@ export class TH extends MutableElement {
 
         if (this.blank) {
             // an element to preserve the right-border
-            return html`<div class=${classMap(blankElementClasses)}></div> `
+            return html`<div class=${classMap(blankElementClasses)}><slot></slot></div> `
         } else {
             const body = this.isEditing
                 ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
