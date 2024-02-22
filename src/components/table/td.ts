@@ -50,9 +50,6 @@ export class TableData extends MutableElement {
     @property({ type: Boolean, attribute: 'bottom-border' })
     public withBottomBorder: boolean = false
 
-    @property({ type: Boolean, attribute: 'blank' })
-    public blank = false
-
     @property({ type: Boolean, attribute: 'odd' })
     public isOdd?: boolean
 

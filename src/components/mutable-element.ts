@@ -46,6 +46,9 @@ export class MutableElement extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'separate-cells' })
     public separateCells: boolean = false
 
+    @property({ type: Boolean, attribute: 'blank' })
+    public blank = false
+
     @state()
     public isEditing = false
 

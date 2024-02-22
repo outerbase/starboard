@@ -61,9 +61,6 @@ export class TH extends MutableElement {
     @property({ attribute: 'installed-plugins', type: Object })
     public installedPlugins: Record<string, PluginWorkspaceInstallationId | undefined> = {}
 
-    @property({ type: Boolean, attribute: 'blank' })
-    public blank = false
-
     @property({ attribute: 'is-last', type: Boolean })
     protected isLastColumn = false
 
