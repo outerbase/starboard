@@ -1,5 +1,5 @@
 import { type TemplateResult } from 'lit';
-import { ClassifiedElement } from '../classified-element';
+import { ClassifiedElement } from '../classified-element.js';
 import '../menu/input-menu.js';
 export declare class AddColumnElement extends ClassifiedElement {
     protected get classMap(): {

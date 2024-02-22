@@ -7,7 +7,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 };
 var AddColumnElement_1;
 import { html } from 'lit';
-import { ClassifiedElement } from '../classified-element';
+import { ClassifiedElement } from '../classified-element.js';
 import { customElement, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 // import { WarningOctagon } from '../../lib/icons/warning-octagon.js'
