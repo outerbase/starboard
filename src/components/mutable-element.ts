@@ -96,7 +96,7 @@ export class MutableElement extends ClassifiedElement {
         }
     }
 
-    protected onKeyDown(event: KeyboardEvent) {
+    protected onKeyDown(event: KeyboardEvent & { didCloseMenu: boolean }) {
         // WARNING: the input's onBlur will NOT called
 
         if (event.code === 'Escape') {
@@ -125,7 +125,7 @@ export class MutableElement extends ClassifiedElement {
 
         if (event.code === 'Enter' && !this.isEditing && !this.readonly) {
             if (event.target instanceof HTMLElement && !this.isEditing) {
-                this.isEditing = true
+                if (!event.didCloseMenu) this.isEditing = true
             }
         }
     }

@@ -145,7 +145,7 @@ export class Menu extends ClassifiedElement {
         }
     }
 
-    protected onKeyDown(event: KeyboardEvent) {
+    protected onKeyDown(event: KeyboardEvent & { didCloseMenu: boolean }) {
         const { code } = event
 
         if (code === 'Escape') {
@@ -153,6 +153,7 @@ export class Menu extends ClassifiedElement {
         } else if (code === 'Space' || code === 'Enter') {
             event.preventDefault()
             this.open = !this.open
+            event.didCloseMenu = true
 
             if (!this.open && this.focused) this.onSelection(event, this.focused)
         } else if (code === 'ArrowDown' || code === 'ArrowRight') {

@@ -145,95 +145,95 @@ export class TableData extends MutableElement {
         // ignore events being fired from a Plugin
         if (eventTargetIsPlugin(event)) return
 
+        // don't interfere with menu behavior
+        const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
+        if (menu?.open) {
+            return
+        }
+
         super.onKeyDown(event)
+
+        // ignore events fired while editing
+        if (this.isEditing) return
         const { code } = event
 
         let target = event.target
-        if (target instanceof HTMLElement && !this.isEditing) {
-            // handle events from a <check-box />
-            if (target.tagName.toLowerCase() === 'check-box') {
-                const parent = target.parentElement?.parentElement?.parentElement
+        if (!(target instanceof HTMLElement)) return
 
-                if (code === 'ArrowDown') {
-                    event.preventDefault()
-                    ;(parent?.nextElementSibling?.querySelector('check-box') as HTMLElement | undefined)?.focus()
-                } else if (code === 'ArrowUp') {
-                    event.preventDefault()
-                    ;(parent?.previousElementSibling?.querySelector('check-box') as HTMLElement | undefined)?.focus()
-                } else if (code === 'ArrowRight') {
-                    event.preventDefault()
-                    ;(target.parentElement?.parentElement?.nextElementSibling as HTMLElement | undefined)?.focus()
-                }
-                return
-            }
+        // handle events from a <check-box />
+        if (target.tagName.toLowerCase() === 'check-box') {
+            const parent = target.parentElement?.parentElement?.parentElement
 
-            // begin editing if keys are ASCII-ish
-            const isInputTriggering = event.key.length === 1 && isAlphanumericOrSpecial(event.key)
-            const noMetaKeys = !(event.metaKey || event.shiftKey)
-            if (isInputTriggering && noMetaKeys) {
+            if (code === 'ArrowDown') {
                 event.preventDefault()
-
-                // toggle editing mode
-                this.isEditing = true
-
-                // append this character
-                this.value += event.key
-
-                // set the cursor input to the end
-                setTimeout(() => {
-                    const input = this.shadowRoot?.querySelector('input')
-                    input?.focus()
-                    input?.setSelectionRange(input.value.length, input.value.length)
-                }, 0)
-
-                return
-            }
-
-            // navigating around the table
-            if (code === 'ArrowRight') {
-                event.preventDefault()
-                ;(target?.nextElementSibling as HTMLElement)?.focus()
-            } else if (code === 'ArrowLeft') {
-                event.preventDefault()
-                const checkbox = target?.previousElementSibling?.querySelector('check-box') as HTMLElement | undefined
-                if (checkbox) checkbox.focus()
-                else (target?.previousElementSibling as HTMLElement | undefined)?.focus()
-            } else if (code === 'ArrowDown') {
-                event.preventDefault()
-                if (event.target instanceof HTMLElement && !this.isEditing) {
-                    this.moveFocusToNextRow(event.target)
-                }
+                ;(parent?.nextElementSibling?.querySelector('check-box') as HTMLElement | undefined)?.focus()
             } else if (code === 'ArrowUp') {
                 event.preventDefault()
-                if (event.target instanceof HTMLElement && !this.isEditing) {
-                    this.moveFocusToPreviousRow(event.target)
-                }
-            }
-
-            // copy/paste focused cells
-            if (code === 'KeyC') {
+                ;(parent?.previousElementSibling?.querySelector('check-box') as HTMLElement | undefined)?.focus()
+            } else if (code === 'ArrowRight') {
                 event.preventDefault()
-                navigator.clipboard.writeText(this.value?.toString() ?? '')
+                ;(target.parentElement?.parentElement?.nextElementSibling as HTMLElement | undefined)?.focus()
             }
+            return
+        }
 
-            if (code === 'KeyV') {
-                event.preventDefault()
-                this.value = await navigator.clipboard.readText()
+        // begin editing if keys are ASCII-ish
+        const isInputTriggering = event.key.length === 1 && isAlphanumericOrSpecial(event.key)
+        const noMetaKeys = !(event.metaKey || event.shiftKey)
+        if (isInputTriggering && noMetaKeys) {
+            event.preventDefault()
+
+            // toggle editing mode
+            this.isEditing = true
+
+            // append this character
+            this.value += event.key
+
+            // set the cursor input to the end
+            setTimeout(() => {
+                const input = this.shadowRoot?.querySelector('input')
+                input?.focus()
+                input?.setSelectionRange(input.value.length, input.value.length)
+            }, 0)
+
+            return
+        }
+
+        // navigating around the table
+        if (code === 'ArrowRight') {
+            event.preventDefault()
+            ;(target?.nextElementSibling as HTMLElement)?.focus()
+        } else if (code === 'ArrowLeft') {
+            event.preventDefault()
+            const checkbox = target?.previousElementSibling?.querySelector('check-box') as HTMLElement | undefined
+            if (checkbox) checkbox.focus()
+            else (target?.previousElementSibling as HTMLElement | undefined)?.focus()
+        } else if (code === 'ArrowDown') {
+            event.preventDefault()
+            if (event.target instanceof HTMLElement && !this.isEditing) {
+                this.moveFocusToNextRow(event.target)
             }
-
-            if (code === 'Backspace' || code === 'Delete') {
-                event.preventDefault()
-                this.value = undefined
+        } else if (code === 'ArrowUp') {
+            event.preventDefault()
+            if (event.target instanceof HTMLElement && !this.isEditing) {
+                this.moveFocusToPreviousRow(event.target)
             }
         }
 
-        // close menu on 'Escape' key
-        if (code === 'Escape') {
+        // copy/paste focused cells
+        if (code === 'KeyC') {
             event.preventDefault()
-            const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
-            if (menu && menu.open) {
-                menu.open = false
-            }
+            navigator.clipboard.writeText(this.value?.toString() ?? '')
+        }
+
+        if (code === 'KeyV') {
+            event.preventDefault()
+            this.value = await navigator.clipboard.readText()
+        }
+
+        if (code === 'Backspace' || code === 'Delete') {
+            event.preventDefault()
+            this.value = undefined
         }
     }
 

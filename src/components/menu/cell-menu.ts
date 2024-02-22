@@ -44,7 +44,9 @@ export class CellMenu extends Menu {
         // @click shows/hides the menu
         // @dblclick prevents parent's dblclick
         // @keydown navigates the menu
-        // const trigger = this.hasMenu ? html`<span class="font-bold focus:z-[1]">{}</span>` : null
+
+        // TODO @johnny add `tabindex` to #trigger to restore keyboard nav to the cell menu
+        // it needs to be conditional whether the menu is open or not or else double tabbing occurs on the table
         return html`
             <span
                 class=${classMap({
