@@ -327,6 +327,9 @@ export class Table extends ClassifiedElement {
         }
 
         if (_changedProperties.has('selectedRowUUIDs')) {
+            // disqualify 0 === 0
+            if (this.rows.length === 0) return
+
             if (this.selectedRowUUIDs.size !== this.rows.length && this.allRowsSelected) {
                 this.allRowsSelected = false
             } else if (this.selectedRowUUIDs.size === this.rows.length && !this.allRowsSelected) {
