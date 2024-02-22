@@ -103,6 +103,9 @@ export class Table extends ClassifiedElement {
     @property({ attribute: 'column-width-offsets', type: Object })
     public columnWidthOffsets: Record<string, number | undefined> = {}
 
+    @property({ attribute: 'addable-columns', type: Boolean })
+    public addableColumns = false
+
     @state()
     public allRowsSelected = false
 
@@ -576,7 +579,7 @@ export class Table extends ClassifiedElement {
                         ${this.blankFill
                             ? html`<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} fill>
                             ${
-                                this.isNonInteractive
+                                this.isNonInteractive || !this.addableColumns
                                     ? ''
                                     : html`<span class="flex items-center absolute top-0 left-2 bottom-0 right-0">
                                           <outerbase-add-column-trigger></outerbase-add-column-trigger>
