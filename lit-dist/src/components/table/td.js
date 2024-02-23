@@ -114,7 +114,7 @@ let TableData = class TableData extends MutableElement {
         if (menu?.open) {
             return;
         }
-        super.onKeyDown({ ...event, didCloseMenu: false });
+        super.onKeyDown(event);
         // ignore events fired while editing
         if (this.isEditing)
             return;

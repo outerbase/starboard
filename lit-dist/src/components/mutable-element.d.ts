@@ -25,7 +25,7 @@ export declare class MutableElement extends ClassifiedElement {
     protected updated(changedProps: PropertyValues<this>): void;
     protected willUpdate(changedProperties: PropertyValues<this>): void;
     protected onKeyDown(event: KeyboardEvent & {
-        didCloseMenu: boolean;
+        didCloseMenu?: boolean;
     }): void;
     protected onDoubleClick(event: MouseEvent): void;
     protected onChange(event: Event): void;
