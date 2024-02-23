@@ -151,7 +151,7 @@ export class TableData extends MutableElement {
             return
         }
 
-        super.onKeyDown({ ...event, didCloseMenu: false })
+        super.onKeyDown(event)
 
         // ignore events fired while editing
         if (this.isEditing) return
