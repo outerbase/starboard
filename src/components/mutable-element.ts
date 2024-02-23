@@ -1,4 +1,4 @@
-import type { PropertyValues } from 'lit'
+import type { PropertyValueMap, PropertyValues } from 'lit'
 import { isEqual } from 'lodash-es'
 
 import { Theme, type Position, type Serializable } from '../types.js'
@@ -74,25 +74,41 @@ export class MutableElement extends ClassifiedElement {
         }
     }
 
-    protected override willUpdate(changedProperties: PropertyValues<this>) {
-        super.willUpdate(changedProperties)
+    protected override firstUpdated(changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.firstUpdated(changedProperties)
 
         // set initial `originalValue`
         // this is done here instead of, say, connectedCallback() because of a quirk with SSR
-        if (changedProperties.has('value') && this.originalValue === undefined && this.originalValue !== this.value) {
+        if (this.originalValue === undefined && this.originalValue !== this.value) {
             this.originalValue = this.value
         }
+    }
 
+    protected override willUpdate(changedProperties: PropertyValues<this>) {
+        super.willUpdate(changedProperties)
+
+        console.log('willUpdate', Array.from(changedProperties.keys()))
         // TODO @johnny why is this function firing once for every cell when toggling isEditing and prolly any other property?
-        // shoudl be a (small?) perf improvement to resolve that
+        // should be a (small?) perf improvement to resolve that
 
+        // console.log(`changedProperties.has('value')`, changedProperties.has('value'))
+        // console.log(`this.isEditing === false`, this.isEditing === false)
         // dispatch changes when the user stops editing
-        if (changedProperties.get('isEditing') === true && this.isEditing === false && !isEqual(this.value, this.originalValue)) {
-            // ensure the value has actually changed to prevent superfluous events
-            // note: for changedProperties.get('value') is undefined for some reason so this still fires if the value is the same before/after isEditing changed
-            if (this.value !== changedProperties.get('value')) {
-                this.dispatchChangedEvent()
-            }
+        // if (changedProperties.has('value') && this.isEditing === false) {
+        // handle clear, reset, paste
+        if (changedProperties.has('value') && this.isEditing === false) {
+            // skip initialization round
+            if (this.originalValue === undefined) return
+
+            console.log('dispatchChangedEvent')
+            this.dispatchChangedEvent()
+        }
+
+        // handle user input but not on each keystroke
+        if (changedProperties.has('isEditing') && this.isEditing === false) {
+            if (this.originalValue === undefined) return
+            console.log('dispatchChangedEvent')
+            this.dispatchChangedEvent()
         }
     }
 
