@@ -39,6 +39,7 @@ import '../check-box.js'
 import '../widgets/add-column.js'
 
 import { classMap } from 'lit/directives/class-map.js'
+import arrayToObject from '../../lib/array-to-object.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -133,6 +134,9 @@ export class Table extends ClassifiedElement {
 
     @state()
     protected removedRowUUIDs: Set<string> = new Set()
+
+    @state()
+    columnTypes?: Record<string, string | number | boolean | undefined>
 
     protected closeLastMenu?: () => void
 
@@ -322,6 +326,7 @@ export class Table extends ClassifiedElement {
         if (_changedProperties.has('schema')) {
             if (this.schema) {
                 this.columns = this.schema.columns
+                this.columnTypes = arrayToObject(this.columns, 'name', 'type')
                 this.updateVisibleColumns()
             }
         }
@@ -460,6 +465,7 @@ export class Table extends ClassifiedElement {
                                           left-distance-to-viewport=${this.distanceToLeftViewport}
                                           table-bounding-rect="${tableBoundingRect}"
                                           theme=${this.theme}
+                                          type=${this.columnTypes?.[name]}
                                           .plugin=${plugin}
                                           plugin-attributes=${this.installedPlugins?.[name]?.supportingAttributes ?? ''}
                                           ?separate-cells=${true}

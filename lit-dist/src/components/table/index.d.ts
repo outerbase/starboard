@@ -38,6 +38,7 @@ export declare class Table extends ClassifiedElement {
     protected updateVisibleColumns(): void;
     protected selectedRowUUIDs: Set<string>;
     protected removedRowUUIDs: Set<string>;
+    columnTypes?: Record<string, string | number | boolean | undefined>;
     protected closeLastMenu?: () => void;
     addNewRow(row?: Partial<RowAsRecord>): RowAsRecord;
     protected addNewColumn(name: string): void;

@@ -18,6 +18,7 @@ export declare class MutableElement extends ClassifiedElement {
     theme: Theme;
     separateCells: boolean;
     blank: boolean;
+    type?: string;
     isEditing: boolean;
     connectedCallback(): void;
     disconnectedCallback(): void;

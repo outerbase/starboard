@@ -10,6 +10,22 @@ import { CellUpdateEvent } from '../lib/events.js';
 import { property, state } from 'lit/decorators.js';
 import { ClassifiedElement } from './classified-element.js';
 import { eventTargetIsPlugin } from '../lib/event-target-is-plugin.js';
+const NUMBER_TYPES = [
+    'Integer',
+    'SmallInt',
+    'BigInt',
+    'Decimal',
+    'Numeric',
+    'Float',
+    'Real',
+    'Double Precision',
+    'TinyInt',
+    'MediumInt',
+    'Serial',
+    'BigSerial',
+].map((s) => s.toLowerCase());
+const BOOLEAN_TYPES = ['Boolean', 'Bit'].map((s) => s.toLowerCase());
+const JSON_TYPES = ['JSON', 'JSONB'].map((s) => s.toLowerCase());
 export class MutableElement extends ClassifiedElement {
     constructor() {
         super(...arguments);
@@ -122,10 +138,23 @@ export class MutableElement extends ClassifiedElement {
         this.value = value;
     }
     dispatchChangedEvent() {
+        // convert strings to their proper value-types; json, boolean, number, and null
+        const v = this.value;
+        const t = this.type?.toLowerCase();
+        let typedValued;
+        if (t && typeof v === 'string') {
+            if (NUMBER_TYPES.includes(t))
+                typedValued = parseInt(v, 10);
+            if (JSON_TYPES.includes(t))
+                typedValued = JSON.parse(v);
+            if (BOOLEAN_TYPES.includes(t))
+                typedValued = v.toLowerCase().trim() === 'true';
+            // TODO convert `''` to `NULL`?
+        }
         this.dispatchEvent(new CellUpdateEvent({
             position: this.position,
             previousValue: this.originalValue, // TODO @johnny remove this cast / handle types better
-            value: this.value,
+            value: typedValued ?? this.value,
             label: this.label,
         }));
     }
@@ -191,6 +220,9 @@ __decorate([
 __decorate([
     property({ type: Boolean, attribute: 'blank' })
 ], MutableElement.prototype, "blank", void 0);
+__decorate([
+    property({ attribute: 'type', type: String })
+], MutableElement.prototype, "type", void 0);
 __decorate([
     state()
 ], MutableElement.prototype, "isEditing", void 0);
