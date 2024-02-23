@@ -123,6 +123,7 @@ export class Menu extends ClassifiedElement {
         else if (code === 'Space' || code === 'Enter') {
             event.preventDefault();
             this.open = !this.open;
+            event.didCloseMenu = true;
             if (!this.open && this.focused)
                 this.onSelection(event, this.focused);
         }
@@ -194,7 +195,7 @@ export class Menu extends ClassifiedElement {
         // @dblclick prevents parent's dblclick
         // @keydown navigates the menu
         const outerClasses = {
-            'relative -mr-1': true,
+            'relative -mr-1 cursor-pointer': true,
             dark: this.theme == Theme.dark,
         };
         const innerClasses = {

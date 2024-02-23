@@ -20,6 +20,7 @@ export declare class TableData extends MutableElement {
         'first:border-l': boolean;
         'border-b': boolean;
         'cursor-pointer': boolean;
+        dark: boolean;
     };
     pluginAttributes: String;
     withBottomBorder: boolean;

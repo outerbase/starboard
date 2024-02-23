@@ -2,6 +2,10 @@ import type { PropertyValues } from 'lit';
 import { Theme, type Position, type Serializable } from '../types.js';
 import { ClassifiedElement } from './classified-element.js';
 export declare class MutableElement extends ClassifiedElement {
+    protected get classMap(): {
+        'cursor-pointer': boolean;
+        dark: boolean;
+    };
     value?: Serializable;
     get dirty(): boolean;
     position: Position;
@@ -19,7 +23,9 @@ export declare class MutableElement extends ClassifiedElement {
     disconnectedCallback(): void;
     protected updated(changedProps: PropertyValues<this>): void;
     protected willUpdate(changedProperties: PropertyValues<this>): void;
-    protected onKeyDown(event: KeyboardEvent): void;
+    protected onKeyDown(event: KeyboardEvent & {
+        didCloseMenu: boolean;
+    }): void;
     protected onDoubleClick(event: MouseEvent): void;
     protected onChange(event: Event): void;
     protected dispatchChangedEvent(): void;

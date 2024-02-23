@@ -17,6 +17,7 @@ export declare class TH extends MutableElement {
         'cursor-pointer': boolean;
         dark: boolean;
     };
+    readonly: boolean;
     tableHeight?: number;
     withResizer: boolean;
     value: string;
@@ -33,7 +34,7 @@ export declare class TH extends MutableElement {
     connectedCallback(): void;
     disconnectedCallback(): void;
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void;
-    protected willUpdate(_changedProperties: PropertyValues<this>): void;
+    protected willUpdate(changedProperties: PropertyValues<this>): void;
     protected render(): import("lit").TemplateResult<1>;
     protected dispatchChangedEvent(): void;
     protected removeColumn(): void;

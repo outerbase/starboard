@@ -25,7 +25,9 @@ export declare class Menu extends ClassifiedElement {
     protected onTrigger(event: Event): void;
     protected onItemClick(event: MouseEvent): void;
     protected onSelection(event: Event, value: string): void;
-    protected onKeyDown(event: KeyboardEvent): void;
+    protected onKeyDown(event: KeyboardEvent & {
+        didCloseMenu: boolean;
+    }): void;
     focus(): void;
     protected get listElement(): import("lit").TemplateResult<1> | null;
     protected render(): import("lit").TemplateResult<1>;

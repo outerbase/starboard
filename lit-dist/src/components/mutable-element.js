@@ -24,17 +24,24 @@ export class MutableElement extends ClassifiedElement {
         this.blank = false;
         this.isEditing = false;
     }
+    get classMap() {
+        return {
+            ...super.classMap,
+            'cursor-pointer': this.isInteractive && !this.readonly,
+            dark: this.theme == Theme.dark,
+        };
+    }
     get dirty() {
         return this.originalValue !== undefined && !isEqual(this.value, this.originalValue);
     }
     connectedCallback() {
         super.connectedCallback();
-        if (this.isInteractive)
+        if (this.isInteractive && !this.readonly)
             this.addEventListener('dblclick', this.onDoubleClick);
     }
     disconnectedCallback() {
         super.disconnectedCallback();
-        if (this.isInteractive)
+        if (this.isInteractive && !this.readonly)
             this.removeEventListener('dblclick', this.onDoubleClick);
     }
     updated(changedProps) {
@@ -88,7 +95,8 @@ export class MutableElement extends ClassifiedElement {
         }
         if (event.code === 'Enter' && !this.isEditing && !this.readonly) {
             if (event.target instanceof HTMLElement && !this.isEditing) {
-                this.isEditing = true;
+                if (!event.didCloseMenu)
+                    this.isEditing = true;
             }
         }
     }

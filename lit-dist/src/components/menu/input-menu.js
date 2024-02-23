@@ -33,7 +33,7 @@ let InputMenu = class InputMenu extends Menu {
     }
     onKeyDown(event) {
         if (this.open)
-            return super.onKeyDown(event);
+            return super.onKeyDown({ ...event, didCloseMenu: false });
         const { code } = event;
         if (code === 'Space' || code === 'ArrowLeft' || code === 'ArrowRight') {
             return;
@@ -42,7 +42,7 @@ let InputMenu = class InputMenu extends Menu {
             this.open = true;
         }
         else
-            super.onKeyDown(event);
+            super.onKeyDown({ ...event, didCloseMenu: false });
     }
     connectedCallback() {
         super.connectedCallback();

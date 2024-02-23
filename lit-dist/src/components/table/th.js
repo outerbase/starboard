@@ -19,6 +19,7 @@ import { CaretRight } from '../../lib/icons/caret-right.js';
 let TH = class TH extends MutableElement {
     constructor() {
         super(...arguments);
+        this.readonly = true;
         this.withResizer = false;
         this.value = '';
         this.installedPlugins = {};
@@ -54,6 +55,7 @@ let TH = class TH extends MutableElement {
     }
     get classMap() {
         return {
+            ...super.classMap,
             'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
             'border-b border-theme-border dark:border-theme-border-dark': true,
             'first:border-l border-t': this.outerBorder,
@@ -64,8 +66,6 @@ let TH = class TH extends MutableElement {
             // prevent double borders
             'border-r': (!this.withResizer && this.isLastColumn && this.outerBorder) ||
                 (!this.withResizer && this.separateCells && !this.isLastColumn),
-            'cursor-pointer': this.isInteractive,
-            dark: this.theme == Theme.dark,
         };
     }
     connectedCallback() {
@@ -81,9 +81,9 @@ let TH = class TH extends MutableElement {
             this.style.width = this.width;
         }
     }
-    willUpdate(_changedProperties) {
-        super.willUpdate(_changedProperties);
-        if (_changedProperties.has('plugins')) {
+    willUpdate(changedProperties) {
+        super.willUpdate(changedProperties);
+        if (changedProperties.has('plugins')) {
             const withoutDefault = this.plugins?.filter((p) => !p.isDefault) ?? [];
             this._pluginOptions =
                 withoutDefault.map((plugin) => ({
@@ -91,8 +91,56 @@ let TH = class TH extends MutableElement {
                     value: plugin.tagName,
                 })) ?? [];
         }
-        if (_changedProperties.has('width') && this.width && this.style) {
+        if (changedProperties.has('width') && this.width && this.style) {
             this.style.width = this.width;
+        }
+        if (changedProperties.has('readonly')) {
+            if (this.readonly) {
+                this.options = [
+                    {
+                        label: 'Sort A-Z',
+                        value: 'sort:alphabetical:ascending',
+                    },
+                    {
+                        label: 'Sort Z-A',
+                        value: 'sort:alphabetical:descending',
+                    },
+                    {
+                        label: 'Hide Column',
+                        value: 'hide',
+                    },
+                    {
+                        label: 'Delete Column',
+                        value: 'delete',
+                        classes: 'text-red-600',
+                    },
+                ];
+            }
+            else {
+                this.options = [
+                    {
+                        label: 'Sort A-Z',
+                        value: 'sort:alphabetical:ascending',
+                    },
+                    {
+                        label: 'Sort Z-A',
+                        value: 'sort:alphabetical:descending',
+                    },
+                    {
+                        label: 'Hide Column',
+                        value: 'hide',
+                    },
+                    {
+                        label: 'Rename Column',
+                        value: 'rename',
+                    },
+                    {
+                        label: 'Delete Column',
+                        value: 'delete',
+                        classes: 'text-red-600',
+                    },
+                ];
+            }
         }
     }
     render() {

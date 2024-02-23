@@ -32,14 +32,14 @@ export class InputMenu extends Menu {
     }
 
     protected onKeyDown(event: KeyboardEvent) {
-        if (this.open) return super.onKeyDown(event)
+        if (this.open) return super.onKeyDown({ ...event, didCloseMenu: false })
 
         const { code } = event
         if (code === 'Space' || code === 'ArrowLeft' || code === 'ArrowRight') {
             return
         } else if (code === 'ArrowDown') {
             this.open = true
-        } else super.onKeyDown(event)
+        } else super.onKeyDown({ ...event, didCloseMenu: false })
     }
 
     public override connectedCallback() {

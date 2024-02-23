@@ -369,6 +369,28 @@ let Table = class Table extends ClassifiedElement {
             'text-theme-text dark:text-theme-text-dark text-sm': true,
             'min-w-full': true,
         };
+        const selectAllCheckbox = this.rows.length > 0
+            ? html `<check-box
+                      theme=${this.theme}
+                      ?checked=${this.allRowsSelected}
+                      @click=${(event) => {
+                event.preventDefault();
+            }}
+                      @toggle-check=${() => {
+                const everyRowIsChecked = this.rows.length === this.selectedRowUUIDs.size;
+                if (everyRowIsChecked) {
+                    this.selectedRowUUIDs = new Set();
+                    this.allRowsSelected = false;
+                }
+                else {
+                    this.selectedRowUUIDs = new Set(this.rows.map(({ id }) => id));
+                    this.allRowsSelected = true;
+                }
+                //   dispatch event that row selection changed
+                this._onRowSelection();
+            }}
+                  />`
+            : '';
         return html `<div class=${classMap(tableContainerClasses)}>
             <div
                 id="table"
@@ -397,24 +419,7 @@ let Table = class Table extends ClassifiedElement {
                               ?blank=${true}
                               ?read-only=${this.readonly}
                           /><div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
-                          <check-box theme=${this.theme} ?checked=${this.allRowsSelected}
-                            @click=${(event) => {
-                event.preventDefault();
-            }}
-                            @toggle-check=${() => {
-                const everyRowIsChecked = this.rows.length === this.selectedRowUUIDs.size;
-                if (everyRowIsChecked) {
-                    this.selectedRowUUIDs = new Set();
-                    this.allRowsSelected = false;
-                }
-                else {
-                    this.selectedRowUUIDs = new Set(this.rows.map(({ id }) => id));
-                    this.allRowsSelected = true;
-                }
-                //   dispatch event that row selection changed
-                this._onRowSelection();
-            }}
-                          />
+                          ${selectAllCheckbox}
                       </div></outerbase-th>`
             : null}
                         ${repeat(this.visibleColumns, ({ name }, _idx) => name, ({ name }, idx) => {

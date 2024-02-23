@@ -41,6 +41,7 @@ let TableData = class TableData extends MutableElement {
     }
     get classMap() {
         return {
+            ...super.classMap,
             'table-cell relative focus:z-[1] group-hover:bg-theme-row-hover dark:group-hover:bg-theme-row-hover-dark': true,
             'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
             'px-5': this.blank,
@@ -53,7 +54,6 @@ let TableData = class TableData extends MutableElement {
                 (this._drawRightBorder && this.separateCells && !this.isLastColumn), // internal cell walls
             'first:border-l': this.separateCells && this.outerBorder, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bottom-border` attribute is set
-            'cursor-pointer': this.isInteractive,
         };
     }
     willUpdate(changedProperties) {
@@ -109,90 +109,90 @@ let TableData = class TableData extends MutableElement {
         // ignore events being fired from a Plugin
         if (eventTargetIsPlugin(event))
             return;
-        super.onKeyDown(event);
+        // don't interfere with menu behavior
+        const menu = this.shadowRoot?.querySelector('outerbase-td-menu');
+        if (menu?.open) {
+            return;
+        }
+        super.onKeyDown({ ...event, didCloseMenu: false });
+        // ignore events fired while editing
+        if (this.isEditing)
+            return;
         const { code } = event;
         let target = event.target;
-        if (target instanceof HTMLElement && !this.isEditing) {
-            // handle events from a <check-box />
-            if (target.tagName.toLowerCase() === 'check-box') {
-                const parent = target.parentElement?.parentElement?.parentElement;
-                if (code === 'ArrowDown') {
-                    event.preventDefault();
-                    parent?.nextElementSibling?.querySelector('check-box')?.focus();
-                }
-                else if (code === 'ArrowUp') {
-                    event.preventDefault();
-                    parent?.previousElementSibling?.querySelector('check-box')?.focus();
-                }
-                else if (code === 'ArrowRight') {
-                    event.preventDefault();
-                    target.parentElement?.parentElement?.nextElementSibling?.focus();
-                }
-                return;
-            }
-            // begin editing if keys are ASCII-ish
-            const isInputTriggering = event.key.length === 1 && isAlphanumericOrSpecial(event.key);
-            const noMetaKeys = !(event.metaKey || event.shiftKey);
-            if (isInputTriggering && noMetaKeys) {
+        if (!(target instanceof HTMLElement))
+            return;
+        // handle events from a <check-box />
+        if (target.tagName.toLowerCase() === 'check-box') {
+            const parent = target.parentElement?.parentElement?.parentElement;
+            if (code === 'ArrowDown') {
                 event.preventDefault();
-                // toggle editing mode
-                this.isEditing = true;
-                // append this character
-                this.value += event.key;
-                // set the cursor input to the end
-                setTimeout(() => {
-                    const input = this.shadowRoot?.querySelector('input');
-                    input?.focus();
-                    input?.setSelectionRange(input.value.length, input.value.length);
-                }, 0);
-                return;
-            }
-            // navigating around the table
-            if (code === 'ArrowRight') {
-                event.preventDefault();
-                target?.nextElementSibling?.focus();
-            }
-            else if (code === 'ArrowLeft') {
-                event.preventDefault();
-                const checkbox = target?.previousElementSibling?.querySelector('check-box');
-                if (checkbox)
-                    checkbox.focus();
-                else
-                    target?.previousElementSibling?.focus();
-            }
-            else if (code === 'ArrowDown') {
-                event.preventDefault();
-                if (event.target instanceof HTMLElement && !this.isEditing) {
-                    this.moveFocusToNextRow(event.target);
-                }
+                parent?.nextElementSibling?.querySelector('check-box')?.focus();
             }
             else if (code === 'ArrowUp') {
                 event.preventDefault();
-                if (event.target instanceof HTMLElement && !this.isEditing) {
-                    this.moveFocusToPreviousRow(event.target);
-                }
+                parent?.previousElementSibling?.querySelector('check-box')?.focus();
             }
-            // copy/paste focused cells
-            if (code === 'KeyC') {
+            else if (code === 'ArrowRight') {
                 event.preventDefault();
-                navigator.clipboard.writeText(this.value?.toString() ?? '');
+                target.parentElement?.parentElement?.nextElementSibling?.focus();
             }
-            if (code === 'KeyV') {
-                event.preventDefault();
-                this.value = await navigator.clipboard.readText();
-            }
-            if (code === 'Backspace' || code === 'Delete') {
-                event.preventDefault();
-                this.value = undefined;
+            return;
+        }
+        // begin editing if keys are ASCII-ish
+        const isInputTriggering = event.key.length === 1 && isAlphanumericOrSpecial(event.key);
+        const noMetaKeys = !(event.metaKey || event.shiftKey);
+        if (isInputTriggering && noMetaKeys) {
+            event.preventDefault();
+            // toggle editing mode
+            this.isEditing = true;
+            // append this character
+            this.value += event.key;
+            // set the cursor input to the end
+            setTimeout(() => {
+                const input = this.shadowRoot?.querySelector('input');
+                input?.focus();
+                input?.setSelectionRange(input.value.length, input.value.length);
+            }, 0);
+            return;
+        }
+        // navigating around the table
+        if (code === 'ArrowRight') {
+            event.preventDefault();
+            target?.nextElementSibling?.focus();
+        }
+        else if (code === 'ArrowLeft') {
+            event.preventDefault();
+            const checkbox = target?.previousElementSibling?.querySelector('check-box');
+            if (checkbox)
+                checkbox.focus();
+            else
+                target?.previousElementSibling?.focus();
+        }
+        else if (code === 'ArrowDown') {
+            event.preventDefault();
+            if (event.target instanceof HTMLElement && !this.isEditing) {
+                this.moveFocusToNextRow(event.target);
             }
         }
-        // close menu on 'Escape' key
-        if (code === 'Escape') {
+        else if (code === 'ArrowUp') {
             event.preventDefault();
-            const menu = this.shadowRoot?.querySelector('outerbase-td-menu');
-            if (menu && menu.open) {
-                menu.open = false;
+            if (event.target instanceof HTMLElement && !this.isEditing) {
+                this.moveFocusToPreviousRow(event.target);
             }
+        }
+        // copy/paste focused cells
+        if (code === 'KeyC') {
+            event.preventDefault();
+            navigator.clipboard.writeText(this.value?.toString() ?? '');
+        }
+        if (code === 'KeyV') {
+            event.preventDefault();
+            this.value = await navigator.clipboard.readText();
+        }
+        if (code === 'Backspace' || code === 'Delete') {
+            event.preventDefault();
+            this.value = undefined;
         }
     }
     connectedCallback() {
