@@ -225,7 +225,7 @@ export class Menu extends ClassifiedElement {
         // @keydown navigates the menu
 
         const outerClasses = {
-            'relative -mr-1': true,
+            'relative -mr-1 cursor-pointer': true,
             dark: this.theme == Theme.dark,
         }
 

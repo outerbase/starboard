@@ -8,6 +8,14 @@ import { ClassifiedElement } from './classified-element.js'
 import { eventTargetIsPlugin } from '../lib/event-target-is-plugin.js'
 
 export class MutableElement extends ClassifiedElement {
+    protected override get classMap() {
+        return {
+            ...super.classMap,
+            'cursor-pointer': this.isInteractive && !this.readonly,
+            dark: this.theme == Theme.dark,
+        }
+    }
+
     // current value
     @property({ type: String })
     public value?: Serializable
@@ -54,12 +62,12 @@ export class MutableElement extends ClassifiedElement {
 
     public override connectedCallback() {
         super.connectedCallback()
-        if (this.isInteractive) this.addEventListener('dblclick', this.onDoubleClick)
+        if (this.isInteractive && !this.readonly) this.addEventListener('dblclick', this.onDoubleClick)
     }
 
     public override disconnectedCallback() {
         super.disconnectedCallback()
-        if (this.isInteractive) this.removeEventListener('dblclick', this.onDoubleClick)
+        if (this.isInteractive && !this.readonly) this.removeEventListener('dblclick', this.onDoubleClick)
     }
 
     protected override updated(changedProps: PropertyValues<this>) {

@@ -27,6 +27,7 @@ import { CaretRight } from '../../lib/icons/caret-right.js'
 export class TH extends MutableElement {
     protected override get classMap() {
         return {
+            ...super.classMap,
             'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
             'border-b border-theme-border dark:border-theme-border-dark': true,
             'first:border-l border-t': this.outerBorder,
@@ -38,10 +39,10 @@ export class TH extends MutableElement {
             'border-r':
                 (!this.withResizer && this.isLastColumn && this.outerBorder) ||
                 (!this.withResizer && this.separateCells && !this.isLastColumn),
-            'cursor-pointer': this.isInteractive,
-            dark: this.theme == Theme.dark,
         }
     }
+
+    public override readonly = true
 
     @property({ attribute: 'table-height', type: Number })
     public tableHeight?: number
@@ -120,10 +121,10 @@ export class TH extends MutableElement {
         }
     }
 
-    protected override willUpdate(_changedProperties: PropertyValues<this>) {
-        super.willUpdate(_changedProperties)
+    protected override willUpdate(changedProperties: PropertyValues<this>) {
+        super.willUpdate(changedProperties)
 
-        if (_changedProperties.has('plugins')) {
+        if (changedProperties.has('plugins')) {
             const withoutDefault = this.plugins?.filter((p) => !p.isDefault) ?? []
             this._pluginOptions =
                 withoutDefault.map((plugin) => ({
@@ -132,8 +133,56 @@ export class TH extends MutableElement {
                 })) ?? []
         }
 
-        if (_changedProperties.has('width') && this.width && this.style) {
+        if (changedProperties.has('width') && this.width && this.style) {
             this.style.width = this.width
+        }
+
+        if (changedProperties.has('readonly')) {
+            if (this.readonly) {
+                this.options = [
+                    {
+                        label: 'Sort A-Z',
+                        value: 'sort:alphabetical:ascending',
+                    },
+                    {
+                        label: 'Sort Z-A',
+                        value: 'sort:alphabetical:descending',
+                    },
+                    {
+                        label: 'Hide Column',
+                        value: 'hide',
+                    },
+                    {
+                        label: 'Delete Column',
+                        value: 'delete',
+                        classes: 'text-red-600',
+                    },
+                ]
+            } else {
+                this.options = [
+                    {
+                        label: 'Sort A-Z',
+                        value: 'sort:alphabetical:ascending',
+                    },
+                    {
+                        label: 'Sort Z-A',
+                        value: 'sort:alphabetical:descending',
+                    },
+                    {
+                        label: 'Hide Column',
+                        value: 'hide',
+                    },
+                    {
+                        label: 'Rename Column',
+                        value: 'rename',
+                    },
+                    {
+                        label: 'Delete Column',
+                        value: 'delete',
+                        classes: 'text-red-600',
+                    },
+                ]
+            }
         }
     }
 

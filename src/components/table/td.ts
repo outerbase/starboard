@@ -25,6 +25,7 @@ const isAlphanumericOrSpecial = (key: string): boolean => {
 export class TableData extends MutableElement {
     protected override get classMap() {
         return {
+            ...super.classMap,
             'table-cell relative focus:z-[1] group-hover:bg-theme-row-hover dark:group-hover:bg-theme-row-hover-dark': true,
             'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
             'px-5': this.blank,
@@ -39,7 +40,6 @@ export class TableData extends MutableElement {
                 (this._drawRightBorder && this.separateCells && !this.isLastColumn), // internal cell walls
             'first:border-l': this.separateCells && this.outerBorder, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bottom-border` attribute is set
-            'cursor-pointer': this.isInteractive,
         }
     }
 
@@ -151,7 +151,7 @@ export class TableData extends MutableElement {
             return
         }
 
-        super.onKeyDown(event)
+        super.onKeyDown({ ...event, didCloseMenu: false })
 
         // ignore events fired while editing
         if (this.isEditing) return
