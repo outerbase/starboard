@@ -1,6 +1,10 @@
 {
-    "name": "starboard",
-    "version": "0.1.44",
+    "name": "@outerbase/starboard",
+    "version": "0.2.0",
+    "author": {
+        "name": "Johnny Domino",
+        "email": "johnny@outerbase.com"
+    },
     "type": "module",
     "main": "lit-dist/src/components/table/index.js",
     "module": "lit-dist/src/components/table/index.js",
