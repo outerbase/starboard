@@ -1,16 +1,17 @@
-import { html, type PropertyValues, type TemplateResult } from 'lit'
 import { classMap } from 'lit/directives/class-map.js'
+import { html, type PropertyValues, type TemplateResult } from 'lit'
+import type { DirectiveResult } from 'lit/async-directive.js'
 import { customElement, property, state } from 'lit/decorators.js'
+import { UnsafeHTMLDirective, unsafeHTML } from 'lit/directives/unsafe-html.js'
 
 import { MutableElement } from '../mutable-element.js'
 import { type MenuSelectedEvent } from '../../lib/events.js'
+import { Theme, type ColumnPlugin, PluginEvent } from '../../types.js'
+import { eventTargetIsPlugin, eventTargetIsPluginEditor } from '../../lib/event-target-is-plugin.js'
+
+import type { CellMenu } from '../menu/cell-menu.js'
 
 import '../menu/cell-menu.js' // <outerbase-td-menu />
-import type { CellMenu } from '../menu/cell-menu.js'
-import { Theme, type ColumnPlugin, PluginEvent } from '../../types.js'
-import { UnsafeHTMLDirective, unsafeHTML } from 'lit/directives/unsafe-html.js'
-import type { DirectiveResult } from 'lit/async-directive.js'
-import { eventTargetIsPlugin, eventTargetIsPluginEditor } from '../../lib/event-target-is-plugin.js'
 
 type PluginActionEvent = CustomEvent<{ action: PluginEvent.onEdit | PluginEvent.onStopEdit | PluginEvent.onCancelEdit; value: any }>
 
@@ -91,27 +92,6 @@ export class TableData extends MutableElement {
     @state()
     protected isDisplayingPluginEditor = false
 
-    protected willUpdate(changedProperties: PropertyValues<this>): void {
-        super.willUpdate(changedProperties)
-        if (changedProperties.has('isInteractive') && this.isInteractive === true && !this.blank) {
-            // prevent blank rows from being selectable; i.e. the first row that is used just for padding
-            this.tabIndex = 0
-        }
-
-        if (changedProperties.has('readonly')) {
-            if (this.readonly) {
-                this.options = [{ label: 'Copy', value: 'copy' }]
-            } else {
-                this.options = [
-                    { label: 'Edit', value: 'edit' },
-                    { label: 'Copy', value: 'copy' },
-                    { label: 'Paste', value: 'paste' },
-                    { label: 'Clear', value: 'clear' },
-                ]
-            }
-        }
-    }
-
     protected onContextMenu(event: MouseEvent) {
         const isPlugin = eventTargetIsPluginEditor(event)
         if (isPlugin) return
@@ -140,6 +120,22 @@ export class TableData extends MutableElement {
             this.isDisplayingPluginEditor = false
         } else if (eventName === PluginEvent.updateCell) {
             this.value = value
+        }
+    }
+
+    protected async onMenuSelection(event: MenuSelectedEvent) {
+        switch (event.value) {
+            case 'edit':
+                return (this.isEditing = true)
+            case 'copy':
+                return navigator.clipboard.writeText(this.value?.toString() ?? '')
+            case 'paste':
+                this.value = await navigator.clipboard.readText()
+                return
+            case 'clear':
+                return (this.value = '')
+            case 'reset':
+                return (this.value = this.originalValue)
         }
     }
 
@@ -276,6 +272,27 @@ export class TableData extends MutableElement {
         if (this.isInteractive) this.removeEventListener('dblclick', this.onDoubleClick)
     }
 
+    protected willUpdate(changedProperties: PropertyValues<this>): void {
+        super.willUpdate(changedProperties)
+        if (changedProperties.has('isInteractive') && this.isInteractive === true && !this.blank) {
+            // prevent blank rows from being selectable; i.e. the first row that is used just for padding
+            this.tabIndex = 0
+        }
+
+        if (changedProperties.has('readonly')) {
+            if (this.readonly) {
+                this.options = [{ label: 'Copy', value: 'copy' }]
+            } else {
+                this.options = [
+                    { label: 'Edit', value: 'edit' },
+                    { label: 'Copy', value: 'copy' },
+                    { label: 'Paste', value: 'paste' },
+                    { label: 'Clear', value: 'clear' },
+                ]
+            }
+        }
+    }
+
     protected override render() {
         const value = this.value === null ? null : typeof this.value === 'object' ? JSON.stringify(this.value) : this.value
         const contentWrapperClass = classMap({ 'font-normal': true, dark: this.theme == Theme.dark })
@@ -340,21 +357,5 @@ export class TableData extends MutableElement {
                         ><span class=${contentWrapperClass}>${cellContents}</span
                         ><span class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
                     >`
-    }
-
-    protected async onMenuSelection(event: MenuSelectedEvent) {
-        switch (event.value) {
-            case 'edit':
-                return (this.isEditing = true)
-            case 'copy':
-                return navigator.clipboard.writeText(this.value?.toString() ?? '')
-            case 'paste':
-                this.value = await navigator.clipboard.readText()
-                return
-            case 'clear':
-                return (this.value = '')
-            case 'reset':
-                return (this.value = this.originalValue)
-        }
     }
 }
