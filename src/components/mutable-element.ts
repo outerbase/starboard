@@ -5,7 +5,6 @@ import { Theme, type Position, type Serializable } from '../types.js'
 import { CellUpdateEvent } from '../lib/events.js'
 import { property, state } from 'lit/decorators.js'
 import { ClassifiedElement } from './classified-element.js'
-import { eventTargetIsPlugin } from '../lib/event-target-is-plugin.js'
 
 const NUMBER_TYPES = [
     'Integer',
