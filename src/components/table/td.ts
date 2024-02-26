@@ -116,6 +116,8 @@ export class TableData extends MutableElement {
         const isPlugin = eventTargetIsPluginEditor(event)
         if (isPlugin) return
 
+        if (this.blank) return
+
         const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
         if (menu) {
             event.preventDefault()

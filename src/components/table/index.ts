@@ -485,7 +485,7 @@ export class Table extends ClassifiedElement {
                               }
                           )}
                           ${this.blankFill
-                              ? html`<outerbase-td ?outer-border=${false} ?read-only=${true} ?separate-cells=${false} ?bottom-border=${true} ?interactive=${false} ?menu=${false} value="&nbsp;"></<outerbase-td>`
+                              ? html`<outerbase-td ?outer-border=${false} ?read-only=${true} ?separate-cells=${false} ?bottom-border=${true} ?interactive=${false} ?menu=${false} ?blank=${true}></<outerbase-td>`
                               : ''}
                       </outerbase-tr>`
                     : null
