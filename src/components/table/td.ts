@@ -90,7 +90,7 @@ export class TableData extends MutableElement {
     ]
 
     @state()
-    protected isDisplayingPluginEditor = false
+    public isDisplayingPluginEditor = false
 
     protected onContextMenu(event: MouseEvent) {
         const isPlugin = eventTargetIsPluginEditor(event)
@@ -272,6 +272,18 @@ export class TableData extends MutableElement {
         if (this.isInteractive) this.removeEventListener('dblclick', this.onDoubleClick)
     }
 
+    onDisplayEditor(event: MouseEvent) {
+        const didClickInsidePluginEditor = event.composedPath().some((v) => {
+            return v instanceof HTMLElement && v.id === 'plugin-editor'
+        })
+
+        if (!didClickInsidePluginEditor) {
+            this.isDisplayingPluginEditor = false
+        }
+    }
+
+    private _onDisplayEditor?: typeof this.onDisplayEditor
+
     protected willUpdate(changedProperties: PropertyValues<this>): void {
         super.willUpdate(changedProperties)
         if (changedProperties.has('isInteractive') && this.isInteractive === true && !this.blank) {
@@ -289,6 +301,22 @@ export class TableData extends MutableElement {
                     { label: 'Paste', value: 'paste' },
                     { label: 'Clear', value: 'clear' },
                 ]
+            }
+        }
+
+        if (changedProperties.has('isDisplayingPluginEditor')) {
+            if (this.isDisplayingPluginEditor) {
+                setTimeout(() => {
+                    this._onDisplayEditor = this.onDisplayEditor.bind(this)
+                    document.addEventListener('click', this._onDisplayEditor)
+                }, 0)
+            } else {
+                setTimeout(() => {
+                    if (this._onDisplayEditor) {
+                        document.removeEventListener('click', this._onDisplayEditor)
+                        delete this._onDisplayEditor
+                    }
+                }, 0)
             }
         }
     }
@@ -355,7 +383,7 @@ export class TableData extends MutableElement {
                         ?selectable-text=${!this.isInteractive}
                         @menu-selection=${this.onMenuSelection}
                         ><span class=${contentWrapperClass}>${cellContents}</span
-                        ><span class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
+                        ><span id="plugin-editor" class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
                     >`
     }
 }
