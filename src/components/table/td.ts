@@ -239,12 +239,32 @@ export class TableData extends MutableElement {
         }
     }
 
+    protected onDoubleClick(event: MouseEvent) {
+        if (this.isEditing) return // allow double-clicking to select text while editing
+
+        if (!eventTargetIsPlugin(event)) {
+            this.isEditing = true
+            setTimeout(() => {
+                const input = this.shadowRoot?.querySelector('input')
+
+                if (input) {
+                    input.readOnly = this.readonly
+                    input.focus()
+
+                    // set cursor to end if writable
+                    if (!this.readonly) input.setSelectionRange(input.value.length, input.value.length)
+                }
+            }, 0)
+        }
+    }
+
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.addEventListener('custom-change', this.onPluginEvent)
         this.addEventListener('keydown', this.onKeyDown)
+        if (this.isInteractive) this.addEventListener('dblclick', this.onDoubleClick)
     }
 
     public override disconnectedCallback(): void {
@@ -253,6 +273,7 @@ export class TableData extends MutableElement {
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.removeEventListener('custom-change', this.onPluginEvent)
         this.removeEventListener('keydown', this.onKeyDown)
+        if (this.isInteractive) this.removeEventListener('dblclick', this.onDoubleClick)
     }
 
     protected override render() {

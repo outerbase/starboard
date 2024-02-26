@@ -80,16 +80,6 @@ export class MutableElement extends ClassifiedElement {
     @state()
     public isEditing = false
 
-    public override connectedCallback() {
-        super.connectedCallback()
-        if (this.isInteractive && !this.readonly) this.addEventListener('dblclick', this.onDoubleClick)
-    }
-
-    public override disconnectedCallback() {
-        super.disconnectedCallback()
-        if (this.isInteractive && !this.readonly) this.removeEventListener('dblclick', this.onDoubleClick)
-    }
-
     protected override updated(changedProps: PropertyValues<this>) {
         super.updated(changedProps)
 
@@ -154,25 +144,6 @@ export class MutableElement extends ClassifiedElement {
             if (event.target instanceof HTMLElement && !this.isEditing) {
                 if (!event.didCloseMenu) this.isEditing = true
             }
-        }
-    }
-
-    protected onDoubleClick(event: MouseEvent) {
-        if (this.isEditing) return // allow double-clicking to select text while editing
-
-        if (!eventTargetIsPlugin(event)) {
-            this.isEditing = true
-            setTimeout(() => {
-                const input = this.shadowRoot?.querySelector('input')
-
-                if (input) {
-                    input.readOnly = this.readonly
-                    input.focus()
-
-                    // set cursor to end if writable
-                    if (!this.readonly) input.setSelectionRange(input.value.length, input.value.length)
-                }
-            }, 0)
         }
     }
 
