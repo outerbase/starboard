@@ -91,25 +91,20 @@ export class MutableElement extends ClassifiedElement {
         }
     }
 
+    protected override firstUpdated(changedProperties: PropertyValues<this>): void {
+        super.firstUpdated(changedProperties)
+
+        if (this.originalValue === undefined && this.originalValue !== this.value) {
+            this.originalValue = this.value
+        }
+    }
+
     protected override willUpdate(changedProperties: PropertyValues<this>) {
         super.willUpdate(changedProperties)
 
-        // set initial `originalValue`
-        // this is done here instead of, say, connectedCallback() because of a quirk with SSR
-        if (changedProperties.has('value') && this.originalValue === undefined && this.originalValue !== this.value) {
-            this.originalValue = this.value
-        }
-
-        // TODO @johnny why is this function firing once for every cell when toggling isEditing and prolly any other property?
-        // shoudl be a (small?) perf improvement to resolve that
-
         // dispatch changes when the user stops editing
         if (changedProperties.get('isEditing') === true && this.isEditing === false) {
-            // ensure the value has actually changed to prevent superfluous events
-            // note: for changedProperties.get('value') is undefined for some reason so this still fires if the value is the same before/after isEditing changed
-            if (this.value !== changedProperties.get('value')) {
-                this.dispatchChangedEvent()
-            }
+            this.dispatchChangedEvent()
         }
     }
 

@@ -287,6 +287,7 @@ export class TableData extends MutableElement {
 
     protected willUpdate(changedProperties: PropertyValues<this>): void {
         super.willUpdate(changedProperties)
+
         if (changedProperties.has('isInteractive') && this.isInteractive === true && !this.blank) {
             // prevent blank rows from being selectable; i.e. the first row that is used just for padding
             this.tabIndex = 0
@@ -319,6 +320,11 @@ export class TableData extends MutableElement {
                     }
                 }, 0)
             }
+        }
+
+        // handle clear, reset, paste menu items
+        if (changedProperties.has('value') && changedProperties.get('value') !== undefined && this.isEditing === false) {
+            this.dispatchChangedEvent()
         }
     }
 
