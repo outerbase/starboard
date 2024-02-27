@@ -139,6 +139,7 @@ export class Table extends ClassifiedElement {
     columnTypes?: Record<string, string | number | boolean | undefined>
 
     protected closeLastMenu?: () => void
+    protected fromIdToRowMap: Record<string, RowAsRecord | undefined> = {}
 
     // METHODS (public)
     public addNewRow(row?: Partial<RowAsRecord>) {
@@ -224,10 +225,11 @@ export class Table extends ClassifiedElement {
         this.updateVisibleColumns()
     }
 
+    // TODO @johnny 'Select All' is firing this once for each row instead of just once
     protected _onRowSelection() {
         const selectedRows: Array<RowAsRecord> = []
         this.selectedRowUUIDs.forEach((_id) => {
-            const row = this.rows.find(({ id }) => _id === id)
+            const row = this.fromIdToRowMap[_id]
             if (row) selectedRows.push(row)
         })
 
@@ -344,6 +346,14 @@ export class Table extends ClassifiedElement {
             } else if (this.selectedRowUUIDs.size === this.rows.length && !this.allRowsSelected) {
                 this.allRowsSelected = true
             }
+        }
+
+        if (_changedProperties.has('rows')) {
+            const m: Record<string, RowAsRecord | undefined> = {}
+            this.rows.forEach((r) => {
+                m[r.id] = r
+            })
+            this.fromIdToRowMap = m
         }
     }
 
