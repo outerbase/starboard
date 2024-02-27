@@ -27,14 +27,15 @@ export class TableData extends MutableElement {
     protected override get classMap() {
         return {
             ...super.classMap,
-            'table-cell relative focus:z-[1] group-hover:bg-theme-row-hover dark:group-hover:bg-theme-row-hover-dark': true,
+            'table-cell relative focus:z-[1]': true,
             'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
             'px-5': this.blank,
             'border-theme-border dark:border-theme-border-dark': true,
             'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
+            'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty && !this.hideDirt, // dirty cells
+            'group-hover:bg-theme-row-hover dark:group-hover:bg-theme-row-hover-dark': !this.dirty || this.hideDirt,
             'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none':
                 !this.isEditing && this.isInteractive,
-            'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty && !this.hideDirt, // dirty cells
             'border-r':
                 this.isInteractive ||
                 (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outerBorder) || // include last column when outerBorder

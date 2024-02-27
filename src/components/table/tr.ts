@@ -9,6 +9,7 @@ export class TableRow extends ClassifiedElement {
     protected override get classMap() {
         return {
             'table-row group': true,
+            // 'hover:bg-theme-row-hover dark:hover:bg-theme-row-hover-dark': true,
 
             // when a header
             'text-theme-column-text dark:text-theme-column-text-dark': this.isHeaderRow,
