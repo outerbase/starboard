@@ -347,43 +347,50 @@ export class TableData extends MutableElement {
             cellContents = html`${value || html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}`
         }
 
-        return this.isEditing
-            ? // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
-              html`<span class=${contentWrapperClass}>&nbsp;<input .value=${value ?? ''} @input=${this.onChange} class=${classMap({
+        const inputEl = this.isEditing // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
+            ? html`<span class=${contentWrapperClass}>&nbsp;<input .value=${value ?? ''} @input=${this.onChange} class=${classMap({
                   'z-[2] absolute top-0 bottom-0 right-0 left-0': true,
                   'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
                   'px-3 font-normal focus:rounded-[4px]': true,
               })} @blur=${this.onBlur}></input></span>`
-            : this.blank
-              ? html`<slot></slot>`
-              : html`<!-- providing a non-breaking whitespace to force the content to actually render and be clickable -->
-                    <outerbase-td-menu
-                        theme=${this.theme}
-                        left-distance-to-viewport=${this.leftDistanceToViewport}
-                        table-bounding-rect=${this.tableBoundingRect}
-                        .options=${this.dirty
-                            ? [
-                                  ...this.options,
-                                  {
-                                      label:
-                                          typeof this.originalValue === 'object'
-                                              ? 'Revert'
-                                              : html`Revert to
-                                                    <span class="pointer-events-none italic whitespace-nowrap"
-                                                        >${this.originalValue !== null || this.originalValue !== undefined
-                                                            ? this.originalValue
-                                                            : 'NULL'}</span
-                                                    >`,
-                                      value: 'reset',
-                                  },
-                              ]
-                            : this.options}
-                        ?without-padding=${!!this.plugin}
-                        ?menu=${this.hasMenu}
-                        ?selectable-text=${!this.isInteractive}
-                        @menu-selection=${this.onMenuSelection}
-                        ><span class=${contentWrapperClass}>${cellContents}</span
-                        ><span id="plugin-editor" class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
-                    >`
+            : html``
+
+        const emptySlot = this.blank ? html`<slot></slot>` : html``
+
+        const menuOptions = this.dirty
+            ? [
+                  ...this.options,
+                  {
+                      label:
+                          typeof this.originalValue === 'object'
+                              ? 'Revert'
+                              : html`Revert to
+                                    <span class="pointer-events-none italic whitespace-nowrap"
+                                        >${this.originalValue !== null || this.originalValue !== undefined
+                                            ? this.originalValue
+                                            : 'NULL'}</span
+                                    >`,
+                      value: 'reset',
+                  },
+              ]
+            : this.options
+
+        const menuEl =
+            !this.isEditing && !this.blank
+                ? html`<outerbase-td-menu
+                      theme=${this.theme}
+                      left-distance-to-viewport=${this.leftDistanceToViewport}
+                      table-bounding-rect=${this.tableBoundingRect}
+                      .options=${menuOptions}
+                      ?without-padding=${!!this.plugin}
+                      ?menu=${this.hasMenu}
+                      ?selectable-text=${!this.isInteractive}
+                      @menu-selection=${this.onMenuSelection}
+                      ><span class=${contentWrapperClass}>${cellContents}</span
+                      ><span id="plugin-editor" class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
+                  >`
+                : html``
+
+        return this.isEditing ? inputEl : this.blank ? emptySlot : menuEl
     }
 }
