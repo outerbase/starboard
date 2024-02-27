@@ -104,7 +104,7 @@ export class MutableElement extends ClassifiedElement {
         // shoudl be a (small?) perf improvement to resolve that
 
         // dispatch changes when the user stops editing
-        if (changedProperties.get('isEditing') === true && this.isEditing === false && !isEqual(this.value, this.originalValue)) {
+        if (changedProperties.get('isEditing') === true && this.isEditing === false) {
             // ensure the value has actually changed to prevent superfluous events
             // note: for changedProperties.get('value') is undefined for some reason so this still fires if the value is the same before/after isEditing changed
             if (this.value !== changedProperties.get('value')) {
