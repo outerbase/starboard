@@ -143,7 +143,8 @@ export class MutableElement extends ClassifiedElement {
 
     protected onChange(event: Event) {
         const { value } = event.target as HTMLInputElement
-        this.value = value
+        if (value === '') this.value = null
+        else this.value = value
     }
 
     protected dispatchChangedEvent() {
