@@ -29,6 +29,7 @@ export class TH extends MutableElement {
         return {
             ...super.classMap,
             'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
+            'cursor-pointer': true,
             'border-b border-theme-border dark:border-theme-border-dark': true,
             'first:border-l border-t': this.outerBorder,
             'px-cell-padding-x py-cell-padding-y': true,
@@ -105,14 +106,133 @@ export class TH extends MutableElement {
     @state()
     protected _pluginOptions: HeaderMenuOptions = []
 
+    protected override dispatchChangedEvent() {
+        if (!this.originalValue) throw new Error('missing OG value')
+
+        this.dispatchEvent(
+            new ColumnRenameEvent({
+                name: this.originalValue,
+                data: { name: this.value },
+            })
+        )
+    }
+
+    protected removeColumn() {
+        if (!this.originalValue) throw new Error('missing OG value')
+
+        this.dispatchEvent(
+            new ColumnRemovedEvent({
+                name: this.originalValue,
+            })
+        )
+    }
+
+    protected hideColumn() {
+        if (!this.originalValue) throw new Error('missing OG value')
+
+        this.dispatchEvent(
+            new ColumnHiddenEvent({
+                name: this.originalValue,
+            })
+        )
+    }
+
+    protected onMenuSelection(event: MenuSelectedEvent) {
+        event.stopPropagation()
+        let dispatchColumnUpdateEvent = false
+
+        const columnName = this.originalValue ?? this.value
+
+        // handle (potential) plugin selection
+        const plugin = this.plugins?.find(({ tagName }) => event.value === tagName)
+        if (plugin) {
+            return this.dispatchEvent(new ColumnPluginActivatedEvent(columnName, { ...plugin, columnName: this.value }))
+        }
+
+        // look for the 'none' plugin and delete installed column plugin as a result when chosen
+        if (event.value === 'uninstall-column-plugin') {
+            // starboard can immediately update it's state
+            // dashboard will also receive this event
+
+            const name = this.originalValue ?? this.value
+            const installedPlugin = this.installedPlugins[name]
+            if (!installedPlugin) throw new Error(`Attempting to uninstall a non-existent plugin: ${name}`)
+
+            this.dispatchEvent(new ColumnPluginDeactivatedEvent(columnName, installedPlugin))
+        }
+
+        switch (event.value) {
+            case 'hide':
+                return this.hideColumn()
+            case 'rename':
+                return (this.isEditing = true)
+            case 'delete':
+                return this.removeColumn()
+            case 'reset':
+                this.dispatchEvent(
+                    new ColumnRenameEvent({
+                        name: this.originalValue ?? '',
+                        data: { value: this.value },
+                    })
+                )
+                return (this.value = this.originalValue ?? '')
+            default:
+                // intentionally let other (e.g. sorting) events pass-through to parent
+                dispatchColumnUpdateEvent = true
+        }
+
+        if (dispatchColumnUpdateEvent) {
+            this.dispatchEvent(
+                new ColumnUpdatedEvent({
+                    name: this.originalValue ?? this.value,
+                    data: { action: event.value },
+                })
+            )
+        }
+    }
+
+    protected onContextMenu(event: MouseEvent) {
+        const menu = this.shadowRoot?.querySelector('outerbase-th-menu') as ColumnMenu | null
+        if (menu) {
+            event.preventDefault()
+            menu.focus()
+            menu.open = true
+        }
+    }
+
+    protected onClick(event: MouseEvent) {
+        const path = event.composedPath() as Array<HTMLElement>
+        const hasTrigger = path.some((p) => p.getAttribute?.('id') === 'trigger')
+        // we check for the 'trigger' which is the button inside this cell
+        // if it's being clicked we don't want to interfere with it's operation / trigger sorting
+        if (!hasTrigger) {
+            this.dispatchEvent(
+                new ColumnUpdatedEvent({
+                    name: this.originalValue ?? this.value,
+                    data: { action: 'sort:alphabetical:ascending' },
+                })
+            )
+        } else {
+            // ignore
+        }
+    }
+    private _onClick?: (event: MouseEvent) => void
+
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
+
+        this._onClick = this.onClick.bind(this)
+        this.addEventListener('click', this._onClick)
     }
 
     public override disconnectedCallback(): void {
         super.disconnectedCallback
         this.removeEventListener('contextmenu', this.onContextMenu)
+        if (this._onClick) {
+            this.removeEventListener('click', this._onClick)
+            delete this._onClick
+        }
     }
 
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -263,100 +383,6 @@ export class TH extends MutableElement {
                       ></column-resizer
                   ></span>`
                 : html`<div class=${classMap(resultContainerClasses)}><slot></slot>${body}</div>`
-        }
-    }
-
-    protected override dispatchChangedEvent() {
-        if (!this.originalValue) throw new Error('missing OG value')
-
-        this.dispatchEvent(
-            new ColumnRenameEvent({
-                name: this.originalValue,
-                data: { name: this.value },
-            })
-        )
-    }
-
-    protected removeColumn() {
-        if (!this.originalValue) throw new Error('missing OG value')
-
-        this.dispatchEvent(
-            new ColumnRemovedEvent({
-                name: this.originalValue,
-            })
-        )
-    }
-
-    protected hideColumn() {
-        if (!this.originalValue) throw new Error('missing OG value')
-
-        this.dispatchEvent(
-            new ColumnHiddenEvent({
-                name: this.originalValue,
-            })
-        )
-    }
-
-    protected onMenuSelection(event: MenuSelectedEvent) {
-        event.stopPropagation()
-        let dispatchColumnUpdateEvent = false
-
-        const columnName = this.originalValue ?? this.value
-
-        // handle (potential) plugin selection
-        const plugin = this.plugins?.find(({ tagName }) => event.value === tagName)
-        if (plugin) {
-            return this.dispatchEvent(new ColumnPluginActivatedEvent(columnName, { ...plugin, columnName: this.value }))
-        }
-
-        // look for the 'none' plugin and delete installed column plugin as a result when chosen
-        if (event.value === 'uninstall-column-plugin') {
-            // starboard can immediately update it's state
-            // dashboard will also receive this event
-
-            const name = this.originalValue ?? this.value
-            const installedPlugin = this.installedPlugins[name]
-            if (!installedPlugin) throw new Error(`Attempting to uninstall a non-existent plugin: ${name}`)
-
-            this.dispatchEvent(new ColumnPluginDeactivatedEvent(columnName, installedPlugin))
-        }
-
-        switch (event.value) {
-            case 'hide':
-                return this.hideColumn()
-            case 'rename':
-                return (this.isEditing = true)
-            case 'delete':
-                return this.removeColumn()
-            case 'reset':
-                this.dispatchEvent(
-                    new ColumnRenameEvent({
-                        name: this.originalValue ?? '',
-                        data: { value: this.value },
-                    })
-                )
-                return (this.value = this.originalValue ?? '')
-            default:
-                // intentionally let other (e.g. sorting) events pass-through to parent
-                dispatchColumnUpdateEvent = true
-        }
-
-        if (dispatchColumnUpdateEvent) {
-            this.dispatchEvent(
-                new ColumnUpdatedEvent({
-                    name: this.originalValue ?? this.value,
-                    data: { action: event.value },
-                })
-            )
-        }
-    }
-
-    protected onContextMenu(event: MouseEvent) {
-        const menu = this.shadowRoot?.querySelector('outerbase-th-menu') as ColumnMenu | null
-        if (menu) {
-            event.preventDefault()
-            menu.focus()
-            menu.open = true
         }
     }
 }
