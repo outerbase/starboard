@@ -217,7 +217,7 @@ export class TH extends MutableElement {
 
         // we check for the 'trigger' which is the button inside this cell
         // if it's being clicked we don't want to interfere with it's operation / trigger sorting
-        if (!hasTrigger) {
+        if (!hasTrigger && name) {
             this.dispatchEvent(
                 new ColumnUpdatedEvent({
                     name,
