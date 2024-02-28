@@ -17,7 +17,6 @@ type PluginActionEvent = CustomEvent<{ action: PluginEvent.onEdit | PluginEvent.
 
 const isAlphanumericOrSpecial = (key: string): boolean => {
     // Regular expression to match alphanumeric characters and specified special characters
-    // const regex = /^[a-zA-Z0-9`~!@#\$%\^&\*\+\?\(\)\[\],<\.>]+$/
     return /^[a-zA-Z0-9 \.,]+$/.test(key)
 }
 
@@ -113,7 +112,6 @@ export class TableData extends MutableElement {
 
         if (eventName === PluginEvent.onEdit) {
             this.isDisplayingPluginEditor = true
-            // TODO add an event listener for clicks outside the plugin to stop editing?
         } else if (eventName === PluginEvent.onStopEdit) {
             this.isDisplayingPluginEditor = false
             // TODO update our value to match the one from the editor
