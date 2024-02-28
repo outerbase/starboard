@@ -26,8 +26,9 @@ export class ColumnResizer extends ClassifiedElement {
 
     private _mouseDown(e: MouseEvent) {
         if (!this.column) throw new Error('`column` is unset; aborting')
+        const v = this.column.value ?? this.column.originalValue ?? ''
 
-        this.dispatchEvent(new ResizeStartEvent(this.column.value))
+        this.dispatchEvent(new ResizeStartEvent(v))
 
         let dx: number
 
@@ -37,7 +38,7 @@ export class ColumnResizer extends ClassifiedElement {
             if (!this.width) throw new Error('`width` is unset; aborting')
 
             dx = e.clientX - this.xPosition
-            this.dispatchEvent(new ResizeEvent(this.column.value, dx))
+            this.dispatchEvent(new ResizeEvent(v, dx))
         }
 
         const _mouseUp = (_e: Event) => {
@@ -46,7 +47,7 @@ export class ColumnResizer extends ClassifiedElement {
 
             if (!this.column) throw new Error('`column` is unset; aborting')
 
-            this.dispatchEvent(new ResizeEndEvent(this.column.value, dx))
+            this.dispatchEvent(new ResizeEndEvent(v, dx))
         }
 
         document.addEventListener('mousemove', _mouseMove)
