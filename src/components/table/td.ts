@@ -132,11 +132,16 @@ export class TableData extends MutableElement {
                 return navigator.clipboard.writeText(this.value?.toString() ?? '')
             case 'paste':
                 this.value = await navigator.clipboard.readText()
+                this.dispatchChangedEvent()
                 return
             case 'clear':
-                return (this.value = '')
+                delete this.value
+                this.dispatchChangedEvent()
+                return
             case 'reset':
-                return (this.value = this.originalValue)
+                this.value = this.originalValue
+                this.dispatchChangedEvent()
+                return
         }
     }
 
@@ -321,11 +326,6 @@ export class TableData extends MutableElement {
                     }
                 }, 0)
             }
-        }
-
-        // handle clear, reset, paste menu items
-        if (changedProperties.has('value') && changedProperties.get('value') !== undefined && this.isEditing === false) {
-            this.dispatchChangedEvent()
         }
     }
 
