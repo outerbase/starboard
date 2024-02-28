@@ -95,13 +95,17 @@ export class TH extends MutableElement {
         return this._value?.toString()
     }
     override set value(newValue: string) {
+        const oldValue = this._value
         this._value = newValue
+        this.requestUpdate('value', oldValue)
     }
     override get originalValue(): string | undefined {
         return this._originalValue?.toString()
     }
     override set originalValue(newValue: string) {
+        const oldValue = this._originalValue
         this._originalValue = newValue
+        this.requestUpdate('value', oldValue)
     }
 
     @state()

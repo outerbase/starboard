@@ -41,8 +41,10 @@ export class MutableElement extends ClassifiedElement {
     }
 
     set value(newValue: Serializable) {
+        const oldValue = this._value
         // convert strings to their proper value-types; json, boolean, number, and null
         this._value = this.convertToType(newValue) ?? newValue
+        this.requestUpdate('value', oldValue)
     }
 
     protected _originalValue?: Serializable
@@ -52,8 +54,10 @@ export class MutableElement extends ClassifiedElement {
     }
 
     set originalValue(newValue: Serializable) {
+        const oldValue = this._originalValue
         // convert strings to their proper value-types; json, boolean, number, and null
         this._originalValue = this.convertToType(newValue) ?? newValue
+        this.requestUpdate('originalValue', oldValue)
     }
 
     @property({ type: String })
@@ -133,8 +137,13 @@ export class MutableElement extends ClassifiedElement {
         }
 
         if (changedProperties.has('type')) {
-            this._value = this.convertToType(this._value)
-            this._originalValue = this.convertToType(this._originalValue)
+            const oldValue = this.value
+            this._value = this.convertToType(this.value) ?? this._value
+            this.requestUpdate('value', oldValue)
+
+            const oldOriginalValue = this.originalValue
+            this._originalValue = this.convertToType(this.originalValue) ?? this.originalValue
+            this.requestUpdate('originalValue', oldOriginalValue)
         }
     }
 
