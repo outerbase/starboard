@@ -34,8 +34,27 @@ export class MutableElement extends ClassifiedElement {
     }
 
     // current value
-    @property({ type: String })
-    public value?: Serializable
+    protected _value?: Serializable
+    @property({ attribute: 'value', type: String })
+    get value(): Serializable {
+        return this._value
+    }
+
+    set value(newValue: Serializable) {
+        // convert strings to their proper value-types; json, boolean, number, and null
+        this._value = this.convertToType(newValue) ?? newValue
+    }
+
+    protected _originalValue?: Serializable
+    @property({ attribute: 'original-value', type: String })
+    get originalValue(): Serializable {
+        return this._originalValue
+    }
+
+    set originalValue(newValue: Serializable) {
+        // convert strings to their proper value-types; json, boolean, number, and null
+        this._originalValue = this.convertToType(newValue) ?? newValue
+    }
 
     @property({ type: String })
     public get dirty() {
@@ -48,9 +67,6 @@ export class MutableElement extends ClassifiedElement {
 
     @property({ type: String })
     public label?: string
-
-    @property({ attribute: 'original-value', type: String })
-    public originalValue?: Serializable
 
     @property({ attribute: 'read-only', type: Boolean })
     public readonly = false
@@ -80,6 +96,19 @@ export class MutableElement extends ClassifiedElement {
     @state()
     public isEditing = false
 
+    protected convertToType(newValue: Serializable) {
+        // convert strings to their proper value-types; json, boolean, number, and null
+        const v = newValue
+        const t = this.type?.toLowerCase()
+
+        if (t && typeof v === 'string') {
+            if (NUMBER_TYPES.includes(t)) return parseInt(v, 10)
+            if (JSON_TYPES.includes(t)) return JSON.parse(v)
+            if (BOOLEAN_TYPES.includes(t)) return v.toLowerCase().trim() === 'true'
+            if (v === '') return null
+        }
+    }
+
     protected override updated(changedProps: PropertyValues<this>) {
         super.updated(changedProps)
 
@@ -96,8 +125,16 @@ export class MutableElement extends ClassifiedElement {
         super.willUpdate(changedProperties)
 
         // dispatch changes when the user stops editing
-        if (changedProperties.get('isEditing') === true && this.isEditing === false) {
+        if (
+            (changedProperties.has('value') && changedProperties.get('value') !== undefined && this.isEditing === false) ||
+            (changedProperties.get('isEditing') === true && this.isEditing === false)
+        ) {
             this.dispatchChangedEvent()
+        }
+
+        if (changedProperties.has('type')) {
+            this._value = this.convertToType(this._value)
+            this._originalValue = this.convertToType(this._originalValue)
         }
     }
 
@@ -141,23 +178,11 @@ export class MutableElement extends ClassifiedElement {
     }
 
     protected dispatchChangedEvent() {
-        // convert strings to their proper value-types; json, boolean, number, and null
-        const v = this.value
-        const t = this.type?.toLowerCase()
-        let typedValued: Serializable
-
-        if (t && typeof v === 'string') {
-            if (NUMBER_TYPES.includes(t)) typedValued = parseInt(v, 10)
-            if (JSON_TYPES.includes(t)) typedValued = JSON.parse(v)
-            if (BOOLEAN_TYPES.includes(t)) typedValued = v.toLowerCase().trim() === 'true'
-            // TODO convert `''` to `NULL`?
-        }
-
         this.dispatchEvent(
             new CellUpdateEvent({
                 position: this.position,
-                previousValue: this.originalValue as string | undefined, // TODO @johnny remove this cast / handle types better
-                value: typedValued ?? this.value,
+                previousValue: this.originalValue,
+                value: this.value,
                 label: this.label,
             })
         )
