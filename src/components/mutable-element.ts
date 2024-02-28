@@ -12,7 +12,7 @@ const NUMBER_TYPES = [
     'SmallInt',
     'BigInt',
     'Decimal',
-    'Numeric',
+    // 'Numeric', // API appears to deliver these as strings
     'Float',
     'Real',
     'Double Precision',
