@@ -51,12 +51,6 @@ export class TH extends MutableElement {
     @property({ attribute: 'with-resizer', type: Boolean })
     public withResizer = false
 
-    @property({ attribute: 'value', type: String })
-    public override value: string = ''
-
-    @property({ attribute: 'original-value', type: String })
-    public override originalValue?: string
-
     @property({ attribute: 'plugins', type: Array })
     public plugins?: Array<ColumnPlugin>
 
@@ -97,6 +91,19 @@ export class TH extends MutableElement {
     @property({ attribute: 'left-distance-to-viewport', type: Number })
     protected distanceToLeftViewport = -1
 
+    override get value(): string | undefined {
+        return this._value?.toString()
+    }
+    override set value(newValue: string) {
+        this._value = newValue
+    }
+    override get originalValue(): string | undefined {
+        return this._originalValue?.toString()
+    }
+    override set originalValue(newValue: string) {
+        this._originalValue = newValue
+    }
+
     @state()
     private _previousWidth = 0
 
@@ -107,7 +114,7 @@ export class TH extends MutableElement {
     protected _pluginOptions: HeaderMenuOptions = []
 
     protected override dispatchChangedEvent() {
-        if (!this.originalValue) throw new Error('missing OG value')
+        if (typeof this.originalValue !== 'string') return
 
         this.dispatchEvent(
             new ColumnRenameEvent({
@@ -141,12 +148,12 @@ export class TH extends MutableElement {
         event.stopPropagation()
         let dispatchColumnUpdateEvent = false
 
-        const columnName = this.originalValue ?? this.value
+        const columnName = this.originalValue ?? this.value ?? ''
 
         // handle (potential) plugin selection
         const plugin = this.plugins?.find(({ tagName }) => event.value === tagName)
         if (plugin) {
-            return this.dispatchEvent(new ColumnPluginActivatedEvent(columnName, { ...plugin, columnName: this.value }))
+            return this.dispatchEvent(new ColumnPluginActivatedEvent(columnName, { ...plugin, columnName }))
         }
 
         // look for the 'none' plugin and delete installed column plugin as a result when chosen
@@ -154,9 +161,8 @@ export class TH extends MutableElement {
             // starboard can immediately update it's state
             // dashboard will also receive this event
 
-            const name = this.originalValue ?? this.value
-            const installedPlugin = this.installedPlugins[name]
-            if (!installedPlugin) throw new Error(`Attempting to uninstall a non-existent plugin: ${name}`)
+            const installedPlugin = this.installedPlugins[columnName]
+            if (!installedPlugin) throw new Error(`Attempting to uninstall a non-existent plugin on ${columnName}`)
 
             this.dispatchEvent(new ColumnPluginDeactivatedEvent(columnName, installedPlugin))
         }
@@ -184,7 +190,7 @@ export class TH extends MutableElement {
         if (dispatchColumnUpdateEvent) {
             this.dispatchEvent(
                 new ColumnUpdatedEvent({
-                    name: this.originalValue ?? this.value,
+                    name: this.originalValue ?? this.value ?? '',
                     data: { action: event.value },
                 })
             )
@@ -203,12 +209,14 @@ export class TH extends MutableElement {
     protected onClick(event: MouseEvent) {
         const path = event.composedPath() as Array<HTMLElement>
         const hasTrigger = path.some((p) => p.getAttribute?.('id') === 'trigger')
+        const name = this.originalValue ?? this.value ?? ''
+
         // we check for the 'trigger' which is the button inside this cell
         // if it's being clicked we don't want to interfere with it's operation / trigger sorting
         if (!hasTrigger) {
             this.dispatchEvent(
                 new ColumnUpdatedEvent({
-                    name: this.originalValue ?? this.value,
+                    name,
                     data: { action: 'sort:alphabetical:ascending' },
                 })
             )
@@ -307,7 +315,7 @@ export class TH extends MutableElement {
     }
 
     protected override render() {
-        const name = this.originalValue ?? this.value
+        const name = this.originalValue ?? this.value ?? ''
         const hasPlugin = typeof this.installedPlugins?.[name] !== 'undefined' && !this.installedPlugins?.[name]?.isDefaultPlugin
         const options = this.dirty
             ? [
