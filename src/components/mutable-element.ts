@@ -7,6 +7,7 @@ import { property, state } from 'lit/decorators.js'
 import { ClassifiedElement } from './classified-element.js'
 
 const NUMBER_TYPES = [
+    'Int',
     'Integer',
     'SmallInt',
     'BigInt',
@@ -38,7 +39,7 @@ export class MutableElement extends ClassifiedElement {
 
     @property({ type: String })
     public get dirty() {
-        return this.originalValue !== undefined && !isEqual(this.value, this.originalValue)
+        return !isEqual(this.value, this.originalValue)
     }
 
     // the cell's row's uuid and column name
@@ -88,14 +89,6 @@ export class MutableElement extends ClassifiedElement {
             if (input) {
                 input.select()
             }
-        }
-    }
-
-    protected override firstUpdated(changedProperties: PropertyValues<this>): void {
-        super.firstUpdated(changedProperties)
-
-        if (this.originalValue === undefined && this.originalValue !== this.value) {
-            this.originalValue = this.value
         }
     }
 

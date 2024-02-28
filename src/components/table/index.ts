@@ -413,7 +413,6 @@ export class Table extends ClassifiedElement {
 
     protected renderRows(rows: Array<RowAsRecord>) {
         const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null
-
         return html`${repeat(
             rows,
             ({ id }) => id,
@@ -470,7 +469,7 @@ export class Table extends ClassifiedElement {
                                       <outerbase-td
                                           .position=${{ row: id, column: name }}
                                           .value=${values[name]}
-                                          .original-value=${originalValues[name]}
+                                          .originalValue=${originalValues[name]}
                                           width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
                                           left-distance-to-viewport=${this.distanceToLeftViewport}
                                           table-bounding-rect="${tableBoundingRect}"
@@ -558,6 +557,8 @@ export class Table extends ClassifiedElement {
                               table-height=${ifDefined(this._height)}
                               theme=${this.theme}
                               width="42px"
+                              .value=${null}
+                              .originalValue=${null}
                               ?separate-cells=${true}
                               ?outer-border=${this.outerBorder}
                               ?is-last=${0 === this.visibleColumns.length}
@@ -600,7 +601,9 @@ export class Table extends ClassifiedElement {
                             }
                         )}
                         ${this.blankFill
-                            ? html`<outerbase-th ?outer-border=${this.outerBorder} ?read-only=${true} fill>
+                            ? html`<outerbase-th ?outer-border=${
+                                  this.outerBorder
+                              } ?read-only=${true} fill .value=${null} .originalValue=${null}>
                             ${
                                 this.isNonInteractive || !this.addableColumns
                                     ? ''
