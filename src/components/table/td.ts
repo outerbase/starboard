@@ -135,7 +135,7 @@ export class TableData extends MutableElement {
                 this.dispatchChangedEvent()
                 return
             case 'clear':
-                delete this.value
+                this.value = null
                 this.dispatchChangedEvent()
                 return
             case 'reset':
