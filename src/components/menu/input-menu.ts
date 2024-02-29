@@ -1,11 +1,11 @@
-import { customElement, property } from 'lit/decorators.js'
-
-import { Menu } from './index.js'
-import { classMap } from 'lit/directives/class-map.js'
-import { CaretDown } from '../../lib/icons/caret-down.js'
 import { html } from 'lit'
-import { MenuSelectedEvent, Theme } from '../../types.js'
+import { customElement, property } from 'lit/decorators.js'
+import { classMap } from 'lit/directives/class-map.js'
+
 import { ChangeEvent } from '../../lib/events.js'
+import { CaretDown } from '../../lib/icons/caret-down.js'
+import { MenuSelectedEvent, Theme } from '../../types.js'
+import { Menu } from './index.js'
 
 @customElement('outerbase-input-menu')
 export class InputMenu extends Menu {

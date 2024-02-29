@@ -1,9 +1,9 @@
 import type { PropertyValues } from 'lit'
+import { property, state } from 'lit/decorators.js'
 import { isEqual } from 'lodash-es'
 
-import { Theme, type Position, type Serializable } from '../types.js'
 import { CellUpdateEvent } from '../lib/events.js'
-import { property, state } from 'lit/decorators.js'
+import { Theme, type Position, type Serializable } from '../types.js'
 import { ClassifiedElement } from './classified-element.js'
 
 const NUMBER_TYPES = [

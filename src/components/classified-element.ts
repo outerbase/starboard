@@ -2,8 +2,8 @@
 
 import { LitElement, html, type PropertyValueMap } from 'lit'
 import { property } from 'lit/decorators.js'
-import { TWStyles } from '../../tailwind/index.js'
 
+import { TWStyles } from '../../tailwind/index.js'
 import classMapToClassName from '../lib/class-map-to-class-name.js'
 
 // is propogated to the DOM and therefore it's CSS is applied

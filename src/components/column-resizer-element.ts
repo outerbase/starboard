@@ -1,11 +1,11 @@
-import { customElement, property } from 'lit/decorators.js'
 import { html, type PropertyValueMap } from 'lit'
+import { customElement, property } from 'lit/decorators.js'
 
-import type { TH } from './table/th.js'
-import { ClassifiedElement } from './classified-element.js'
+import { classMap } from 'lit/directives/class-map.js'
 import { ResizeEndEvent, ResizeEvent, ResizeStartEvent } from '../lib/events.js'
 import { Theme } from '../types.js'
-import { classMap } from 'lit/directives/class-map.js'
+import { ClassifiedElement } from './classified-element.js'
+import type { TH } from './table/th.js'
 
 @customElement('column-resizer')
 export class ColumnResizer extends ClassifiedElement {

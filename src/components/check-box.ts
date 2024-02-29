@@ -1,10 +1,11 @@
 import { LitElement, html } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
-import { CheckMark } from '../lib/icons/check-mark.js'
-import { TWStyles } from '../../tailwind/index.js'
-import { Theme } from '../types.js'
 import { classMap } from 'lit/directives/class-map.js'
+
+import { TWStyles } from '../../tailwind/index.js'
 import { CheckEvent } from '../lib/events.js'
+import { CheckMark } from '../lib/icons/check-mark.js'
+import { Theme } from '../types.js'
 
 @customElement('check-box')
 export class CustomCheckbox extends LitElement {

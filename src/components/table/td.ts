@@ -1,13 +1,13 @@
-import { classMap } from 'lit/directives/class-map.js'
 import { html, type PropertyValues, type TemplateResult } from 'lit'
 import type { DirectiveResult } from 'lit/async-directive.js'
 import { customElement, property, state } from 'lit/decorators.js'
-import { UnsafeHTMLDirective, unsafeHTML } from 'lit/directives/unsafe-html.js'
+import { classMap } from 'lit/directives/class-map.js'
+import { unsafeHTML, UnsafeHTMLDirective } from 'lit/directives/unsafe-html.js'
 
-import { MutableElement } from '../mutable-element.js'
-import { type MenuSelectedEvent } from '../../lib/events.js'
-import { Theme, type ColumnPlugin, PluginEvent } from '../../types.js'
 import { eventTargetIsPlugin, eventTargetIsPluginEditor } from '../../lib/event-target-is-plugin.js'
+import { type MenuSelectedEvent } from '../../lib/events.js'
+import { PluginEvent, Theme, type ColumnPlugin } from '../../types.js'
+import { MutableElement } from '../mutable-element.js'
 
 import type { CellMenu } from '../menu/cell-menu.js'
 

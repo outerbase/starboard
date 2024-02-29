@@ -1,14 +1,14 @@
 // https://www.figma.com/file/9jKTBFtr4oSWHsTNTEydcC/Action-Bar-Update?type=design&node-id=17-93528&mode=design&t=7DdNRVMi5wZmqPxS-4
 
 import { html, type TemplateResult } from 'lit'
-import { ClassifiedElement } from '../classified-element.js'
 import { customElement, state } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
-// import { WarningOctagon } from '../../lib/icons/warning-octagon.js'
-import { ChangeEvent, ColumnAddedEvent, MenuSelectedEvent } from '../../lib/events.js'
 
-import '../menu/input-menu.js'
+import { ChangeEvent, ColumnAddedEvent, MenuSelectedEvent } from '../../lib/events.js'
 import { Plus } from '../../lib/icons/plus.js'
+import { ClassifiedElement } from '../classified-element.js'
+import '../menu/input-menu.js'
+
 @customElement('outerbase-add-column')
 export class AddColumnElement extends ClassifiedElement {
     protected get classMap() {

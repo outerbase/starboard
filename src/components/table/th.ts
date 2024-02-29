@@ -1,11 +1,9 @@
 import { html, type PropertyValueMap, type PropertyValues } from 'lit'
-import { ifDefined } from 'lit/directives/if-defined.js'
 import { customElement, property, state } from 'lit/decorators.js'
+import { classMap } from 'lit/directives/class-map.js'
+import { ifDefined } from 'lit/directives/if-defined.js'
 
 // import subcomponents
-import '../column-resizer-element.js'
-import { MutableElement } from '../mutable-element.js'
-import { classMap } from 'lit/directives/class-map.js'
 import {
     ColumnHiddenEvent,
     ColumnPluginActivatedEvent,
@@ -16,11 +14,13 @@ import {
     MenuSelectedEvent,
     ResizeEvent,
 } from '../../lib/events.js'
+import { CaretRight } from '../../lib/icons/caret-right.js'
+import type { ColumnPlugin, HeaderMenuOptions, PluginWorkspaceInstallationId } from '../../types.js'
+import { Theme } from '../../types.js'
+import '../column-resizer-element.js'
 import '../menu/column-menu.js' // <outerbase-th-menu />
 import type { ColumnMenu } from '../menu/column-menu.js'
-import type { HeaderMenuOptions, ColumnPlugin, PluginWorkspaceInstallationId } from '../../types.js'
-import { Theme } from '../../types.js'
-import { CaretRight } from '../../lib/icons/caret-right.js'
+import { MutableElement } from '../mutable-element.js'
 
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')

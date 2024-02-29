@@ -1,8 +1,8 @@
 import { html } from 'lit'
-import { classMap } from 'lit/directives/class-map.js'
 import { customElement, property } from 'lit/decorators.js'
-import { Menu } from './index.js'
+import { classMap } from 'lit/directives/class-map.js'
 import { Theme } from '../../types.js'
+import { Menu } from './index.js'
 
 @customElement('outerbase-td-menu')
 export class CellMenu extends Menu {

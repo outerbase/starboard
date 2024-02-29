@@ -1,8 +1,10 @@
-import { customElement, property, state } from 'lit/decorators.js'
 import { html, nothing, type PropertyValueMap } from 'lit'
+import { customElement, property, state } from 'lit/decorators.js'
+import { classMap } from 'lit/directives/class-map.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { repeat } from 'lit/directives/repeat.js'
 
+import arrayToObject from '../../lib/array-to-object.js'
 import {
     ColumnAddedEvent,
     ColumnHiddenEvent,
@@ -14,32 +16,29 @@ import {
     RowRemovedEvent,
     RowSelectedEvent,
 } from '../../lib/events.js'
-import {
-    type Columns,
-    type Schema,
-    type HeaderMenuOptions,
-    type RowAsRecord,
-    type TableColumn,
-    type ColumnPlugin,
-    ColumnStatus,
-    Theme,
-    type PluginWorkspaceInstallationId,
-    DBType,
-} from '../../types.js'
 import { heightOfElement } from '../../lib/height-of-element.js'
+import {
+    ColumnStatus,
+    DBType,
+    Theme,
+    type ColumnPlugin,
+    type Columns,
+    type HeaderMenuOptions,
+    type PluginWorkspaceInstallationId,
+    type RowAsRecord,
+    type Schema,
+    type TableColumn,
+} from '../../types.js'
 import { ClassifiedElement } from '../classified-element.js'
 
 // import subcomponents
+import '../check-box.js'
+import '../widgets/add-column.js'
 import './tbody.js'
 import './td.js'
 import './th.js'
 import './thead.js'
 import './tr.js'
-import '../check-box.js'
-import '../widgets/add-column.js'
-
-import { classMap } from 'lit/directives/class-map.js'
-import arrayToObject from '../../lib/array-to-object.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
