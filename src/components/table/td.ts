@@ -143,6 +143,7 @@ export class TableData extends MutableElement {
         }
     }
 
+    private _onKeyDown: typeof this.onKeyDown | undefined
     protected async onKeyDown(event: KeyboardEvent): Promise<void> {
         // ignore events being fired from a Plugin
         if (eventTargetIsPlugin(event)) return
@@ -206,20 +207,24 @@ export class TableData extends MutableElement {
         if (code === 'ArrowRight') {
             event.preventDefault()
             ;(target?.nextElementSibling as HTMLElement)?.focus()
+            return
         } else if (code === 'ArrowLeft') {
             event.preventDefault()
             const checkbox = target?.previousElementSibling?.querySelector('check-box') as HTMLElement | undefined
             if (checkbox) checkbox.focus()
             else (target?.previousElementSibling as HTMLElement | undefined)?.focus()
+            return
         } else if (code === 'ArrowDown') {
             event.preventDefault()
             if (event.target instanceof HTMLElement && !this.isEditing) {
                 this.moveFocusToNextRow(event.target)
+                return
             }
         } else if (code === 'ArrowUp') {
             event.preventDefault()
             if (event.target instanceof HTMLElement && !this.isEditing) {
                 this.moveFocusToPreviousRow(event.target)
+                return
             }
         }
 
@@ -227,16 +232,13 @@ export class TableData extends MutableElement {
         if (code === 'KeyC') {
             event.preventDefault()
             navigator.clipboard.writeText(this.value?.toString() ?? '')
-        }
-
-        if (code === 'KeyV') {
-            event.preventDefault()
-            this.value = await navigator.clipboard.readText()
+            return
         }
 
         if (code === 'Backspace' || code === 'Delete') {
             event.preventDefault()
             this.value = undefined
+            return
         }
     }
 
@@ -264,7 +266,10 @@ export class TableData extends MutableElement {
         this.addEventListener('contextmenu', this.onContextMenu)
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.addEventListener('custom-change', this.onPluginEvent)
-        this.addEventListener('keydown', this.onKeyDown)
+
+        this._onKeyDown = this.onKeyDown.bind(this)
+        this.addEventListener('keydown', this._onKeyDown)
+
         if (this.isInteractive) this.addEventListener('dblclick', this.onDoubleClick)
     }
 
@@ -273,7 +278,10 @@ export class TableData extends MutableElement {
         this.removeEventListener('contextmenu', this.onContextMenu)
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.removeEventListener('custom-change', this.onPluginEvent)
-        this.removeEventListener('keydown', this.onKeyDown)
+        if (this._onKeyDown) {
+            this.removeEventListener('keydown', this._onKeyDown)
+            delete this._onKeyDown
+        }
         if (this.isInteractive) this.removeEventListener('dblclick', this.onDoubleClick)
     }
 
@@ -294,7 +302,8 @@ export class TableData extends MutableElement {
 
         if (changedProperties.has('isInteractive') && this.isInteractive === true && !this.blank) {
             // prevent blank rows from being selectable; i.e. the first row that is used just for padding
-            this.tabIndex = 0
+            const pasteableWrapper = this.shadowRoot?.querySelector('#pasteable-wrapper')
+            pasteableWrapper?.setAttribute('tabindex', '0')
         }
 
         if (changedProperties.has('readonly')) {
@@ -383,17 +392,26 @@ export class TableData extends MutableElement {
 
         const menuEl =
             !this.isEditing && !this.blank
-                ? html`<outerbase-td-menu
-                      theme=${this.theme}
-                      left-distance-to-viewport=${this.leftDistanceToViewport}
-                      table-bounding-rect=${this.tableBoundingRect}
-                      .options=${menuOptions}
-                      ?without-padding=${!!this.plugin}
-                      ?menu=${this.hasMenu}
-                      ?selectable-text=${!this.isInteractive}
-                      @menu-selection=${this.onMenuSelection}
-                      ><span class=${contentWrapperClass}>${cellContents}</span
-                      ><span id="plugin-editor" class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
+                ? html`<span
+                      id="pasteable-wrapper"
+                      class="outline-none caret-transparent"
+                      contenteditable="true"
+                      @paste=${(event: ClipboardEvent) => {
+                          event.preventDefault()
+                          this.value = event.clipboardData?.getData('text')
+                      }}
+                      ><outerbase-td-menu
+                          theme=${this.theme}
+                          left-distance-to-viewport=${this.leftDistanceToViewport}
+                          table-bounding-rect=${this.tableBoundingRect}
+                          .options=${menuOptions}
+                          ?without-padding=${!!this.plugin}
+                          ?menu=${this.hasMenu}
+                          ?selectable-text=${!this.isInteractive}
+                          @menu-selection=${this.onMenuSelection}
+                          ><span class=${contentWrapperClass}>${cellContents}</span
+                          ><span id="plugin-editor" class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
+                      ></span
                   >`
                 : html``
 
