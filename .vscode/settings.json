@@ -18,11 +18,13 @@
     },
     "files.watcherExclude": {
         "**/node_modules": true,
-        "**/dist": true
+        "**/dist": true,
+        "**/lit-dist": true
     },
     "search.exclude": {
         "**/node_modules": true,
-        "**/dist": true
+        "**/dist": true,
+        "**/lit-dist": true
     },
     "[astro]": {
         "editor.defaultFormatter": "astro-build.astro-vscode"
