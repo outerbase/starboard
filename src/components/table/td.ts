@@ -41,6 +41,7 @@ export class TableData extends MutableElement {
                 (this._drawRightBorder && this.separateCells && !this.isLastColumn), // internal cell walls
             'first:border-l': this.separateCells && this.outerBorder, // left/right borders when the `separate-cells` attribute is set
             'border-b': this.withBottomBorder, // bottom border when the `with-bottom-border` attribute is set
+            'highlight-mask': true,
         }
     }
 

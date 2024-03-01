@@ -5,6 +5,6 @@ import { ClassifiedElement } from '../classified-element.js'
 @customElement('outerbase-rowgroup')
 export class TBody extends ClassifiedElement {
     protected override get classMap() {
-        return { 'table-row-group': true }
+        return { 'table-row-group h-[500px]': true }
     }
 }

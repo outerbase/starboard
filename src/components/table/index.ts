@@ -1,4 +1,4 @@
-import { html, nothing, type PropertyValueMap } from 'lit'
+import { css, html, nothing, type PropertyValueMap } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
@@ -32,6 +32,7 @@ import {
 import { ClassifiedElement } from '../classified-element.js'
 
 // import subcomponents
+import { debounce } from 'lodash-es'
 import '../check-box.js'
 import '../widgets/add-column.js'
 import './tbody.js'
@@ -136,6 +137,51 @@ export class Table extends ClassifiedElement {
 
     @state()
     columnTypes?: Record<string, string | number | boolean | undefined>
+
+    @property({ type: Number }) itemHeight = 35 // Fixed height for simplicity
+    @property({ type: Number }) buffer = 5 // Number of items to buffer above and below the viewport
+    private visibleCount = 0 // Updated based on component size and itemHeight
+
+    static get styles() {
+        return [
+            ...super.styles,
+            css`
+                :host {
+                    display: block;
+                    overflow-y: auto;
+                    position: relative;
+                    height: 100%; /* Ensure this is set or controlled by parent for scrolling to work */
+                }
+                .spacer {
+                    height: 1px;
+                    flex-shrink: 0; /* Prevents spacers from shrinking */
+                }
+            `,
+        ]
+    }
+
+    constructor() {
+        super()
+        // Enhance handleScroll with debounce
+        this.handleScroll = debounce(this.handleScroll.bind(this), 50)
+    }
+
+    handleScroll() {
+        this.updateVisibleCount()
+        this.requestUpdate()
+    }
+
+    updateVisibleCount() {
+        const scrollOffset = this.scrollTop
+        this.visibleCount = Math.ceil(this.clientHeight / this.itemHeight)
+    }
+
+    renderItems() {
+        const scrollOffset = this.scrollTop
+        const startIndex = Math.max(0, Math.floor(scrollOffset / this.itemHeight) - this.buffer)
+        const endIndex = Math.min(this.rows.length, startIndex + this.visibleCount + this.buffer * 2)
+        return this.rows.slice(startIndex, endIndex).map((item) => html`<div>${item}</div>`)
+    }
 
     protected closeLastMenu?: () => void
     protected fromIdToRowMap: Record<string, RowAsRecord | undefined> = {}
@@ -305,6 +351,8 @@ export class Table extends ClassifiedElement {
         if (this.onKeyDown_bound) {
             document.removeEventListener('keydown', this.onKeyDown_bound)
         }
+
+        this.removeEventListener('scroll', this.handleScroll)
     }
 
     protected override firstUpdated(_changedProperties: PropertyValueMap<this>): void {
@@ -318,6 +366,8 @@ export class Table extends ClassifiedElement {
 
         this._previousWidth = table.clientWidth
         table.style.width = `${this._previousWidth}px`
+
+        this.addEventListener('scroll', this.handleScroll)
     }
 
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -502,6 +552,12 @@ export class Table extends ClassifiedElement {
     }
 
     protected override render() {
+        const totalHeight = this.rows.length * this.itemHeight
+        const scrollOffset = this.scrollTop
+        const startIndex = Math.max(0, Math.floor(scrollOffset / this.itemHeight) - this.buffer)
+        const topSpacerHeight = startIndex * this.itemHeight
+        const bottomSpacerHeight = Math.max(0, totalHeight - (topSpacerHeight + this.renderItems().length * this.itemHeight))
+
         const tableContainerClasses = { dark: this.theme == Theme.dark }
         const tableClasses = {
             'table table-fixed bg-theme-table dark:bg-theme-table-dark': true,
@@ -615,10 +671,12 @@ export class Table extends ClassifiedElement {
                     </outerbase-tr>
                 </outerbase-thead>
 
+                <outerbase-rowgroup class="spacer" style="height: ${topSpacerHeight}px"></outerbase-rowgroup>
                 <outerbase-rowgroup>
                     <!-- render a TableRow element for each row of data -->
                     ${this.renderRows(this.rows.filter(({ isNew }) => isNew))} ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}
                 </outerbase-rowgroup>
+                <outerbase-rowgroup class="spacer" style="height: ${bottomSpacerHeight}px"></outerbase-rowgroup>
             </div>
         </div>`
     }
