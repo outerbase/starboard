@@ -247,7 +247,7 @@ export class TableData extends MutableElement {
         }
     }
 
-    protected onClick(event: MouseEvent) {
+    protected onClick(_event: MouseEvent) {
         // set focus on the inner contenteditable
         this.focus()
     }
