@@ -396,6 +396,8 @@ export class TableData extends MutableElement {
                       id="pasteable-wrapper"
                       class="outline-none caret-transparent"
                       contenteditable="true"
+                      spellcheck="false"
+                      autocorrect="off"
                       @paste=${(event: ClipboardEvent) => {
                           event.preventDefault()
                           this.value = event.clipboardData?.getData('text')
