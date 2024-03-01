@@ -143,6 +143,10 @@ export class TableData extends MutableElement {
         }
     }
 
+    public focus() {
+        this.shadowRoot?.querySelector<HTMLElement>('[contenteditable]')?.focus()
+    }
+
     private _onKeyDown: typeof this.onKeyDown | undefined
     protected async onKeyDown(event: KeyboardEvent): Promise<void> {
         // ignore events being fired from a Plugin
@@ -204,6 +208,7 @@ export class TableData extends MutableElement {
         }
 
         // navigating around the table
+
         if (code === 'ArrowRight') {
             event.preventDefault()
             ;(target?.nextElementSibling as HTMLElement)?.focus()
@@ -242,6 +247,11 @@ export class TableData extends MutableElement {
         }
     }
 
+    protected onClick(event: MouseEvent) {
+        // set focus on the inner contenteditable
+        this.focus()
+    }
+
     protected onDoubleClick(event: MouseEvent) {
         if (this.isEditing) return // allow double-clicking to select text while editing
 
@@ -270,7 +280,10 @@ export class TableData extends MutableElement {
         this._onKeyDown = this.onKeyDown.bind(this)
         this.addEventListener('keydown', this._onKeyDown)
 
-        if (this.isInteractive) this.addEventListener('dblclick', this.onDoubleClick)
+        if (this.isInteractive) {
+            this.addEventListener('click', this.onClick)
+            this.addEventListener('dblclick', this.onDoubleClick)
+        }
     }
 
     public override disconnectedCallback(): void {
@@ -282,7 +295,10 @@ export class TableData extends MutableElement {
             this.removeEventListener('keydown', this._onKeyDown)
             delete this._onKeyDown
         }
-        if (this.isInteractive) this.removeEventListener('dblclick', this.onDoubleClick)
+        if (this.isInteractive) {
+            this.removeEventListener('click', this.onClick)
+            this.removeEventListener('dblclick', this.onDoubleClick)
+        }
     }
 
     onDisplayEditor(event: MouseEvent) {
@@ -299,12 +315,6 @@ export class TableData extends MutableElement {
 
     protected willUpdate(changedProperties: PropertyValues<this>): void {
         super.willUpdate(changedProperties)
-
-        if (changedProperties.has('isInteractive') && this.isInteractive === true && !this.blank) {
-            // prevent blank rows from being selectable; i.e. the first row that is used just for padding
-            const pasteableWrapper = this.shadowRoot?.querySelector('#pasteable-wrapper')
-            pasteableWrapper?.setAttribute('tabindex', '0')
-        }
 
         if (changedProperties.has('readonly')) {
             if (this.readonly) {
@@ -393,7 +403,6 @@ export class TableData extends MutableElement {
         const menuEl =
             !this.isEditing && !this.blank
                 ? html`<span
-                      id="pasteable-wrapper"
                       class="outline-none caret-transparent"
                       contenteditable="true"
                       spellcheck="false"
