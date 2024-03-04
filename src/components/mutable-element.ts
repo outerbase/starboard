@@ -22,8 +22,7 @@ const NUMBER_TYPES = [
     'BigSerial',
 ].map((s) => s.toLowerCase())
 const BOOLEAN_TYPES = ['Boolean', 'Bit'].map((s) => s.toLowerCase())
-const JSON_TYPES = ['JSON', 'JSONB'].map((s) => s.toLowerCase())
-
+const JSON_TYPES = ['JSON', 'JSONB', 'ARRAY'].map((s) => s.toLowerCase())
 export class MutableElement extends ClassifiedElement {
     protected override get classMap() {
         return {
