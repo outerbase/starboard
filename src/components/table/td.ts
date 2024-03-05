@@ -252,7 +252,10 @@ export class TableData extends MutableElement {
 
     protected onClick(_event: MouseEvent) {
         // set focus on the inner contenteditable
-        this.focus()
+        const didClickInsidePluginEditor = _event.composedPath().some((v) => {
+            return v instanceof HTMLElement && v.id === 'plugin-editor'
+        })
+        if (!didClickInsidePluginEditor) this.focus()
     }
 
     protected onDoubleClick(event: MouseEvent) {
