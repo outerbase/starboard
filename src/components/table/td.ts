@@ -288,7 +288,7 @@ export class TableData extends MutableElement {
 
         if (this.isInteractive) {
             this.addEventListener('click', this.onClick)
-            this.addEventListener('dblclick', this.onDoubleClick)
+            if (!this.plugin) this.addEventListener('dblclick', this.onDoubleClick)
         }
     }
 
@@ -303,7 +303,7 @@ export class TableData extends MutableElement {
         }
         if (this.isInteractive) {
             this.removeEventListener('click', this.onClick)
-            this.removeEventListener('dblclick', this.onDoubleClick)
+            if (!this.plugin) this.removeEventListener('dblclick', this.onDoubleClick)
         }
     }
 
