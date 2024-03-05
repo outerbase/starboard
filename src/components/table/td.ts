@@ -7,7 +7,7 @@ import { unsafeHTML, UnsafeHTMLDirective } from 'lit/directives/unsafe-html.js'
 import { eventTargetIsPlugin, eventTargetIsPluginEditor } from '../../lib/event-target-is-plugin.js'
 import { type MenuSelectedEvent } from '../../lib/events.js'
 import { PluginEvent, Theme, type ColumnPlugin } from '../../types.js'
-import { MutableElement } from '../mutable-element.js'
+import { JSON_TYPES, MutableElement } from '../mutable-element.js'
 
 import type { CellMenu } from '../menu/cell-menu.js'
 
@@ -162,6 +162,7 @@ export class TableData extends MutableElement {
 
         // ignore events fired while editing
         if (this.isEditing) return
+
         const { code } = event
 
         let target = event.target
@@ -187,7 +188,9 @@ export class TableData extends MutableElement {
         // begin editing if keys are ASCII-ish
         const isInputTriggering = event.key.length === 1 && isAlphanumericOrSpecial(event.key)
         const noMetaKeys = !(event.metaKey || event.shiftKey)
-        if (isInputTriggering && noMetaKeys) {
+        const typeIsNotJSON = !(this.type && JSON_TYPES.includes(this.type))
+
+        if (isInputTriggering && noMetaKeys && typeIsNotJSON) {
             event.preventDefault()
 
             // toggle editing mode

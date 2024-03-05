@@ -6,7 +6,7 @@ import { CellUpdateEvent } from '../lib/events.js'
 import { Theme, type Position, type Serializable } from '../types.js'
 import { ClassifiedElement } from './classified-element.js'
 
-const NUMBER_TYPES = [
+export const NUMBER_TYPES = [
     'Int',
     'Integer',
     'SmallInt',
@@ -21,8 +21,8 @@ const NUMBER_TYPES = [
     'Serial',
     'BigSerial',
 ].map((s) => s.toLowerCase())
-const BOOLEAN_TYPES = ['Boolean', 'Bit'].map((s) => s.toLowerCase())
-const JSON_TYPES = ['JSON', 'JSONB', 'ARRAY'].map((s) => s.toLowerCase())
+export const BOOLEAN_TYPES = ['Boolean', 'Bit'].map((s) => s.toLowerCase())
+export const JSON_TYPES = ['JSON', 'JSONB', 'ARRAY'].map((s) => s.toLowerCase())
 export class MutableElement extends ClassifiedElement {
     protected override get classMap() {
         return {
