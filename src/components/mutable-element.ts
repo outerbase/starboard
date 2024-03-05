@@ -93,8 +93,15 @@ export class MutableElement extends ClassifiedElement {
     @property({ type: Boolean, attribute: 'blank' })
     public blank = false
 
+    private _type?: string
     @property({ attribute: 'type', type: String })
-    public type?: string
+    public get type(): string | undefined {
+        return this._type
+    }
+    public set type(newValue: string) {
+        console.log('newValue', newValue)
+        this._type = newValue?.toLowerCase()
+    }
 
     @state()
     public isEditing = false
@@ -102,7 +109,7 @@ export class MutableElement extends ClassifiedElement {
     protected convertToType(newValue: Serializable) {
         // convert strings to their proper value-types; json, boolean, number, and null
         const v = newValue
-        const t = this.type?.toLowerCase()
+        const t = this.type
 
         if (t && typeof v === 'string') {
             if (NUMBER_TYPES.includes(t)) return parseInt(v, 10)
