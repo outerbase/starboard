@@ -99,7 +99,6 @@ export class MutableElement extends ClassifiedElement {
         return this._type
     }
     public set type(newValue: string) {
-        console.log('newValue', newValue)
         this._type = newValue?.toLowerCase()
     }
 
