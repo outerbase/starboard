@@ -2,9 +2,14 @@
 
 ![](https://cdn.theasc.com/Spaceballs-Eagle-5.jpg)
 
-## Publishing
+## Publishing to NPM
 
-Before some arbitrary other module can import these LitElement component(s), they should be compiled down to JS. This is accomplished via the `pnpm build:lit` command defined in _package.json_. This script will automatically run when packing/publishing per the [`prepack` script](https://docs.npmjs.com/cli/v10/using-npm/scripts).
+-   increment the version in `package.json` to be greater-than the last version published to npm
+-   run the following command, completing the 2fa challenge, etc
+
+```sh
+npm publish --access restricted
+```
 
 ## Developing locally
 
@@ -12,24 +17,15 @@ Before some arbitrary other module can import these LitElement component(s), the
 pnpm dev
 ```
 
-### Developing for Dashboard
+## Developing inside of Dashboard
 
-```
-# pnpm build:lit
-pnpm build:lit:watch
-```
-
-## Importing into another project
-
-From this repo
-
-From the other repo
+From Dashboard, run the following
 
 ```
 pnpm link ../path/to/starboard
 ```
 
-## `pnpm link` quirks
+### `pnpm link` quirks
 
 This feature has been unreliable. Follow the following steps for the best chance of success. The following commands are in the context of Dashboard.
 
@@ -37,6 +33,18 @@ This feature has been unreliable. Follow the following steps for the best chance
 -   `pnpm link ../path/to/starboard/repo` // to ensure Dashboard is seeing local changes
 
 If you suspect that your changes aren't being applied, throw in an `alert` or `debugger` and verify they are before spinning your wheels further.
+
+## Building for local Dashboard
+
+The results of building are observed by any other projects whom `pnpm link ...`'d to this project
+
+```
+# one-time
+pnpm build:lit
+
+# continuously on changes
+pnpm build:lit:watch
+```
 
 ## Usage in React
 
@@ -52,15 +60,7 @@ export const OuterbaseTable = createComponent({
 
     events: {
         onCellUpdated: 'row-updated',
-
-        onRowAdded: 'row-added',
-        onRowUpdated: 'row-updated',
-        onRowSelected: 'row-selected',
-        onRowRemoved: 'row-removed',
-
-        onColumnAdded: 'column-added',
-        onColumnUpdated: 'column-updated',
-        onColumnRemoved: 'column-removed',
+        // etc...
     },
 })
 ```
