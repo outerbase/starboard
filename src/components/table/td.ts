@@ -425,8 +425,11 @@ export class TableData extends MutableElement {
                           this.value = event.clipboardData?.getData('text')
                       }}
                       @keydown=${(event: KeyboardEvent) => {
-                          // we'd really prefer no one knew this was a `contenteditable` at all
-                          event.preventDefault()
+                          // our goal here is to prevent the user from engaging with the `contenteditable` component
+                          const didNotOriginateInsidePluginEditor = event.composedPath().every((v) => {
+                              return v instanceof HTMLElement && v.id !== 'plugin-editor'
+                          })
+                          if (didNotOriginateInsidePluginEditor) event.preventDefault()
                       }}
                       ><outerbase-td-menu
                           theme=${this.theme}
