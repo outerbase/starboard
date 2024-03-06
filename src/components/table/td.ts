@@ -7,7 +7,7 @@ import { unsafeHTML, UnsafeHTMLDirective } from 'lit/directives/unsafe-html.js'
 import { eventTargetIsPlugin, eventTargetIsPluginEditor } from '../../lib/event-target-is-plugin.js'
 import { type MenuSelectedEvent } from '../../lib/events.js'
 import { PluginEvent, Theme, type ColumnPlugin } from '../../types.js'
-import { JSON_TYPES, MutableElement } from '../mutable-element.js'
+import { BOOLEAN_TYPES, JSON_TYPES, MutableElement } from '../mutable-element.js'
 
 import type { CellMenu } from '../menu/cell-menu.js'
 
@@ -189,8 +189,9 @@ export class TableData extends MutableElement {
         const isInputTriggering = event.key.length === 1 && isAlphanumericOrSpecial(event.key)
         const noMetaKeys = !(event.metaKey || event.shiftKey)
         const typeIsNotJSON = !(this.type && JSON_TYPES.includes(this.type))
+        const typeIsNotBoolean = !(this.type && BOOLEAN_TYPES.includes(this.type))
 
-        if (isInputTriggering && noMetaKeys && typeIsNotJSON) {
+        if (isInputTriggering && noMetaKeys && typeIsNotJSON && typeIsNotBoolean) {
             event.preventDefault()
 
             // toggle editing mode
@@ -206,8 +207,6 @@ export class TableData extends MutableElement {
                 input?.focus()
                 input?.setSelectionRange(input.value.length, input.value.length)
             }, 0)
-
-            return
         }
 
         // navigating around the table
@@ -236,8 +235,8 @@ export class TableData extends MutableElement {
             }
         }
 
-        // copy/paste focused cells
-        if (code === 'KeyC') {
+        // copy focused cells
+        if (event.metaKey && code === 'KeyC') {
             event.preventDefault()
             navigator.clipboard.writeText(this.value?.toString() ?? '')
             return
@@ -267,7 +266,6 @@ export class TableData extends MutableElement {
                 const input = this.shadowRoot?.querySelector('input')
 
                 if (input) {
-                    input.readOnly = this.readonly
                     input.focus()
 
                     // set cursor to end if writable
@@ -375,11 +373,14 @@ export class TableData extends MutableElement {
                 )
             }
         } else {
-            cellContents = html`${value || html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}`
+            cellContents = html`${value ?? html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}`
         }
 
         const inputEl = this.isEditing // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
-            ? html`<span class=${contentWrapperClass}>&nbsp;<input .value=${value ?? ''} @input=${this.onChange} class=${classMap({
+            ? html`<span class=${contentWrapperClass}>&nbsp;<input .value=${value ?? ''} ?readonly=${
+                  // disallow input on booleans (`t` and `f ` set it to true and false)
+                  (this.type && BOOLEAN_TYPES.includes(this.type)) || this.readonly
+              } @input=${this.onChange} class=${classMap({
                   'z-[2] absolute top-0 bottom-0 right-0 left-0': true,
                   'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
                   'px-3 font-normal focus:rounded-[4px]': true,
@@ -406,6 +407,7 @@ export class TableData extends MutableElement {
               ]
             : this.options
 
+        // note: contenteditable is all so we can get the `paste` event that an arbitrary htmleelement does not otherwise receive
         const menuEl =
             !this.isEditing && !this.blank
                 ? html`<span
@@ -416,6 +418,10 @@ export class TableData extends MutableElement {
                       @paste=${(event: ClipboardEvent) => {
                           event.preventDefault()
                           this.value = event.clipboardData?.getData('text')
+                      }}
+                      @keydown=${(event: KeyboardEvent) => {
+                          // we'd really prefer no one knew this was a `contenteditable` at all
+                          event.preventDefault()
                       }}
                       ><outerbase-td-menu
                           theme=${this.theme}

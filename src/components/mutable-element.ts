@@ -183,6 +183,19 @@ export class MutableElement extends ClassifiedElement {
                 if (!event.didCloseMenu) this.isEditing = true
             }
         }
+
+        // set the value to `true` or `false` on `t` or `f`
+        if (this.type && BOOLEAN_TYPES.includes(this.type)) {
+            if (event.code === 'KeyT') {
+                this._value = true
+                this.requestUpdate('value')
+                return
+            } else if (event.code === 'KeyF') {
+                this._value = false
+                this.requestUpdate('value')
+                return
+            }
+        }
     }
 
     protected onChange(event: Event) {
