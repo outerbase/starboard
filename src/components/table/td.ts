@@ -243,7 +243,7 @@ export class TableData extends MutableElement {
         // copy focused cells
         if (event.metaKey && code === 'KeyC') {
             event.preventDefault()
-            navigator.clipboard.writeText(this.value?.toString() ?? '')
+            navigator.clipboard.writeText(JSON.stringify(this.value))
             return
         }
 
