@@ -158,6 +158,11 @@ export class TableData extends MutableElement {
             return
         }
 
+        if (this.plugin && event.code === 'Enter' && event.target instanceof HTMLElement) {
+            this.moveFocusToNextRow(event.target)
+            return
+        }
+
         super.onKeyDown(event)
 
         // ignore events fired while editing
