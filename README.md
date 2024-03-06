@@ -59,7 +59,7 @@ export const OuterbaseTable = createComponent({
     react: React,
 
     events: {
-        onCellUpdated: 'row-updated',
+        onCellUpdated: 'cell-updated' as EventName<CellUpdateEvent>,
         // etc...
     },
 })
