@@ -441,7 +441,7 @@ export class TableData extends MutableElement {
                           ?selectable-text=${!this.isInteractive}
                           @menu-selection=${this.onMenuSelection}
                           ><span class=${contentWrapperClass}>${cellContents}</span
-                          ><span id="plugin-editor" class="absolute top-8">${cellEditorContents}</span></outerbase-td-menu
+                          ><span id="plugin-editor" class="absolute top-8 caret-current">${cellEditorContents}</span></outerbase-td-menu
                       ></span
                   >`
                 : html``
