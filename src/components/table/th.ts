@@ -213,11 +213,12 @@ export class TH extends MutableElement {
     protected onClick(event: MouseEvent) {
         const path = event.composedPath() as Array<HTMLElement>
         const hasTrigger = path.some((p) => p.getAttribute?.('id') === 'trigger')
-        const name = this.originalValue ?? this.value ?? ''
+        const name = this.originalValue ?? this.value
+        const isNotResizer = !path.some((p) => p.tagName?.toLowerCase() === 'column-resizer')
 
         // we check for the 'trigger' which is the button inside this cell
         // if it's being clicked we don't want to interfere with it's operation / trigger sorting
-        if (!hasTrigger && name) {
+        if (!hasTrigger && name && isNotResizer) {
             this.dispatchEvent(
                 new ColumnUpdatedEvent({
                     name,
