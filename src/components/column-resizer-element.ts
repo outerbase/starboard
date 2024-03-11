@@ -24,36 +24,32 @@ export class ColumnResizer extends ClassifiedElement {
     private xPosition?: number
     private width?: number
 
-    private _mouseDown(e: MouseEvent) {
+    private _mouseDown(downEvent: MouseEvent) {
         if (!this.column) throw new Error('`column` is unset; aborting')
         const v = this.column.value ?? this.column.originalValue ?? ''
 
         this.dispatchEvent(new ResizeStartEvent(v))
 
-        let dx: number
-
-        const _mouseMove = (e: MouseEvent) => {
+        const _mouseMove = (moveEvent: MouseEvent) => {
             if (!this.column) throw new Error('`column` is unset; aborting')
             if (!this.xPosition) throw new Error('`xPosition` is unset; aborting')
             if (!this.width) throw new Error('`width` is unset; aborting')
 
-            dx = e.clientX - this.xPosition
-            this.dispatchEvent(new ResizeEvent(v, dx))
+            this.dispatchEvent(new ResizeEvent(v, moveEvent.clientX - this.xPosition))
         }
 
-        const _mouseUp = (_e: Event) => {
+        const _mouseUp = (upEvent: MouseEvent) => {
             document.removeEventListener('mouseup', _mouseUp)
             document.removeEventListener('mousemove', _mouseMove)
 
             if (!this.column) throw new Error('`column` is unset; aborting')
-
-            this.dispatchEvent(new ResizeEndEvent(v, dx))
+            this.dispatchEvent(new ResizeEndEvent(v, this.xPosition ? upEvent.clientX - this.xPosition : 0))
         }
 
         document.addEventListener('mousemove', _mouseMove)
         document.addEventListener('mouseup', _mouseUp)
 
-        this.xPosition = e.clientX
+        this.xPosition = downEvent.clientX
         this.width = parseInt(window.getComputedStyle(this.column).width, 10)
     }
 
