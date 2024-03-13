@@ -127,7 +127,9 @@ export class TableData extends MutableElement {
             case 'edit':
                 return (this.isEditing = true)
             case 'copy':
-                return navigator.clipboard.writeText(this.value?.toString() ?? '')
+                if (!this.value) return
+                if (typeof this.value === 'object') return navigator.clipboard.writeText(JSON.stringify(this.value))
+                else return navigator.clipboard.writeText(this.value.toString())
             case 'paste':
                 this.value = await navigator.clipboard.readText()
                 this.dispatchChangedEvent()
@@ -243,8 +245,9 @@ export class TableData extends MutableElement {
         // copy focused cells
         if (event.metaKey && code === 'KeyC') {
             event.preventDefault()
-            navigator.clipboard.writeText(JSON.stringify(this.value))
-            return
+            if (!this.value) return
+            if (typeof this.value === 'object') return navigator.clipboard.writeText(JSON.stringify(this.value))
+            else return navigator.clipboard.writeText(this.value.toString())
         }
 
         if (code === 'Backspace' || code === 'Delete') {
