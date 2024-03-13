@@ -16,7 +16,6 @@ import {
     RowRemovedEvent,
     RowSelectedEvent,
 } from '../../lib/events.js'
-import { heightOfElement } from '../../lib/height-of-element.js'
 import {
     ColumnStatus,
     DBType,
@@ -111,9 +110,6 @@ export class Table extends ClassifiedElement {
 
     @state()
     private _height?: number
-
-    @state()
-    private resizeObserver?: ResizeObserver
 
     @state()
     protected columns: Columns = []
@@ -288,19 +284,8 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    // LIFECYCLE HOOKS
-    public override connectedCallback() {
-        super.connectedCallback()
-
-        this.resizeObserver = new ResizeObserver((_entries) => {
-            this._height = heightOfElement(_entries[0]?.target)
-        })
-        this.resizeObserver.observe(this)
-    }
-
     public override disconnectedCallback() {
         super.disconnectedCallback()
-        this.resizeObserver?.disconnect()
 
         if (this.onKeyDown_bound) {
             document.removeEventListener('keydown', this.onKeyDown_bound)
@@ -411,7 +396,6 @@ export class Table extends ClassifiedElement {
     }
 
     protected renderRows(rows: Array<RowAsRecord>) {
-        const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null
         return html`${repeat(
             rows,
             ({ id }) => id,

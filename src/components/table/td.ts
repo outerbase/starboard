@@ -72,9 +72,6 @@ export class TableData extends MutableElement {
     @property({ attribute: 'left-distance-to-viewport', type: Number })
     public leftDistanceToViewport = -1
 
-    @property({ attribute: 'table-bounding-rect', type: String })
-    public tableBoundingRect: string | undefined // we skip having `JSON.parse` run by treating it as a string
-
     @property({ attribute: 'hide-dirt', type: Boolean })
     public hideDirt = false
 
@@ -439,7 +436,6 @@ export class TableData extends MutableElement {
                       ><outerbase-td-menu
                           theme=${this.theme}
                           left-distance-to-viewport=${this.leftDistanceToViewport}
-                          table-bounding-rect=${this.tableBoundingRect}
                           .options=${menuOptions}
                           ?without-padding=${!!this.plugin}
                           ?menu=${this.hasMenu}
