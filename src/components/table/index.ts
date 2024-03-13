@@ -502,7 +502,10 @@ export class Table extends ClassifiedElement {
     }
 
     protected override render() {
-        const tableContainerClasses = { dark: this.theme == Theme.dark }
+        const tableContainerClasses = {
+            dark: this.theme == Theme.dark,
+            'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none': true,
+        }
         const tableClasses = {
             'table table-fixed bg-theme-table dark:bg-theme-table-dark': true,
             'text-theme-text dark:text-theme-text-dark text-sm': true,
