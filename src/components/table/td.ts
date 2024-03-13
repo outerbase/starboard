@@ -127,9 +127,7 @@ export class TableData extends MutableElement {
             case 'edit':
                 return (this.isEditing = true)
             case 'copy':
-                if (!this.value) return
-                if (typeof this.value === 'object') return navigator.clipboard.writeText(JSON.stringify(this.value))
-                else return navigator.clipboard.writeText(this.value.toString())
+                return this.copyValueToClipboard()
             case 'paste':
                 this.value = await navigator.clipboard.readText()
                 this.dispatchChangedEvent()
@@ -147,6 +145,12 @@ export class TableData extends MutableElement {
 
     public focus() {
         this.shadowRoot?.querySelector<HTMLElement>('[contenteditable]')?.focus()
+    }
+
+    public copyValueToClipboard() {
+        if (this.value === null || this.value === undefined) return navigator.clipboard.writeText('')
+        else if (typeof this.value === 'object') return navigator.clipboard.writeText(JSON.stringify(this.value))
+        else return navigator.clipboard.writeText(this.value.toString())
     }
 
     private _onKeyDown: typeof this.onKeyDown | undefined
@@ -245,9 +249,7 @@ export class TableData extends MutableElement {
         // copy focused cells
         if (event.metaKey && code === 'KeyC') {
             event.preventDefault()
-            if (!this.value) return
-            if (typeof this.value === 'object') return navigator.clipboard.writeText(JSON.stringify(this.value))
-            else return navigator.clipboard.writeText(this.value.toString())
+            return this.copyValueToClipboard()
         }
 
         if (code === 'Backspace' || code === 'Delete') {
