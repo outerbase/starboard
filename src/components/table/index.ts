@@ -1,4 +1,4 @@
-import { css, html, nothing, type PropertyValueMap } from 'lit'
+import { html, nothing, type PropertyValueMap } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
@@ -31,7 +31,6 @@ import {
 import { ClassifiedElement } from '../classified-element.js'
 
 // import subcomponents
-import type { VirtualizeDirectiveConfig } from '@lit-labs/virtualizer/virtualize.js'
 import '../check-box.js'
 import '../widgets/add-column.js'
 import './tbody.js'
@@ -42,20 +41,6 @@ import './tr.js'
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
-    static override styles = [
-        ...ClassifiedElement.styles,
-        // use `!important` to override `lit-labs/virtualizer`'s table-clobbering nonsense
-        css`
-            .table-row-group {
-                display: table-row-group !important;
-            }
-            outerbase-tr {
-                position: relative !important;
-                transform: unset !important;
-            }
-        `,
-    ]
-
     // STATE
     @property({ type: Boolean, attribute: 'selectable-rows' })
     public selectableRows = false
@@ -147,13 +132,6 @@ export class Table extends ClassifiedElement {
 
     @state()
     columnTypes?: Record<string, string | number | boolean | undefined>
-
-    constructor() {
-        super()
-        import('@lit-labs/virtualizer/virtualize.js').then(({ virtualize }) => {
-            this.virtualize = virtualize
-        })
-    }
 
     protected closeLastMenu?: () => void
     protected fromIdToRowMap: Record<string, RowAsRecord | undefined> = {}
@@ -417,106 +395,105 @@ export class Table extends ClassifiedElement {
         return this.getBoundingClientRect().left
     }
 
-    protected renderRow({ id, isNew, values, originalValues, isLastRow }: RowAsRecord & { isLastRow: boolean }) {
-        return html`<outerbase-tr .selected=${this.selectedRowUUIDs.has(id)} ?new=${isNew} @on-selection=${this._onRowSelection}>
-            <!-- checkmark cell -->
-            ${this.selectableRows
-                ? html`<outerbase-td
-                      theme=${this.theme}
-                      width="42px"
-                      .position=${{
-                          row: id,
-                          column: '__selected', // our own; not expected to exist in DB
-                      }}
-                      .type=${null}
-                      ?separate-cells=${true}
-                      ?draw-right-border=${true}
-                      ?bottom-border=${true}
-                      ?outer-border=${this.outerBorder}
-                      ?blank=${true}
-                      ?is-last-row=${isLastRow}
-                      ?is-last-column=${false}
-                      ?row-selector="${true}"
-                      ?read-only=${true}
-                      ?interactive=${true}
-                  >
-                      <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
-                          <check-box
-                              ?checked="${this.selectedRowUUIDs.has(id)}"
-                              @toggle-check="${() => this.toggleSelectedRow(id)}"
-                              theme=${this.theme}
-                          />
-                      </div>
-                  </outerbase-td>`
-                : null}
-
-            <!-- render a TableCell for each column of data in the current row -->
-            ${repeat(
-                this.visibleColumns,
-                ({ name }) => name, // use the column name as the unique identifier for each entry in this row
-                ({ name }, idx) => {
-                    const installedPlugin = this.plugins?.find(
-                        ({ pluginWorkspaceId }) => pluginWorkspaceId === this.installedPlugins?.[name]?.plugin_workspace_id
-                    )
-                    const defaultPlugin = this.plugins?.find(({ id }) => id === this.installedPlugins?.[name]?.plugin_installation_id)
-                    const plugin = installedPlugin ?? defaultPlugin
-                    return html`
-                        <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
-                        <!-- TODO @caleb & johnny move plugins to support the new installedPlugins variable -->
-                        <outerbase-td
-                            width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
-                            left-distance-to-viewport=${this.distanceToLeftViewport}
-                            theme=${this.theme}
-                            type=${this.columnTypes?.[name]}
-                            plugin-attributes=${this.installedPlugins?.[name]?.supportingAttributes ?? ''}
-                            .position=${{ row: id, column: name }}
-                            .value=${values?.[name]}
-                            .originalValue=${originalValues?.[name]}
-                            .plugin=${plugin}
-                            ?separate-cells=${true}
-                            ?draw-right-border=${true}
-                            ?bottom-border=${true}
-                            ?outer-border=${this.outerBorder}
-                            ?is-last-row=${isLastRow}
-                            ?is-last-column=${idx === this.visibleColumns.length - 1}
-                            ?menu=${!this.isNonInteractive && !this.readonly}
-                            ?selectable-text=${this.isNonInteractive}
-                            ?interactive=${!this.isNonInteractive}
-                            ?hide-dirt=${isNew}
-                            ?read-only=${this.readonly}
-                        >
-                        </outerbase-td>
-                    `
-                }
-            )}
-            ${this.blankFill
-                ? html`<outerbase-td ?outer-border=${false} ?read-only=${true} ?separate-cells=${false} ?bottom-border=${true} ?interactive=${false} ?menu=${false} ?blank=${true}></<outerbase-td>`
-                : ''}
-        </outerbase-tr>`
-    }
-
-    @state() virtualize?: <T>(config?: VirtualizeDirectiveConfig<T> | undefined) => unknown
-
     protected renderRows(rows: Array<RowAsRecord>) {
-        return html`<outerbase-rowgroup
-            >${this.virtualize?.({
-                items: rows,
-                renderItem: (row: RowAsRecord, rowIndex: number) => this.renderRow({ ...row, isLastRow: rowIndex === rows.length - 1 }),
-                keyFunction: (row) => row.id,
-            })}</outerbase-rowgroup
-        >`
+        return html`${repeat(
+            rows,
+            ({ id }) => id,
+            ({ id, values, originalValues, isNew }, rowIndex) => {
+                return !this.removedRowUUIDs.has(id)
+                    ? html`<outerbase-tr .selected=${this.selectedRowUUIDs.has(id)} ?new=${isNew} @on-selection=${this._onRowSelection}>
+                          <!-- checkmark cell -->
+                          ${this.selectableRows
+                              ? html`<outerbase-td
+                                    .position=${{
+                                        row: id,
+                                        column: '__selected', // our own; not expected to exist in DB
+                                    }}
+                                    .type=${null}
+                                    theme=${this.theme}
+                                    ?separate-cells=${true}
+                                    ?draw-right-border=${true}
+                                    ?bottom-border=${true}
+                                    ?outer-border=${this.outerBorder}
+                                    ?blank=${true}
+                                    ?is-last-row=${rowIndex === this.rows.length - 1}
+                                    ?is-last-column=${false}
+                                    ?row-selector="${true}"
+                                    ?read-only=${true}
+                                    ?interactive=${true}
+                                    width="42px"
+                                >
+                                    <div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
+                                        <check-box
+                                            ?checked="${this.selectedRowUUIDs.has(id)}"
+                                            @toggle-check="${() => this.toggleSelectedRow(id)}"
+                                            theme=${this.theme}
+                                        />
+                                    </div>
+                                </outerbase-td>`
+                              : null}
+
+                          <!-- render a TableCell for each column of data in the current row -->
+                          ${repeat(
+                              this.visibleColumns,
+                              ({ name }) => name, // use the column name as the unique identifier for each entry in this row
+                              ({ name }, idx) => {
+                                  const installedPlugin = this.plugins?.find(
+                                      ({ pluginWorkspaceId }) => pluginWorkspaceId === this.installedPlugins?.[name]?.plugin_workspace_id
+                                  )
+                                  const defaultPlugin = this.plugins?.find(
+                                      ({ id }) => id === this.installedPlugins?.[name]?.plugin_installation_id
+                                  )
+                                  const plugin = installedPlugin ?? defaultPlugin
+
+                                  return html`
+                                      <!-- TODO @johnny remove separate-cells and instead rely on css variables to suppress borders -->
+                                      <!-- TODO @caleb & johnny move plugins to support the new installedPlugins variable -->
+                                      <outerbase-td
+                                          .position=${{ row: id, column: name }}
+                                          .value=${values[name]}
+                                          .originalValue=${originalValues[name]}
+                                          width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
+                                          left-distance-to-viewport=${this.distanceToLeftViewport}
+                                          table-bounding-rect="${tableBoundingRect}"
+                                          theme=${this.theme}
+                                          type=${this.columnTypes?.[name]}
+                                          .plugin=${plugin}
+                                          plugin-attributes=${this.installedPlugins?.[name]?.supportingAttributes ?? ''}
+                                          ?separate-cells=${true}
+                                          ?draw-right-border=${true}
+                                          ?bottom-border=${true}
+                                          ?outer-border=${this.outerBorder}
+                                          ?is-last-row=${rowIndex === this.rows.length - 1}
+                                          ?is-last-column=${idx === this.visibleColumns.length - 1}
+                                          ?menu=${!this.isNonInteractive && !this.readonly}
+                                          ?selectable-text=${this.isNonInteractive}
+                                          ?interactive=${!this.isNonInteractive}
+                                          ?hide-dirt=${isNew}
+                                          ?read-only=${this.readonly}
+                                      >
+                                      </outerbase-td>
+                                  `
+                              }
+                          )}
+                          ${this.blankFill
+                              ? html`<outerbase-td ?outer-border=${false} ?read-only=${true} ?separate-cells=${false} ?bottom-border=${true} ?interactive=${false} ?menu=${false} ?blank=${true}></<outerbase-td>`
+                              : ''}
+                      </outerbase-tr>`
+                    : null
+            }
+        )}`
     }
 
     protected override render() {
         const tableContainerClasses = {
             dark: this.theme == Theme.dark,
-            'highlight-block': true,
-            'h-full w-full overflow-auto overscroll-contain': true,
+            'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none': true,
         }
         const tableClasses = {
             'table table-fixed bg-theme-table dark:bg-theme-table-dark': true,
             'text-theme-text dark:text-theme-text-dark text-sm': true,
-            'min-w-full relative min-h-full': true,
+            'min-w-full': true,
         }
 
         const selectAllCheckbox =
@@ -599,12 +576,12 @@ export class Table extends ClassifiedElement {
                                     ?is-last=${idx === this.visibleColumns.length - 1}
                                     ?removable=${true}
                                     ?interactive=${!this.isNonInteractive}
-                                    ?read-only=${this.readonly}
                                     @column-hidden=${this._onColumnHidden}
                                     @column-removed=${this._onColumnRemoved}
                                     @column-plugin-deactivated=${this._onColumnPluginDeactivated}
                                     @resize-start=${this._onColumnResizeStart}
                                     @resize=${this._onColumnResized}
+                                    ?read-only=${this.readonly}
                                 >
                                 </outerbase-th>`
                             }
@@ -625,9 +602,10 @@ export class Table extends ClassifiedElement {
                     </outerbase-tr>
                 </outerbase-thead>
 
-                <!-- render a TableRow element for each row of data -->
-                <!--${this.renderRows(this.rows.filter(({ isNew }) => isNew))}-->
-                ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}
+                <outerbase-rowgroup>
+                    <!-- render a TableRow element for each row of data -->
+                    ${this.renderRows(this.rows.filter(({ isNew }) => isNew))} ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}
+                </outerbase-rowgroup>
             </div>
         </div>`
     }
