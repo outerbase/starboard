@@ -455,7 +455,6 @@ export class Table extends ClassifiedElement {
                                           .originalValue=${originalValues[name]}
                                           width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
                                           left-distance-to-viewport=${this.distanceToLeftViewport}
-                                          table-bounding-rect="${tableBoundingRect}"
                                           theme=${this.theme}
                                           type=${this.columnTypes?.[name]}
                                           .plugin=${plugin}
