@@ -62,9 +62,6 @@ export class Table extends ClassifiedElement {
         this.rows = rows
     }
 
-    @state() protected newRows?: Array<RowAsRecord>
-    @state() protected existingRows?: Array<RowAsRecord>
-
     @property({ attribute: 'plugins', type: Array })
     public plugins?: Array<ColumnPlugin>
 
@@ -365,11 +362,6 @@ export class Table extends ClassifiedElement {
             } else if (this.selectedRowUUIDs.size === this.rows.length && !this.allRowsSelected) {
                 this.allRowsSelected = true
             }
-        }
-
-        let shouldRecomputeRows = false
-        if (_changedProperties.has('removedRowUUIDs')) {
-            shouldRecomputeRows = true
         }
 
         if (_changedProperties.has('rows')) {
