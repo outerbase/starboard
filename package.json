@@ -25,7 +25,6 @@
         "prepack": "pnpm build:lit"
     },
     "dependencies": {
-        "@lit-labs/virtualizer": "^2.0.12",
         "lit": "^2.8.0",
         "lodash-es": "^4.17.21",
         "tailwindcss": "^3.4.1",

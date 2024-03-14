@@ -1,4 +1,4 @@
-import { css, html, nothing, type PropertyValueMap } from 'lit'
+import { html, nothing, type PropertyValueMap } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
@@ -47,20 +47,6 @@ const SCROLL_BUFFER_SIZE = SCROLL_THRESHOLD * 2
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
-    static override styles = [
-        ...ClassifiedElement.styles,
-        // use `!important` to override `lit-labs/virtualizer`'s table-clobbering nonsense
-        css`
-            .table-row-group {
-                display: table-row-group !important;
-            }
-            outerbase-tr {
-                position: relative !important;
-                transform: unset !important;
-            }
-        `,
-    ]
-
     // STATE
     @property({ type: Boolean, attribute: 'selectable-rows' })
     public selectableRows = false
@@ -656,12 +642,12 @@ export class Table extends ClassifiedElement {
                                     ?is-last=${idx === this.visibleColumns.length - 1}
                                     ?removable=${true}
                                     ?interactive=${!this.isNonInteractive}
-                                    ?read-only=${this.readonly}
                                     @column-hidden=${this._onColumnHidden}
                                     @column-removed=${this._onColumnRemoved}
                                     @column-plugin-deactivated=${this._onColumnPluginDeactivated}
                                     @resize-start=${this._onColumnResizeStart}
                                     @resize=${this._onColumnResized}
+                                    ?read-only=${this.readonly}
                                 >
                                 </outerbase-th>`
                             }
