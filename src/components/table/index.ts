@@ -70,6 +70,12 @@ export class Table extends ClassifiedElement {
     @state()
     protected rows: Array<RowAsRecord> = []
 
+    @state()
+    private newRows: Array<RowAsRecord> = []
+
+    @state()
+    private existingRows: Array<RowAsRecord> = []
+
     @property({ attribute: 'non-interactive', type: Boolean })
     public isNonInteractive = false
 
@@ -367,7 +373,13 @@ export class Table extends ClassifiedElement {
                 m[r.id] = r
             })
             this.fromIdToRowMap = m
-            this.updateTableView()
+
+            this.updateTableView() // updates this.visibleRows
+            this.newRows = this.rows.filter(({ isNew }) => isNew)
+        }
+
+        if (_changedProperties.has('visibleRows')) {
+            this.existingRows = this.visibleRows.filter(({ isNew }) => !isNew)
         }
     }
 
@@ -534,13 +546,11 @@ export class Table extends ClassifiedElement {
         const scrollTop = (event?.target as HTMLElement)?.scrollTop ?? this.shadowRoot?.querySelector('#scroller')?.scrollTop
         if (scrollTop >= 0) {
             this.updateVisibleRows(scrollTop)
-            this.requestUpdate()
         }
     }
 
     private readonly rowHeight: number = 38 // Adjust based on your row height
-    private visibleRows: Array<RowAsRecord> = []
-
+    @state() private visibleRows: Array<RowAsRecord> = []
     @state() private visibleEndIndex = 0
     @state() private visibleStartIndex = 0
 
@@ -669,8 +679,7 @@ export class Table extends ClassifiedElement {
                     ></div>
 
                     <!-- render a TableRow element for each row of data -->
-                    ${this.renderRows(this.rows.filter(({ isNew }) => isNew))}
-                    ${this.renderRows(this.visibleRows.filter(({ isNew }) => !isNew))}
+                    ${this.renderRows(this.newRows)} ${this.renderRows(this.existingRows)}
 
                     <div
                         class="bg-yellow-50"
