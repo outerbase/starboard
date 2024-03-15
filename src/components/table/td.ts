@@ -147,7 +147,6 @@ export class TableData extends MutableElement {
         else return navigator.clipboard.writeText(this.value.toString())
     }
 
-    private _onKeyDown: typeof this.onKeyDown | undefined
     protected async onKeyDown(event: KeyboardEvent): Promise<void> {
         // ignore events being fired from a Plugin
         if (eventTargetIsPlugin(event)) return
@@ -285,8 +284,7 @@ export class TableData extends MutableElement {
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.addEventListener('custom-change', this.onPluginEvent)
 
-        this._onKeyDown = this.onKeyDown.bind(this)
-        this.addEventListener('keydown', this._onKeyDown)
+        this.addEventListener('keydown', this.onKeyDown)
 
         if (this.isInteractive) {
             this.addEventListener('click', this.onClick)
@@ -299,10 +297,8 @@ export class TableData extends MutableElement {
         this.removeEventListener('contextmenu', this.onContextMenu)
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.removeEventListener('custom-change', this.onPluginEvent)
-        if (this._onKeyDown) {
-            this.removeEventListener('keydown', this._onKeyDown)
-            delete this._onKeyDown
-        }
+        this.removeEventListener('keydown', this.onKeyDown)
+
         if (this.isInteractive) {
             this.removeEventListener('click', this.onClick)
             if (!this.plugin) this.removeEventListener('dblclick', this.onDoubleClick)
@@ -318,8 +314,6 @@ export class TableData extends MutableElement {
             this.isDisplayingPluginEditor = false
         }
     }
-
-    private _onDisplayEditor?: typeof this.onDisplayEditor
 
     protected willUpdate(changedProperties: PropertyValues<this>): void {
         super.willUpdate(changedProperties)
@@ -340,16 +334,10 @@ export class TableData extends MutableElement {
         if (changedProperties.has('isDisplayingPluginEditor')) {
             if (this.isDisplayingPluginEditor) {
                 setTimeout(() => {
-                    this._onDisplayEditor = this.onDisplayEditor.bind(this)
-                    document.addEventListener('click', this._onDisplayEditor)
+                    document.addEventListener('click', this.onDisplayEditor.bind(this))
                 }, 0)
             } else {
-                setTimeout(() => {
-                    if (this._onDisplayEditor) {
-                        document.removeEventListener('click', this._onDisplayEditor)
-                        delete this._onDisplayEditor
-                    }
-                }, 0)
+                document.removeEventListener('click', this.onDisplayEditor)
             }
         }
     }
