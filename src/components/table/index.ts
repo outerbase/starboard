@@ -626,7 +626,6 @@ export class Table extends ClassifiedElement {
                                     theme=${this.theme}
                                     value="${this.renamedColumnNames[name] ?? name}"
                                     original-value="${name}"
-                                    left-distance-to-viewport=${this.distanceToLeftViewport}
                                     width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
                                     ?separate-cells=${true}
                                     ?outer-border=${this.outerBorder}
