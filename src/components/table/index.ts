@@ -427,16 +427,6 @@ export class Table extends ClassifiedElement {
         document.documentElement.style.setProperty('--ob-cell-font-family', "'input-mono', monospace")
     }
 
-    // TODO @johnny this does not get update if the page containing the table changes
-    // This is problematic when deciding which direction to render a column menu
-    // An example is toggling the navigation menu (where there's a list of tables, queries, etc)
-    // Only once you switch tabs does the reference to `distanceToLeftViewport` get recomputed.
-
-    get distanceToLeftViewport() {
-        if (typeof window === 'undefined') return -1
-        return this.getBoundingClientRect().left
-    }
-
     protected renderRows(rows: Array<RowAsRecord>) {
         return html`${repeat(
             rows,
@@ -496,7 +486,6 @@ export class Table extends ClassifiedElement {
                                           .value=${values[name]}
                                           .originalValue=${originalValues[name]}
                                           width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
-                                          left-distance-to-viewport=${this.distanceToLeftViewport}
                                           theme=${this.theme}
                                           type=${this.columnTypes?.[name]}
                                           .plugin=${plugin}

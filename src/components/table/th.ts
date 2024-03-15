@@ -88,9 +88,6 @@ export class TH extends MutableElement {
         },
     ]
 
-    @property({ attribute: 'left-distance-to-viewport', type: Number })
-    protected distanceToLeftViewport = -1
-
     override get value(): string | undefined {
         return this._value?.toString()
     }
@@ -368,11 +365,7 @@ export class TH extends MutableElement {
                       'px-cell-padding-x font-normal': true,
                   })} @blur=${this.onBlur}></input>`
                 : this.hasMenu
-                  ? html`<outerbase-th-menu
-                        theme=${this.theme}
-                        .options=${options}
-                        @menu-selection=${this.onMenuSelection}
-                        left-distance-to-viewport=${this.distanceToLeftViewport}
+                  ? html`<outerbase-th-menu theme=${this.theme} .options=${options} @menu-selection=${this.onMenuSelection}
                         ><span class="font-normal">${this.value}</span></outerbase-th-menu
                     >`
                   : html`<span class="font-normal">${this.value}</span>`

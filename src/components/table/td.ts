@@ -69,9 +69,6 @@ export class TableData extends MutableElement {
     @property({ attribute: 'is-last-row', type: Boolean })
     public isLastRow = false
 
-    @property({ attribute: 'left-distance-to-viewport', type: Number })
-    public leftDistanceToViewport = -1
-
     @property({ attribute: 'hide-dirt', type: Boolean })
     public hideDirt = false
 
@@ -435,7 +432,6 @@ export class TableData extends MutableElement {
                       }}
                       ><outerbase-td-menu
                           theme=${this.theme}
-                          left-distance-to-viewport=${this.leftDistanceToViewport}
                           .options=${menuOptions}
                           ?without-padding=${!!this.plugin}
                           ?menu=${this.hasMenu}
