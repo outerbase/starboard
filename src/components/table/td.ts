@@ -333,6 +333,7 @@ export class TableData extends MutableElement {
 
         if (changedProperties.has('isDisplayingPluginEditor')) {
             if (this.isDisplayingPluginEditor) {
+                // setTimeout is necessary or else it receives the current click event (?!)
                 setTimeout(() => {
                     document.addEventListener('click', this.onDisplayEditor.bind(this))
                 }, 0)
