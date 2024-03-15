@@ -304,13 +304,12 @@ export class Table extends ClassifiedElement {
 
     public override connectedCallback(): void {
         super.connectedCallback()
-
-        // wait for the DOM to contain the #scroller
         setTimeout(() => {
-            // then add PASSIVE event listeners
-            const scroller = this.shadowRoot?.querySelector('#scroller')
-            scroller?.addEventListener('scroll', this.onScroll, { passive: true })
-            scroller?.addEventListener('scrollend', this.onScroll, { passive: true })
+            this.scroller = this.shadowRoot?.querySelector('#scroller')
+            this.scrollContainer = this.shadowRoot!.querySelector('.scroll-container') as HTMLElement | undefined
+
+            this.scroller?.addEventListener('scroll', this.onScroll, { passive: true })
+            if (!IS_SAFARI) this.scroller?.addEventListener('scrollend', this.onScroll, { passive: true })
         }, 0)
     }
 
