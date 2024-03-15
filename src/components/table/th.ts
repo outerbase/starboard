@@ -226,23 +226,18 @@ export class TH extends MutableElement {
             // ignore
         }
     }
-    private _onClick?: (event: MouseEvent) => void
 
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
 
-        this._onClick = this.onClick.bind(this)
-        this.addEventListener('click', this._onClick)
+        this.addEventListener('click', this.onClick)
     }
 
     public override disconnectedCallback(): void {
         super.disconnectedCallback
         this.removeEventListener('contextmenu', this.onContextMenu)
-        if (this._onClick) {
-            this.removeEventListener('click', this._onClick)
-            delete this._onClick
-        }
+        this.removeEventListener('click', this.onClick)
     }
 
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
