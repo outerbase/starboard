@@ -42,7 +42,7 @@ import './thead.js'
 import './tr.js'
 
 const SCROLL_THROTTLE_MS = 10
-const SCROLL_BUFFER_SIZE = 10
+const SCROLL_BUFFER_SIZE = 30
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -295,8 +295,24 @@ export class Table extends ClassifiedElement {
         }
     }
 
+    public override connectedCallback(): void {
+        super.connectedCallback()
+
+        // wait for the DOM to contain the #scroller
+        setTimeout(() => {
+            // then add PASSIVE event listeners
+            const scroller = this.shadowRoot?.querySelector('#scroller')
+            scroller?.addEventListener('scroll', this.onScroll, { passive: true })
+            scroller?.addEventListener('scrollend', this.onScroll, { passive: true })
+        }, 0)
+    }
+
     public override disconnectedCallback() {
         super.disconnectedCallback()
+
+        // remove event listeners
+        this.querySelector('#scroller')?.removeEventListener('scroll', this.onScroll)
+        this.querySelector('#scroller')?.removeEventListener('scrollend', this.onScroll)
 
         if (this.onKeyDown_bound) {
             document.removeEventListener('keydown', this.onKeyDown_bound)
@@ -351,6 +367,7 @@ export class Table extends ClassifiedElement {
                 m[r.id] = r
             })
             this.fromIdToRowMap = m
+            this.updateTableView()
         }
     }
 
@@ -510,7 +527,11 @@ export class Table extends ClassifiedElement {
     }
 
     private onScroll(event: Event): void {
-        const scrollTop = (event.target as HTMLElement)?.scrollTop ?? this.shadowRoot?.querySelector('#scroller')?.scrollTop
+        this.updateTableView(event)
+    }
+
+    private updateTableView(event?: Event): void {
+        const scrollTop = (event?.target as HTMLElement)?.scrollTop ?? this.shadowRoot?.querySelector('#scroller')?.scrollTop
         if (scrollTop >= 0) {
             this.updateVisibleRows(scrollTop)
             this.requestUpdate()
@@ -560,7 +581,7 @@ export class Table extends ClassifiedElement {
                   />`
                 : ''
 
-        return html`<div id="scroller" class=${classMap(tableContainerClasses)} @scroll="${this.onScroll}" @scrollend="${this.onScroll}">
+        return html`<div id="scroller" class=${classMap(tableContainerClasses)}>
             <div
                 id="table"
                 class=${classMap(tableClasses)}
