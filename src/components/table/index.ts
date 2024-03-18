@@ -590,7 +590,6 @@ export class Table extends ClassifiedElement {
         const tableContainerClasses = {
             dark: this.theme == Theme.dark,
             'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none scroll-container': true,
-            'transform translate-x-0 translate-y-0': true, // turn on the gpu
         }
         const tableClasses = {
             'table table-fixed bg-theme-table dark:bg-theme-table-dark': true,
