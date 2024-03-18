@@ -74,9 +74,6 @@ export class Table extends ClassifiedElement {
     @state()
     private newRows: Array<RowAsRecord> = []
 
-    @state()
-    private existingRows: Array<RowAsRecord> = []
-
     @property({ attribute: 'non-interactive', type: Boolean })
     public isNonInteractive = false
 
@@ -308,9 +305,8 @@ export class Table extends ClassifiedElement {
     public override connectedCallback(): void {
         super.connectedCallback()
         setTimeout(() => {
-            this.scroller = this.shadowRoot?.querySelector('#scroller')
             this.scrollContainer = this.shadowRoot!.querySelector('.scroll-container') as HTMLElement | undefined
-
+            this.scroller = this.shadowRoot?.querySelector('#scroller')
             this.scroller?.addEventListener('scroll', this.onScroll, { passive: true })
             if (!IS_SAFARI) this.scroller?.addEventListener('scrollend', this.onScroll, { passive: true })
         }, 0)
@@ -371,9 +367,8 @@ export class Table extends ClassifiedElement {
                 m[r.id] = r
             })
             this.fromIdToRowMap = m
-
-            this.updateTableView(null, true) // updates this.visibleRows
             this.newRows = this.rows.filter(({ isNew }) => isNew)
+            this.updateTableView()
         }
     }
 
@@ -516,8 +511,9 @@ export class Table extends ClassifiedElement {
         if (this.visibleStartIndex !== _startIndex || this.visibleEndIndex !== _endIndex || force) {
             this.visibleStartIndex = _startIndex
             this.visibleEndIndex = _endIndex
-            this.visibleRows = this.rows.slice(Math.max(0, this.visibleStartIndex), this.visibleEndIndex)
-            this.existingRows = this.visibleRows.filter(({ isNew }) => !isNew)
+            this.existingVisibleRows = this.rows
+                .slice(Math.max(0, this.visibleStartIndex), this.visibleEndIndex)
+                .filter(({ isNew }) => !isNew)
         }
     }
 
@@ -529,17 +525,19 @@ export class Table extends ClassifiedElement {
         this.updateTableView(event)
     }
 
-    private updateTableView(event: Event | null | undefined, force = false): void {
-        const scrollTop = (event?.target as HTMLElement)?.scrollTop ?? this.scrollContainer?.scrollTop
-        if (scrollTop >= 0 || event === null) {
-            this.updateVisibleRows(scrollTop, force)
+    private updateTableView(event?: Event): void {
+        const scrollTop = this.scrollContainer?.scrollTop
+        if (scrollTop) {
+            this.updateVisibleRows(scrollTop)
+        } else {
+            setTimeout(() => this.updateVisibleRows(0), 0)
         }
     }
 
     private readonly rowHeight: number = 38 // Adjust based on your row height
-    private visibleRows: Array<RowAsRecord> = []
     @state() private visibleEndIndex = 0
     @state() private visibleStartIndex = 0
+    @state() private existingVisibleRows: Array<RowAsRecord> = []
 
     protected override render() {
         const tableContainerClasses = {
@@ -662,7 +660,7 @@ export class Table extends ClassifiedElement {
                     <div style=${styleMap({ height: `${Math.max(this.visibleStartIndex * this.rowHeight, 0)}px` })}></div>
 
                     <!-- render a TableRow element for each row of data -->
-                    ${this.renderRows(this.newRows)} ${this.renderRows(this.existingRows)}
+                    ${this.renderRows(this.newRows)} ${this.renderRows(this.existingVisibleRows)}
 
                     <div
                         style=${styleMap({ height: `${Math.max((this.rows.length - this.visibleEndIndex) * this.rowHeight, 0)}px` })}
