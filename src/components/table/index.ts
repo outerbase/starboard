@@ -42,7 +42,7 @@ import './thead.js'
 import './tr.js'
 
 const IS_SAFARI = typeof navigator !== 'undefined' ? /^((?!chrome|android).)*safari/i.test(navigator.userAgent) : false
-const SCROLL_THRESHOLD = IS_SAFARI ? 20 : 1 // number of rows before triggering
+const SCROLL_THRESHOLD = IS_SAFARI ? 20 : 3 // number of rows before triggering
 const SCROLL_BUFFER_SIZE = SCROLL_THRESHOLD * 2
 
 @customElement('outerbase-table')
