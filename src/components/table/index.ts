@@ -37,6 +37,7 @@ import '../check-box.js'
 import '../widgets/add-column.js'
 import './tbody.js'
 import './td.js'
+import type { TableData } from './td.js'
 import './th.js'
 import './thead.js'
 import './tr.js'
@@ -332,6 +333,24 @@ export class Table extends ClassifiedElement {
         if (!table) throw new Error('Unexpectedly missing a table')
         this._previousWidth = table.clientWidth
         table.style.width = `${this._previousWidth}px`
+
+        // measure the height of each row
+        const elem = document.createElement('outerbase-td') as TableData
+        elem.withBottomBorder = true
+        elem.outerBorder = this.outerBorder
+        elem.isInteractive = true
+
+        // Temporarily add to the DOM to measure
+        this.shadowRoot?.querySelector('#scroller')?.appendChild(elem)
+        setTimeout(() => {
+            const offsetHeight = elem.offsetHeight
+            this.shadowRoot?.querySelector('#scroller')?.removeChild(elem)
+
+            if (this.rowHeight !== offsetHeight) {
+                console.info(`Updating row height from ${this.rowHeight} to ${offsetHeight}`)
+                this.rowHeight = offsetHeight
+            }
+        }, 0)
     }
 
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -534,7 +553,7 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    private readonly rowHeight: number = 38 // Adjust based on your row height
+    @state() private rowHeight: number = 38
     @state() private visibleEndIndex = 0
     @state() private visibleStartIndex = 0
     @state() private existingVisibleRows: Array<RowAsRecord> = []
