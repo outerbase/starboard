@@ -568,11 +568,11 @@ export class Table extends ClassifiedElement {
         return Math.ceil((this.scrollContainer?.clientHeight ?? 0) / this.rowHeight)
     }
 
-    private onScroll(event: Event): void {
-        this.updateTableView(event)
+    private onScroll(_event: Event): void {
+        this.updateTableView()
     }
 
-    private updateTableView(event?: Event): void {
+    private updateTableView(): void {
         const scrollTop = this.scrollContainer?.scrollTop
         if (scrollTop) {
             this.updateVisibleRows(scrollTop)
