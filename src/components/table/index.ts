@@ -147,35 +147,6 @@ export class Table extends ClassifiedElement {
         this.onScroll = this.onScroll.bind(this)
         this.updateTableView = this.updateTableView.bind(this)
         this.onKeyDown = this.onKeyDown.bind(this)
-
-        // add a virtual table for iterating thru the larger table without copying the array
-        const theTable = this
-        this.existingVisibleRows = new Proxy(
-            {},
-            {
-                get(_target: unknown, prop: string) {
-                    // Check if the prop is a Symbol and handle accordingly
-                    if (typeof prop === 'symbol') {
-                        return theTable.rows[prop]
-                    }
-
-                    // Adding checks for length and other array properties/methods.
-                    if (prop === 'length') {
-                        return theTable.visibleEndIndex - theTable.visibleStartIndex
-                    }
-
-                    const index = Number(prop)
-                    if (!isNaN(index)) {
-                        if (index < 0 || index >= theTable.visibleEndIndex - theTable.visibleStartIndex) {
-                            return undefined // Out of bounds access returns undefined
-                        }
-                        return theTable.rows[theTable.visibleStartIndex + index]
-                    } else {
-                        throw new Error('Oops')
-                    }
-                },
-            }
-        ) as Array<RowAsRecord>
     }
 
     protected closeLastMenu?: () => void
