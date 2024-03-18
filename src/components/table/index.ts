@@ -32,7 +32,6 @@ import { ClassifiedElement } from '../classified-element.js'
 
 // import subcomponents
 import { styleMap } from 'lit/directives/style-map.js'
-import { throttle } from 'lodash-es'
 import '../check-box.js'
 import '../widgets/add-column.js'
 import './tbody.js'
@@ -43,8 +42,8 @@ import './thead.js'
 import './tr.js'
 
 const IS_SAFARI = typeof navigator !== 'undefined' ? /^((?!chrome|android).)*safari/i.test(navigator.userAgent) : false
-const SCROLL_BUFFER_SIZE = IS_SAFARI ? 1 : 4
-const SCROLL_DEBOUNCE_MS = IS_SAFARI ? 10 : 0
+const SCROLL_THRESHOLD = IS_SAFARI ? 20 : 1 // number of rows before triggering
+const SCROLL_BUFFER_SIZE = SCROLL_THRESHOLD * 2
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -145,37 +144,9 @@ export class Table extends ClassifiedElement {
 
     constructor() {
         super()
-        this.onScroll = throttle(this.onScroll.bind(this), SCROLL_DEBOUNCE_MS)
+        this.onScroll = this.onScroll.bind(this)
+        this.updateTableView = this.updateTableView.bind(this)
         this.onKeyDown = this.onKeyDown.bind(this)
-
-        // add a virtual table for iterating thru the larger table without copying the array
-        const theTable = this
-        this.existingVisibleRows = new Proxy(
-            {},
-            {
-                get(_target: unknown, prop: string) {
-                    // Check if the prop is a Symbol and handle accordingly
-                    if (typeof prop === 'symbol') {
-                        return theTable.rows[prop]
-                    }
-
-                    // Adding checks for length and other array properties/methods.
-                    if (prop === 'length') {
-                        return theTable.visibleEndIndex - theTable.visibleStartIndex
-                    }
-
-                    const index = Number(prop)
-                    if (!isNaN(index)) {
-                        if (index < 0 || index >= theTable.visibleEndIndex - theTable.visibleStartIndex) {
-                            return undefined // Out of bounds access returns undefined
-                        }
-                        return theTable.rows[theTable.visibleStartIndex + index]
-                    } else {
-                        throw new Error('Oops')
-                    }
-                },
-            }
-        ) as Array<RowAsRecord>
     }
 
     protected closeLastMenu?: () => void
@@ -375,7 +346,6 @@ export class Table extends ClassifiedElement {
             this.shadowRoot?.querySelector('#scroller')?.removeChild(elem)
 
             if (this.rowHeight !== offsetHeight) {
-                console.info(`Updating row height from ${this.rowHeight} to ${offsetHeight}`)
                 this.rowHeight = offsetHeight
             }
         }, 0)
@@ -562,6 +532,8 @@ export class Table extends ClassifiedElement {
         if (this.visibleEndIndex !== _endIndex) {
             this.visibleEndIndex = _endIndex
         }
+
+        this.existingVisibleRows = this.rows.slice(_startIndex, _endIndex)
     }
 
     private numberOfVisibleRows(): number {
@@ -569,7 +541,13 @@ export class Table extends ClassifiedElement {
     }
 
     private onScroll(_event: Event): void {
-        this.updateTableView()
+        const previous = this.previousScrollPosition ?? 0
+        const current = this.scrollContainer?.scrollTop ?? 0
+
+        if (Math.abs(previous - current) > SCROLL_THRESHOLD * this.rowHeight) {
+            this.previousScrollPosition = current
+            this.updateTableView()
+        }
     }
 
     private updateTableView(): void {
@@ -584,7 +562,8 @@ export class Table extends ClassifiedElement {
     @state() private rowHeight: number = 38
     @state() private visibleEndIndex = 0
     @state() private visibleStartIndex = 0
-    @state() private existingVisibleRows: Array<RowAsRecord> = []
+    private existingVisibleRows: Array<RowAsRecord> = []
+    private previousScrollPosition?: number
 
     protected override render() {
         const tableContainerClasses = {
