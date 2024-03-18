@@ -7,6 +7,6 @@ export class ColumnMenu extends Menu {
     protected override get menuPositionClasses() {
         const isRenderingInBrowser = typeof window !== 'undefined'
         if (!isRenderingInBrowser) return ''
-        return 'right-0 top-7'
+        return 'right-0 top-8'
     }
 }

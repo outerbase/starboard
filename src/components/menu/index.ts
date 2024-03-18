@@ -187,7 +187,7 @@ export class Menu extends ClassifiedElement {
         if (!this.open) return null
 
         const classes = {
-            // [this.menuPositionClasses]: true,
+            [this.menuPositionClasses]: true,
             'absolute z-[2] max-w-56 overflow-hidden': true,
             'text-base': true,
             'bg-white dark:bg-black shadow-lg': true,
