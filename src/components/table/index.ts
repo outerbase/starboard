@@ -32,7 +32,7 @@ import { ClassifiedElement } from '../classified-element.js'
 
 // import subcomponents
 import { styleMap } from 'lit/directives/style-map.js'
-import { debounce } from 'lodash-es'
+import { throttle } from 'lodash-es'
 import '../check-box.js'
 import '../widgets/add-column.js'
 import './tbody.js'
@@ -43,8 +43,8 @@ import './thead.js'
 import './tr.js'
 
 const IS_SAFARI = typeof navigator !== 'undefined' ? /^((?!chrome|android).)*safari/i.test(navigator.userAgent) : false
-const SCROLL_BUFFER_SIZE = IS_SAFARI ? 50 : 5
-const SCROLL_DEBOUNCE_MS = IS_SAFARI ? 20 : 10
+const SCROLL_BUFFER_SIZE = IS_SAFARI ? 1 : 4
+const SCROLL_DEBOUNCE_MS = IS_SAFARI ? 10 : 0
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -145,9 +145,37 @@ export class Table extends ClassifiedElement {
 
     constructor() {
         super()
-        // this.onScroll = debounce(this.onScroll.bind(this), SCROLL_DEBOUNCE_MS, { maxWait: 200 }) // Debounce the onScroll method
-        this.onScroll = debounce(this.onScroll.bind(this), SCROLL_DEBOUNCE_MS) // Debounce the onScroll method
+        this.onScroll = throttle(this.onScroll.bind(this), SCROLL_DEBOUNCE_MS)
         this.onKeyDown = this.onKeyDown.bind(this)
+
+        // add a virtual table for iterating thru the larger table without copying the array
+        const theTable = this
+        this.existingVisibleRows = new Proxy(
+            {},
+            {
+                get(_target: unknown, prop: string) {
+                    // Check if the prop is a Symbol and handle accordingly
+                    if (typeof prop === 'symbol') {
+                        return theTable.rows[prop]
+                    }
+
+                    // Adding checks for length and other array properties/methods.
+                    if (prop === 'length') {
+                        return theTable.visibleEndIndex - theTable.visibleStartIndex
+                    }
+
+                    const index = Number(prop)
+                    if (!isNaN(index)) {
+                        if (index < 0 || index >= theTable.visibleEndIndex - theTable.visibleStartIndex) {
+                            return undefined // Out of bounds access returns undefined
+                        }
+                        return theTable.rows[theTable.visibleStartIndex + index]
+                    } else {
+                        throw new Error('Oops')
+                    }
+                },
+            }
+        ) as Array<RowAsRecord>
     }
 
     protected closeLastMenu?: () => void
@@ -523,16 +551,16 @@ export class Table extends ClassifiedElement {
         )}`
     }
 
-    private updateVisibleRows(scrollTop: number, force = false): void {
+    private updateVisibleRows(scrollTop: number): void {
         const _startIndex = Math.max(Math.floor((scrollTop ?? 0) / this.rowHeight) - SCROLL_BUFFER_SIZE, 0)
+        if (this.visibleStartIndex !== _startIndex) {
+            this.visibleStartIndex = _startIndex
+        }
+
         const possiblyVisibleEndIndex = _startIndex + this.numberOfVisibleRows() + 2 * SCROLL_BUFFER_SIZE // 2x because we need to re-add it to the start index
         const _endIndex = possiblyVisibleEndIndex < this.rows.length ? possiblyVisibleEndIndex : this.rows.length
-        if (this.visibleStartIndex !== _startIndex || this.visibleEndIndex !== _endIndex || force) {
-            this.visibleStartIndex = _startIndex
+        if (this.visibleEndIndex !== _endIndex) {
             this.visibleEndIndex = _endIndex
-            this.existingVisibleRows = this.rows
-                .slice(Math.max(0, this.visibleStartIndex), this.visibleEndIndex)
-                .filter(({ isNew }) => !isNew)
         }
     }
 
@@ -562,6 +590,7 @@ export class Table extends ClassifiedElement {
         const tableContainerClasses = {
             dark: this.theme == Theme.dark,
             'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none scroll-container': true,
+            'transform translate-x-0 translate-y-0': true, // turn on the gpu
         }
         const tableClasses = {
             'table table-fixed bg-theme-table dark:bg-theme-table-dark': true,
@@ -676,13 +705,21 @@ export class Table extends ClassifiedElement {
                 </outerbase-thead>
 
                 <outerbase-rowgroup>
-                    <div style=${styleMap({ height: `${Math.max(this.visibleStartIndex * this.rowHeight, 0)}px` })}></div>
+                    <div
+                        style=${styleMap({
+                            height: `${Math.max(this.visibleStartIndex * this.rowHeight, 0)}px`,
+                            'will-change': 'height',
+                        })}
+                    ></div>
 
                     <!-- render a TableRow element for each row of data -->
                     ${this.renderRows(this.newRows)} ${this.renderRows(this.existingVisibleRows)}
 
                     <div
-                        style=${styleMap({ height: `${Math.max((this.rows.length - this.visibleEndIndex) * this.rowHeight, 0)}px` })}
+                        style=${styleMap({
+                            height: `${Math.max((this.rows.length - this.visibleEndIndex) * this.rowHeight, 0)}px`,
+                            'will-change': 'transform, height',
+                        })}
                     ></div>
                 </outerbase-rowgroup>
             </div>
