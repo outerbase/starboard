@@ -562,7 +562,7 @@ export class Table extends ClassifiedElement {
     @state() private rowHeight: number = 38
     @state() private visibleEndIndex = 0
     @state() private visibleStartIndex = 0
-    private existingVisibleRows: Array<RowAsRecord> = []
+    @state() private existingVisibleRows: Array<RowAsRecord> = []
     private previousScrollPosition?: number
 
     protected override render() {
