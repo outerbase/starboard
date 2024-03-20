@@ -686,7 +686,7 @@ export class Table extends ClassifiedElement {
                     <div
                         style=${styleMap({
                             height: `${Math.max(this.visibleStartIndex * this.rowHeight, 0)}px`,
-                            'will-change': 'height',
+                            'will-change': 'transform, height',
                         })}
                     ></div>
 
