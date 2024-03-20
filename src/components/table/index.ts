@@ -533,7 +533,7 @@ export class Table extends ClassifiedElement {
             this.visibleEndIndex = _endIndex
         }
 
-        this.existingVisibleRows = this.rows.slice(_startIndex, _endIndex)
+        this.existingVisibleRows = this.rows.filter(({ isNew }) => !isNew).slice(_startIndex, _endIndex)
     }
 
     private numberOfVisibleRows(): number {
