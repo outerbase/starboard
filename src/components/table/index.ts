@@ -31,8 +31,11 @@ import {
 import { ClassifiedElement } from '../classified-element.js'
 
 // import subcomponents
+import { createRef, ref, type Ref } from 'lit/directives/ref.js'
 import { styleMap } from 'lit/directives/style-map.js'
 import '../check-box.js'
+import '../scroller/index.js'
+import type { ScrollableElement } from '../scroller/index.js'
 import '../widgets/add-column.js'
 import './tbody.js'
 import './td.js'
@@ -40,10 +43,6 @@ import type { TableData } from './td.js'
 import './th.js'
 import './thead.js'
 import './tr.js'
-
-const IS_SAFARI = typeof navigator !== 'undefined' ? /^((?!chrome|android).)*safari/i.test(navigator.userAgent) : false
-const SCROLL_THRESHOLD = IS_SAFARI ? 20 : 3 // number of rows before triggering
-const SCROLL_BUFFER_SIZE = SCROLL_THRESHOLD * 2
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -247,9 +246,6 @@ export class Table extends ClassifiedElement {
         this.dispatchEvent(new RowSelectedEvent(selectedRows))
     }
 
-    private scrollContainer: HTMLElement | undefined | null
-    private scroller: HTMLElement | undefined | null
-
     protected widthForColumnType(name: string, offset = 0) {
         const columnType = this.visibleColumns.find(({ name: _name }) => name === _name)?.type?.toUpperCase() as DBType
         if (
@@ -302,19 +298,8 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    public override connectedCallback(): void {
-        super.connectedCallback()
-        setTimeout(() => {
-            this.scrollContainer = this.shadowRoot!.querySelector('.scroll-container') as HTMLElement | undefined
-            this.scroller = this.shadowRoot?.querySelector('#scroller')
-            this.scroller?.addEventListener('scroll', this.onScroll, { passive: true })
-            if (!IS_SAFARI) this.scroller?.addEventListener('scrollend', this.onScroll, { passive: true })
-        }, 0)
-    }
-
     public override disconnectedCallback() {
         super.disconnectedCallback()
-
         document.removeEventListener('keydown', this.onKeyDown)
     }
 
@@ -329,6 +314,7 @@ export class Table extends ClassifiedElement {
         this._previousWidth = table.clientWidth
         table.style.width = `${this._previousWidth}px`
 
+        // ensure that `this.rowHeight` is correct
         // measure the height of each row
         const elem = document.createElement('outerbase-td') as TableData
         elem.withBottomBorder = true
@@ -336,15 +322,15 @@ export class Table extends ClassifiedElement {
         elem.isInteractive = true
 
         // Temporarily add to the DOM to measure
-        this.shadowRoot?.querySelector('#scroller')?.appendChild(elem)
+        this.scrollable.value?.appendChild(elem)
         setTimeout(() => {
             const offsetHeight = elem.offsetHeight
-            this.shadowRoot?.querySelector('#scroller')?.removeChild(elem)
-
+            this.scrollable.value?.removeChild(elem)
             if (this.rowHeight !== offsetHeight) {
                 this.rowHeight = offsetHeight
             }
         }, 0)
+        // end: ensure that `this.rowHeight` is correct
     }
 
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -518,36 +504,39 @@ export class Table extends ClassifiedElement {
     }
 
     private updateVisibleRows(scrollTop: number): void {
-        const _startIndex = Math.max(Math.floor((scrollTop ?? 0) / this.rowHeight) - SCROLL_BUFFER_SIZE, 0)
+        const bufferSize = 6
+        const rows = this.rows.filter(({ isNew }) => !isNew)
+
+        const _startIndex = Math.max(Math.floor((scrollTop ?? 0) / this.rowHeight) - bufferSize, 0)
         if (this.visibleStartIndex !== _startIndex) {
             this.visibleStartIndex = _startIndex
         }
 
-        const possiblyVisibleEndIndex = _startIndex + this.numberOfVisibleRows() + 2 * SCROLL_BUFFER_SIZE // 2x because we need to re-add it to the start index
-        const _endIndex = possiblyVisibleEndIndex < this.rows.length ? possiblyVisibleEndIndex : this.rows.length
+        const possiblyVisibleEndIndex = _startIndex + this.numberOfVisibleRows() + 2 * bufferSize // 2x because we need to re-add it to the start index
+        const _endIndex = possiblyVisibleEndIndex < rows.length ? possiblyVisibleEndIndex : rows.length
         if (this.visibleEndIndex !== _endIndex) {
             this.visibleEndIndex = _endIndex
         }
 
-        this.existingVisibleRows = this.rows.filter(({ isNew }) => !isNew).slice(_startIndex, _endIndex)
-    }
-
-    private numberOfVisibleRows(): number {
-        return Math.ceil((this.scrollContainer?.clientHeight ?? 0) / this.rowHeight)
-    }
-
-    private onScroll(_event: Event): void {
-        const previous = this.previousScrollPosition ?? 0
-        const current = this.scrollContainer?.scrollTop ?? 0
-
-        if (Math.abs(previous - current) > SCROLL_THRESHOLD * this.rowHeight) {
-            this.previousScrollPosition = current
-            this.updateTableView()
+        if (
+            this.visibleStartIndex !== _startIndex ||
+            this.visibleEndIndex !== _endIndex ||
+            this.existingVisibleRows.length !== _startIndex - _endIndex
+        ) {
+            this.existingVisibleRows = rows.slice(_startIndex, _endIndex)
         }
     }
 
+    private numberOfVisibleRows(): number {
+        return Math.ceil(this.scrollable.value?.scroller.value?.clientHeight ?? 0 / this.rowHeight)
+    }
+
+    public onScroll(_event: Event): void {
+        this.updateTableView()
+    }
+
     private updateTableView(): void {
-        const scrollTop = this.scrollContainer?.scrollTop
+        const scrollTop = this.scrollable.value?.scroller.value?.scrollTop ?? 0
         if (scrollTop) {
             this.updateVisibleRows(scrollTop)
         } else {
@@ -559,13 +548,9 @@ export class Table extends ClassifiedElement {
     @state() private visibleEndIndex = 0
     @state() private visibleStartIndex = 0
     @state() private existingVisibleRows: Array<RowAsRecord> = []
-    private previousScrollPosition?: number
+    @property() public scrollable: Ref<ScrollableElement> = createRef()
 
     protected override render() {
-        const tableContainerClasses = {
-            dark: this.theme == Theme.dark,
-            'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none scroll-container': true,
-        }
         const tableClasses = {
             'table table-fixed bg-theme-table dark:bg-theme-table-dark': true,
             'text-theme-text dark:text-theme-text-dark text-sm': true,
@@ -598,25 +583,27 @@ export class Table extends ClassifiedElement {
                   />`
                 : ''
 
-        return html`<div id="scroller" class=${classMap(tableContainerClasses)}>
-            <div
-                id="table"
-                class=${classMap(tableClasses)}
-                @menuopen=${(event: MenuOpenEvent) => {
-                    // this special case is when the same menu is opened after being closed
-                    // without this the menu is immediately closed on subsequent triggers
-                    if (this.closeLastMenu === event.close) return
+        return html`
+            <outerbase-scrollable threshold=${4 * this.rowHeight} .onScroll=${this.onScroll} ${ref(this.scrollable)}>
+                <div
+                    id="table"
+                    class=${classMap(tableClasses)}
+                    @menuopen=${(event: MenuOpenEvent) => {
+                        // this special case is when the same menu is opened after being closed
+                        // without this the menu is immediately closed on subsequent triggers
+                        if (this.closeLastMenu === event.close) return
 
-                    // remember this menu and close it when a subsequent one is opened
-                    this.closeLastMenu?.()
-                    this.closeLastMenu = event.close
-                }}
-            >
-                <outerbase-thead>
-                    <outerbase-tr header>
-                        <!-- first column of (optional) checkboxes -->
-                        ${this.selectableRows
-                            ? html`<outerbase-th
+                        // remember this menu and close it when a subsequent one is opened
+                        this.closeLastMenu?.()
+                        this.closeLastMenu = event.close
+                    }}
+                >
+                    <outerbase-thead>
+                        <outerbase-tr header>
+                            <!-- first column of (optional) checkboxes -->
+                            ${
+                                this.selectableRows
+                                    ? html`<outerbase-th
                               table-height=${ifDefined(this._height)}
                               theme=${this.theme}
                               width="42px"
@@ -630,42 +617,44 @@ export class Table extends ClassifiedElement {
                           /><div class="absolute top-0 bottom-0 right-0 left-0 flex items-center justify-center h-full">
                           ${selectAllCheckbox}
                       </div></outerbase-th>`
-                            : null}
-                        ${repeat(
-                            this.visibleColumns,
-                            ({ name }, _idx) => name,
-                            ({ name }, idx) => {
-                                // omit column resizer on the last column because it's sort-of awkward
-                                return html`<outerbase-th
-                                    .options=${this.columnOptions || nothing}
-                                    .plugins="${this.plugins}"
-                                    installed-plugins=${JSON.stringify(this.installedPlugins)}
-                                    table-height=${ifDefined(this._height)}
-                                    theme=${this.theme}
-                                    value="${this.renamedColumnNames[name] ?? name}"
-                                    original-value="${name}"
-                                    width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
-                                    ?separate-cells=${true}
-                                    ?outer-border=${this.outerBorder}
-                                    ?menu=${!this.isNonInteractive && !this.readonly}
-                                    ?with-resizer=${!this.isNonInteractive}
-                                    ?is-last=${idx === this.visibleColumns.length - 1}
-                                    ?removable=${true}
-                                    ?interactive=${!this.isNonInteractive}
-                                    @column-hidden=${this._onColumnHidden}
-                                    @column-removed=${this._onColumnRemoved}
-                                    @column-plugin-deactivated=${this._onColumnPluginDeactivated}
-                                    @resize-start=${this._onColumnResizeStart}
-                                    @resize=${this._onColumnResized}
-                                    ?read-only=${this.readonly}
-                                >
-                                </outerbase-th>`
+                                    : null
                             }
-                        )}
-                        ${this.blankFill
-                            ? html`<outerbase-th ?outer-border=${
-                                  this.outerBorder
-                              } ?read-only=${true} fill .value=${null} .originalValue=${null}>
+                            ${repeat(
+                                this.visibleColumns,
+                                ({ name }, _idx) => name,
+                                ({ name }, idx) => {
+                                    // omit column resizer on the last column because it's sort-of awkward
+                                    return html`<outerbase-th
+                                        .options=${this.columnOptions || nothing}
+                                        .plugins="${this.plugins}"
+                                        installed-plugins=${JSON.stringify(this.installedPlugins)}
+                                        table-height=${ifDefined(this._height)}
+                                        theme=${this.theme}
+                                        value="${this.renamedColumnNames[name] ?? name}"
+                                        original-value="${name}"
+                                        width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
+                                        ?separate-cells=${true}
+                                        ?outer-border=${this.outerBorder}
+                                        ?menu=${!this.isNonInteractive && !this.readonly}
+                                        ?with-resizer=${!this.isNonInteractive}
+                                        ?is-last=${idx === this.visibleColumns.length - 1}
+                                        ?removable=${true}
+                                        ?interactive=${!this.isNonInteractive}
+                                        @column-hidden=${this._onColumnHidden}
+                                        @column-removed=${this._onColumnRemoved}
+                                        @column-plugin-deactivated=${this._onColumnPluginDeactivated}
+                                        @resize-start=${this._onColumnResizeStart}
+                                        @resize=${this._onColumnResized}
+                                        ?read-only=${this.readonly}
+                                    >
+                                    </outerbase-th>`
+                                }
+                            )}
+                            ${
+                                this.blankFill
+                                    ? html`<outerbase-th ?outer-border=${
+                                          this.outerBorder
+                                      } ?read-only=${true} fill .value=${null} .originalValue=${null}>
                             ${
                                 this.isNonInteractive || !this.addableColumns
                                     ? ''
@@ -674,20 +663,21 @@ export class Table extends ClassifiedElement {
                                       </span>`
                             }
                             </<outerbase-th>`
-                            : ''}
-                    </outerbase-tr>
-                </outerbase-thead>
+                                    : ''
+                            }
+                        </outerbase-tr>
+                    </outerbase-thead>
 
-                <outerbase-rowgroup>
-                    <div
-                        style=${styleMap({
-                            height: `${Math.max(this.visibleStartIndex * this.rowHeight, 0)}px`,
-                            'will-change': 'transform, height',
-                        })}
-                    ></div>
+                    <outerbase-rowgroup>
+                        <div
+                            style=${styleMap({
+                                height: `${Math.max(this.visibleStartIndex * this.rowHeight, 0)}px`,
+                                'will-change': 'transform, height',
+                            })}
+                        ></div>
 
-                    <!-- render a TableRow element for each row of data -->
-                    ${this.renderRows(this.newRows)} ${this.renderRows(this.existingVisibleRows)}
+                        <!-- render a TableRow element for each row of data -->
+                        ${this.renderRows(this.newRows)} ${this.renderRows(this.existingVisibleRows)}
 
                     <div
                         style=${styleMap({
