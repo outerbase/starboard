@@ -70,6 +70,9 @@ export class ScrollableElement extends ClassifiedElement {
         // add event listeners
         window.addEventListener('resize', this.updateScrollbarDimensions)
 
+        // set initial scroller values
+        setTimeout(this.onScrollHandles, 0)
+
         // attach horizontal scroll handle mouse events
         setTimeout(() => {
             this.bottomScrollHandle.value?.addEventListener('mousedown', (mouseDownEvent: MouseEvent) => {
@@ -144,7 +147,7 @@ export class ScrollableElement extends ClassifiedElement {
     }
 
     // maintains the appearance of our scrollers (horizontal + vertical)
-    private onScrollHandles(_event: Event) {
+    private onScrollHandles(_event?: Event) {
         // vertical
         const scrollTop = this.scroller.value?.scrollTop ?? 0
         const scrollHeight = this.scroller.value?.scrollHeight ?? 0
