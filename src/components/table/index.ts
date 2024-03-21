@@ -506,7 +506,6 @@ export class Table extends ClassifiedElement {
     private updateVisibleRows(scrollTop: number): void {
         const bufferSize = 6
         const rows = this.rows.filter(({ isNew }) => !isNew)
-
         const _startIndex = Math.max(Math.floor((scrollTop ?? 0) / this.rowHeight) - bufferSize, 0)
         if (this.visibleStartIndex !== _startIndex) {
             this.visibleStartIndex = _startIndex
@@ -528,7 +527,7 @@ export class Table extends ClassifiedElement {
     }
 
     private numberOfVisibleRows(): number {
-        return Math.ceil(this.scrollable.value?.scroller.value?.clientHeight ?? 0 / this.rowHeight)
+        return Math.ceil((this.scrollable.value?.scroller.value?.clientHeight ?? 0) / this.rowHeight)
     }
 
     public onScroll(_event: Event): void {
