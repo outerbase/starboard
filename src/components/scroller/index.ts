@@ -45,7 +45,9 @@ export class ScrollableElement extends ClassifiedElement {
     @state() protected isDragging = false
 
     protected startX = 0
+    protected startY = 0
     protected scrollStartX = 0
+    protected scrollStartY = 0
     protected previousScrollPosition?: number
 
     constructor() {
@@ -60,38 +62,59 @@ export class ScrollableElement extends ClassifiedElement {
         // add event listeners
         window.addEventListener('resize', this.updateScrollbarDimensions)
 
+        // attach horizontal scroll handle mouse events
         setTimeout(() => {
             this.bottomScrollHandle.value?.addEventListener('mousedown', (e) => {
-                console.debug('mousedown')
-
-                this.isDragging = true
-                this.startX = e.pageX // Starting X position of the mouse
-                this.scrollStartX = this.scroller.value?.scrollLeft ?? 0 // Starting scroll position
-                document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
-
-                this.bottomScrollHandle.value?.classList.add('scrollbar-active') // Optional: Show scrollbar thumb as active
-
                 e.preventDefault() // Prevent text selection/dragging behavior
 
-                const onMouseMove = (e: MouseEvent) => {
-                    console.debug('mousemove')
+                this.startX = e.pageX // Starting X position of the mouse
+                this.scrollStartX = this.scroller.value?.scrollLeft ?? 0 // Starting scroll position
+                // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
+                // this.bottomScrollHandle.value?.classList.add('scrollbar-active') // Optional: Show scrollbar thumb as active
 
-                    if (!this.isDragging) return
+                const onMouseMove = (e: MouseEvent) => {
                     const deltaX = e.pageX - this.startX // Calculate mouse movement
-                    const thumbWidthPercent = this.scroller.value ? this.scroller.value?.clientWidth / this.scroller.value?.scrollWidth : 0
-                    const scrollX = this.scrollStartX + deltaX / thumbWidthPercent
-                    if (this.scroller.value) this.scroller.value.scrollLeft = scrollX
+                    const scrollWidth = this.scroller.value?.scrollWidth ?? 0
+                    const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
+                    if (this.scroller.value) this.scroller.value.scrollLeft = this.scrollStartX + deltaX / scrollWidthCoEfficient
                 }
 
                 const onMouseUp = (e: MouseEvent) => {
-                    console.debug('mouseup')
-
                     document.removeEventListener('mousemove', onMouseMove)
                     document.removeEventListener('mouseup', onMouseUp)
 
-                    this.isDragging = false
-                    document.body.classList.remove('user-select-none') // Re-enable text selection after dragging
-                    this.bottomScrollHandle.value?.classList.remove('scrollbar-active') // Optional: Show scrollbar thumb as active
+                    // document.body.classList.remove('user-select-none') // Re-enable text selection after dragging
+                    // this.bottomScrollHandle.value?.classList.remove('scrollbar-active') // Optional: Show scrollbar thumb as active
+                }
+
+                document.addEventListener('mouseup', onMouseUp)
+                document.addEventListener('mousemove', onMouseMove)
+            })
+        }, 0)
+
+        // attach vertical scroll handle mouse events
+        setTimeout(() => {
+            this.rightScrollHandle.value?.addEventListener('mousedown', (e) => {
+                e.preventDefault() // Prevent text selection/dragging behavior
+
+                this.startY = e.pageY // Starting X position of the mouse
+                this.scrollStartY = this.scroller.value?.scrollTop ?? 0 // Starting scroll position
+                // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
+                // this.rightScrollHandle.value?.classList.add('scrollbar-active') // Optional: Show scrollbar thumb as active
+
+                const onMouseMove = (e: MouseEvent) => {
+                    const deltaY = e.pageY - this.startY // Calculate mouse movement
+                    const scrollHeight = this.scroller.value?.scrollHeight ?? 0
+                    const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
+                    if (this.scroller.value) this.scroller.value.scrollTop = this.scrollStartY + deltaY / scrollHeightCoEfficient
+                }
+
+                const onMouseUp = (e: MouseEvent) => {
+                    document.removeEventListener('mousemove', onMouseMove)
+                    document.removeEventListener('mouseup', onMouseUp)
+
+                    // document.body.classList.remove('user-select-none') // Re-enable text selection after dragging
+                    // this.rightScrollHandle.value?.classList.remove('scrollbar-active') // Optional: Show scrollbar thumb as active
                 }
 
                 document.addEventListener('mouseup', onMouseUp)
@@ -118,22 +141,22 @@ export class ScrollableElement extends ClassifiedElement {
         // vertical
         const scrollTop = this.scroller.value?.scrollTop ?? 0
         const scrollHeight = this.scroller.value?.scrollHeight ?? 0
-        const verticalScrollProgress = scrollTop / scrollHeight
+        this.verticalScrollProgress = scrollTop / scrollHeight
         const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
         const verticalScrollHandleHeight =
             scrollHeightCoEfficient === 1 ? 0 : (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient // 0 when nothing to scroll
         this.verticalScrollSize = `${verticalScrollHandleHeight}px`
-        this.verticalScrollPosition = `${verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0)}px`
+        this.verticalScrollPosition = `${this.verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0)}px`
 
         // horizontal
         const scrollWidth = this.scroller.value?.scrollWidth ?? 0
         const scrollLeft = this.scroller.value?.scrollLeft ?? 0
-        const horizontalScrollProgress = scrollLeft / scrollWidth
+        this.horizontalScrollProgress = scrollLeft / scrollWidth
         const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
         const horizontalScrollHandleWidth =
             scrollWidthCoEfficient === 1 ? 0 : (this.scroller.value?.clientWidth ?? 0) * scrollWidthCoEfficient // 0 when nothing to scroll
         this.horizontalScrollSize = `${horizontalScrollHandleWidth}px`
-        this.horizontalScrollPosition = `${horizontalScrollProgress * (this.scroller.value?.clientHeight ?? 0)}px`
+        this.horizontalScrollPosition = `${this.horizontalScrollProgress * (this.scroller.value?.clientWidth ?? 0)}px`
     }
 
     // trigger `onScroll` when scrolling distance >= threshold (for the sake of optimizing performance)
@@ -163,6 +186,9 @@ export class ScrollableElement extends ClassifiedElement {
     @state() horizontalScrollPosition? = '0px'
     @state() verticalScrollSize? = '0px'
     @state() horizontalScrollSize? = '0px'
+
+    protected horizontalScrollProgress = 0
+    protected verticalScrollProgress = 0
 
     protected override render() {
         const scrollableClasses = {
