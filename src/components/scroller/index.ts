@@ -72,15 +72,15 @@ export class ScrollableElement extends ClassifiedElement {
 
         // attach horizontal scroll handle mouse events
         setTimeout(() => {
-            this.bottomScrollHandle.value?.addEventListener('mousedown', (e) => {
-                e.preventDefault() // Prevent text selection/dragging behavior
+            this.bottomScrollHandle.value?.addEventListener('mousedown', (mouseDownEvent: MouseEvent) => {
+                mouseDownEvent.preventDefault() // Prevent text selection/dragging behavior
 
-                this.startX = e.pageX // Starting X position of the mouse
+                this.startX = mouseDownEvent.pageX // Starting X position of the mouse
                 this.scrollStartX = this.scroller.value?.scrollLeft ?? 0 // Starting scroll position
                 // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
 
-                const onMouseMove = (_event: MouseEvent) => {
-                    const deltaX = e.pageX - this.startX // Calculate mouse movement
+                const onMouseMove = (mouseMoveEvent: MouseEvent) => {
+                    const deltaX = mouseMoveEvent.pageX - this.startX // Calculate mouse movement
                     const scrollWidth = this.scroller.value?.scrollWidth ?? 0
                     const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
                     if (this.scroller.value) this.scroller.value.scrollLeft = this.scrollStartX + deltaX / scrollWidthCoEfficient
@@ -100,16 +100,17 @@ export class ScrollableElement extends ClassifiedElement {
 
         // attach vertical scroll handle mouse events
         setTimeout(() => {
-            this.rightScrollHandle.value?.addEventListener('mousedown', (e) => {
-                e.preventDefault() // Prevent text selection/dragging behavior
+            this.rightScrollHandle.value?.addEventListener('mousedown', (mouseDownEvent: MouseEvent) => {
+                mouseDownEvent.preventDefault() // Prevent text selection/dragging behavior
 
-                this.startY = e.pageY // Starting X position of the mouse
+                this.startY = mouseDownEvent.pageY // Starting X position of the mouse
                 this.scrollStartY = this.scroller.value?.scrollTop ?? 0 // Starting scroll position
                 // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
                 // this.rightScrollHandle.value?.classList.add('scrollbar-active') // Optional: Show scrollbar thumb as active
 
-                const onMouseMove = (_event: MouseEvent) => {
-                    const deltaY = e.pageY - this.startY // Calculate mouse movement
+                const onMouseMove = (mouseMoveEvent: MouseEvent) => {
+                    mouseMoveEvent.preventDefault()
+                    const deltaY = mouseMoveEvent.pageY - this.startY // Calculate mouse movement
                     const scrollHeight = this.scroller.value?.scrollHeight ?? 0
                     const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
                     if (this.scroller.value) this.scroller.value.scrollTop = this.scrollStartY + deltaY / scrollHeightCoEfficient
