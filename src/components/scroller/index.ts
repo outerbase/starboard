@@ -11,6 +11,13 @@ import { ClassifiedElement } from '../classified-element'
 
 @customElement('outerbase-scrollable')
 export class ScrollableElement extends ClassifiedElement {
+    protected override get classMap() {
+        return {
+            ...super.classMap,
+            dark: this.theme == Theme.dark,
+        }
+    }
+
     static override styles = [
         ...ClassifiedElement.styles,
         css`
@@ -144,8 +151,8 @@ export class ScrollableElement extends ClassifiedElement {
         const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
         const verticalScrollHandleHeight =
             scrollHeightCoEfficient === 1 ? 0 : (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient // 0 when nothing to scroll
-        this.verticalScrollSize = `${verticalScrollHandleHeight}px`
-        this.verticalScrollPosition = `${this.verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0)}px`
+        this.verticalScrollSize = verticalScrollHandleHeight
+        this.verticalScrollPosition = this.verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0)
 
         // horizontal
         const scrollWidth = this.scroller.value?.scrollWidth ?? 0
@@ -154,8 +161,8 @@ export class ScrollableElement extends ClassifiedElement {
         const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
         const horizontalScrollHandleWidth =
             scrollWidthCoEfficient === 1 ? 0 : (this.scroller.value?.clientWidth ?? 0) * scrollWidthCoEfficient // 0 when nothing to scroll
-        this.horizontalScrollSize = `${horizontalScrollHandleWidth}px`
-        this.horizontalScrollPosition = `${this.horizontalScrollProgress * (this.scroller.value?.clientWidth ?? 0)}px`
+        this.horizontalScrollSize = horizontalScrollHandleWidth
+        this.horizontalScrollPosition = this.horizontalScrollProgress * (this.scroller.value?.clientWidth ?? 0)
     }
 
     // trigger `onScroll` when scrolling distance >= threshold (for the sake of optimizing performance)
@@ -171,6 +178,20 @@ export class ScrollableElement extends ClassifiedElement {
         }
     }
 
+    private onClickVerticalScroller(event: MouseEvent) {
+        if (this.scroller.value) {
+            const clickedAtCoef = (event.clientY - this.getBoundingClientRect().top) / this.scroller.value?.clientHeight
+            this.scroller.value.scrollTop = clickedAtCoef * (this.scroller.value?.scrollHeight ?? 0) - this.verticalScrollSize
+        }
+    }
+
+    private onClickHorizontalScroller(event: MouseEvent) {
+        if (this.scroller.value) {
+            const clickedAtCoef = (event.clientX - this.getBoundingClientRect().left) / this.scroller.value?.clientWidth
+            this.scroller.value.scrollLeft = clickedAtCoef * (this.scroller.value?.scrollWidth ?? 0) - this.horizontalScrollSize
+        }
+    }
+
     updateScrollbarDimensions() {
         if (!this.scroller.value) return
 
@@ -181,10 +202,10 @@ export class ScrollableElement extends ClassifiedElement {
         if (this.bottomScrollHandle.value) this.bottomScrollHandle.value.style.width = `${scrollbarWidth}%` // Set thumb width as a percentage of its parent
     }
 
-    @state() verticalScrollPosition? = '0px'
-    @state() horizontalScrollPosition? = '0px'
-    @state() verticalScrollSize? = '0px'
-    @state() horizontalScrollSize? = '0px'
+    @state() verticalScrollPosition = 0
+    @state() horizontalScrollPosition = 0
+    @state() verticalScrollSize = 0
+    @state() horizontalScrollSize = 0
 
     protected horizontalScrollProgress = 0
     protected verticalScrollProgress = 0
@@ -192,7 +213,7 @@ export class ScrollableElement extends ClassifiedElement {
     protected override render() {
         const scrollableClasses = {
             dark: this.theme == Theme.dark,
-            'absolute bottom-3 left-0 right-3 top-0 overflow-auto overscroll-none': true,
+            'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none': true,
         }
 
         const handleClasses = {
@@ -203,30 +224,43 @@ export class ScrollableElement extends ClassifiedElement {
         }
 
         const scrollEndClasses = {
-            'absolute right-0 bottom-0': true,
-            'bg-neutral-200 dark:bg-neutral-900': true,
+            'z-50 absolute right-0 bottom-0': true,
+            'bg-neutral-200/50 dark:bg-neutral-900/50': true,
             'transition-opacity duration-300': true,
-            'opacity-0 hover:opacity-100': true,
+            'opacity-0 group-hover:opacity-100': true,
         }
 
-        const verticalHandleStyles = { transform: `translateY(${this.verticalScrollPosition})`, height: this.verticalScrollSize }
-        const horizontalHandleStyles = { transform: `translateX(${this.horizontalScrollPosition})`, width: this.horizontalScrollSize }
+        const verticalHandleStyles = { transform: `translateY(${this.verticalScrollPosition}px)`, height: `${this.verticalScrollSize}px` }
+        const horizontalHandleStyles = {
+            transform: `translateX(${this.horizontalScrollPosition}px)`,
+            width: `${this.horizontalScrollSize}px`,
+        }
 
         return html`<!-- aloha bruddah -->
-            <div class=${classMap({ ...scrollEndClasses, 'top-0 w-3': true })} ${ref(this.rightScrollZone)}>
-                <div style=${styleMap(verticalHandleStyles)} class="${classMap(handleClasses)}" ${ref(this.rightScrollHandle)}></div>
-            </div>
-
-            <div class=${classMap({ ...scrollEndClasses, 'left-0': true })} ${ref(this.bottomScrollZone)}>
+            <div class="group">
                 <div
-                    style=${styleMap(horizontalHandleStyles)}
-                    class="${classMap({ ...handleClasses, 'h-3': true })}"
-                    ${ref(this.bottomScrollHandle)}
-                ></div>
-            </div>
+                    class=${classMap({ ...scrollEndClasses, 'top-0 w-3': true })}
+                    ${ref(this.rightScrollZone)}
+                    @click=${this.onClickVerticalScroller}
+                >
+                    <div style=${styleMap(verticalHandleStyles)} class="${classMap(handleClasses)}" ${ref(this.rightScrollHandle)}></div>
+                </div>
 
-            <div class=${classMap(scrollableClasses)} @scroll=${this._onScroll} @scrollend=${this._onScroll} ${ref(this.scroller)}>
-                <slot></slot>
+                <div
+                    class=${classMap({ ...scrollEndClasses, 'left-0': true })}
+                    ${ref(this.bottomScrollZone)}
+                    @click="${this.onClickHorizontalScroller}"
+                >
+                    <div
+                        style=${styleMap(horizontalHandleStyles)}
+                        class="${classMap({ ...handleClasses, 'h-3': true })}"
+                        ${ref(this.bottomScrollHandle)}
+                    ></div>
+                </div>
+
+                <div class=${classMap(scrollableClasses)} @scroll=${this._onScroll} @scrollend=${this._onScroll} ${ref(this.scroller)}>
+                    <slot></slot>
+                </div>
             </div>`
     }
 }
