@@ -79,14 +79,14 @@ export class ScrollableElement extends ClassifiedElement {
                 this.scrollStartX = this.scroller.value?.scrollLeft ?? 0 // Starting scroll position
                 // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
 
-                const onMouseMove = (e: MouseEvent) => {
+                const onMouseMove = (_event: MouseEvent) => {
                     const deltaX = e.pageX - this.startX // Calculate mouse movement
                     const scrollWidth = this.scroller.value?.scrollWidth ?? 0
                     const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
                     if (this.scroller.value) this.scroller.value.scrollLeft = this.scrollStartX + deltaX / scrollWidthCoEfficient
                 }
 
-                const onMouseUp = (e: MouseEvent) => {
+                const onMouseUp = (_event: MouseEvent) => {
                     document.removeEventListener('mousemove', onMouseMove)
                     document.removeEventListener('mouseup', onMouseUp)
 
@@ -108,14 +108,14 @@ export class ScrollableElement extends ClassifiedElement {
                 // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
                 // this.rightScrollHandle.value?.classList.add('scrollbar-active') // Optional: Show scrollbar thumb as active
 
-                const onMouseMove = (e: MouseEvent) => {
+                const onMouseMove = (_event: MouseEvent) => {
                     const deltaY = e.pageY - this.startY // Calculate mouse movement
                     const scrollHeight = this.scroller.value?.scrollHeight ?? 0
                     const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
                     if (this.scroller.value) this.scroller.value.scrollTop = this.scrollStartY + deltaY / scrollHeightCoEfficient
                 }
 
-                const onMouseUp = (e: MouseEvent) => {
+                const onMouseUp = (_event: MouseEvent) => {
                     document.removeEventListener('mousemove', onMouseMove)
                     document.removeEventListener('mouseup', onMouseUp)
 
