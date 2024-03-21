@@ -70,7 +70,6 @@ export class ScrollableElement extends ClassifiedElement {
                 this.startX = e.pageX // Starting X position of the mouse
                 this.scrollStartX = this.scroller.value?.scrollLeft ?? 0 // Starting scroll position
                 // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
-                // this.bottomScrollHandle.value?.classList.add('scrollbar-active') // Optional: Show scrollbar thumb as active
 
                 const onMouseMove = (e: MouseEvent) => {
                     const deltaX = e.pageX - this.startX // Calculate mouse movement
@@ -84,7 +83,6 @@ export class ScrollableElement extends ClassifiedElement {
                     document.removeEventListener('mouseup', onMouseUp)
 
                     // document.body.classList.remove('user-select-none') // Re-enable text selection after dragging
-                    // this.bottomScrollHandle.value?.classList.remove('scrollbar-active') // Optional: Show scrollbar thumb as active
                 }
 
                 document.addEventListener('mouseup', onMouseUp)
