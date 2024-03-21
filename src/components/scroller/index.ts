@@ -240,7 +240,7 @@ export class ScrollableElement extends ClassifiedElement {
         return html`<!-- aloha bruddah -->
             <div class="group">
                 <div
-                    class=${classMap({ ...scrollEndClasses, 'top-0 w-3': true })}
+                    class=${classMap({ ...scrollEndClasses, 'top-0 w-2': true })}
                     ${ref(this.rightScrollZone)}
                     @click=${this.onClickVerticalScroller}
                 >
@@ -254,7 +254,7 @@ export class ScrollableElement extends ClassifiedElement {
                 >
                     <div
                         style=${styleMap(horizontalHandleStyles)}
-                        class="${classMap({ ...handleClasses, 'h-3': true })}"
+                        class="${classMap({ ...handleClasses, 'h-2': true })}"
                         ${ref(this.bottomScrollHandle)}
                     ></div>
                 </div>
