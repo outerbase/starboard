@@ -88,9 +88,6 @@ export class TH extends MutableElement {
         },
     ]
 
-    @property({ attribute: 'left-distance-to-viewport', type: Number })
-    protected distanceToLeftViewport = -1
-
     override get value(): string | undefined {
         return this._value?.toString()
     }
@@ -229,23 +226,18 @@ export class TH extends MutableElement {
             // ignore
         }
     }
-    private _onClick?: (event: MouseEvent) => void
 
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
 
-        this._onClick = this.onClick.bind(this)
-        this.addEventListener('click', this._onClick)
+        this.addEventListener('click', this.onClick)
     }
 
     public override disconnectedCallback(): void {
         super.disconnectedCallback
         this.removeEventListener('contextmenu', this.onContextMenu)
-        if (this._onClick) {
-            this.removeEventListener('click', this._onClick)
-            delete this._onClick
-        }
+        this.removeEventListener('click', this.onClick)
     }
 
     protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -368,11 +360,7 @@ export class TH extends MutableElement {
                       'px-cell-padding-x font-normal': true,
                   })} @blur=${this.onBlur}></input>`
                 : this.hasMenu
-                  ? html`<outerbase-th-menu
-                        theme=${this.theme}
-                        .options=${options}
-                        @menu-selection=${this.onMenuSelection}
-                        left-distance-to-viewport=${this.distanceToLeftViewport}
+                  ? html`<outerbase-th-menu theme=${this.theme} .options=${options} @menu-selection=${this.onMenuSelection}
                         ><span class="font-normal">${this.value}</span></outerbase-th-menu
                     >`
                   : html`<span class="font-normal">${this.value}</span>`

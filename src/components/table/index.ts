@@ -16,7 +16,6 @@ import {
     RowRemovedEvent,
     RowSelectedEvent,
 } from '../../lib/events.js'
-import { heightOfElement } from '../../lib/height-of-element.js'
 import {
     ColumnStatus,
     DBType,
@@ -32,13 +31,19 @@ import {
 import { ClassifiedElement } from '../classified-element.js'
 
 // import subcomponents
+import { styleMap } from 'lit/directives/style-map.js'
 import '../check-box.js'
 import '../widgets/add-column.js'
 import './tbody.js'
 import './td.js'
+import type { TableData } from './td.js'
 import './th.js'
 import './thead.js'
 import './tr.js'
+
+const IS_SAFARI = typeof navigator !== 'undefined' ? /^((?!chrome|android).)*safari/i.test(navigator.userAgent) : false
+const SCROLL_THRESHOLD = IS_SAFARI ? 20 : 3 // number of rows before triggering
+const SCROLL_BUFFER_SIZE = SCROLL_THRESHOLD * 2
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -65,6 +70,9 @@ export class Table extends ClassifiedElement {
 
     @state()
     protected rows: Array<RowAsRecord> = []
+
+    @state()
+    private newRows: Array<RowAsRecord> = []
 
     @property({ attribute: 'non-interactive', type: Boolean })
     public isNonInteractive = false
@@ -113,9 +121,6 @@ export class Table extends ClassifiedElement {
     private _height?: number
 
     @state()
-    private resizeObserver?: ResizeObserver
-
-    @state()
     protected columns: Columns = []
 
     @state()
@@ -136,6 +141,13 @@ export class Table extends ClassifiedElement {
 
     @state()
     columnTypes?: Record<string, string | number | boolean | undefined>
+
+    constructor() {
+        super()
+        this.onScroll = this.onScroll.bind(this)
+        this.updateTableView = this.updateTableView.bind(this)
+        this.onKeyDown = this.onKeyDown.bind(this)
+    }
 
     protected closeLastMenu?: () => void
     protected fromIdToRowMap: Record<string, RowAsRecord | undefined> = {}
@@ -235,6 +247,9 @@ export class Table extends ClassifiedElement {
         this.dispatchEvent(new RowSelectedEvent(selectedRows))
     }
 
+    private scrollContainer: HTMLElement | undefined | null
+    private scroller: HTMLElement | undefined | null
+
     protected widthForColumnType(name: string, offset = 0) {
         const columnType = this.visibleColumns.find(({ name: _name }) => name === _name)?.type?.toUpperCase() as DBType
         if (
@@ -261,7 +276,6 @@ export class Table extends ClassifiedElement {
     }
 
     // KEYBOARD SHORTCUTS
-    protected onKeyDown_bound?: ({ shiftKey, key }: KeyboardEvent) => void
     protected onKeyDown(event: KeyboardEvent) {
         const actualTarget = event.composedPath()[0]
         const validTrigger = actualTarget instanceof HTMLElement && actualTarget.tagName !== 'INPUT' && actualTarget.tagName !== 'TEXTAREA'
@@ -288,36 +302,53 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    // LIFECYCLE HOOKS
-    public override connectedCallback() {
+    public override connectedCallback(): void {
         super.connectedCallback()
-
-        this.resizeObserver = new ResizeObserver((_entries) => {
-            this._height = heightOfElement(_entries[0]?.target)
-        })
-        this.resizeObserver.observe(this)
+        setTimeout(() => {
+            this.scrollContainer = this.shadowRoot!.querySelector('.scroll-container') as HTMLElement | undefined
+            this.scroller = this.shadowRoot?.querySelector('#scroller')
+            this.scroller?.addEventListener('scroll', this.onScroll, { passive: true })
+            if (!IS_SAFARI) this.scroller?.addEventListener('scrollend', this.onScroll, { passive: true })
+        }, 0)
     }
 
     public override disconnectedCallback() {
         super.disconnectedCallback()
-        this.resizeObserver?.disconnect()
 
-        if (this.onKeyDown_bound) {
-            document.removeEventListener('keydown', this.onKeyDown_bound)
-        }
+        // remove event listeners
+        this.scroller?.removeEventListener('scroll', this.onScroll)
+        this.scroller?.removeEventListener('scrollend', this.onScroll)
+
+        document.removeEventListener('keydown', this.onKeyDown)
     }
 
     protected override firstUpdated(_changedProperties: PropertyValueMap<this>): void {
         if (this.keyboardShortcuts) {
-            this.onKeyDown_bound = this.onKeyDown.bind(this)
-            document.addEventListener('keydown', this.onKeyDown_bound)
+            document.addEventListener('keydown', this.onKeyDown)
         }
 
+        // set table width
         const table = this.shadowRoot?.getElementById('table')
         if (!table) throw new Error('Unexpectedly missing a table')
-
         this._previousWidth = table.clientWidth
         table.style.width = `${this._previousWidth}px`
+
+        // measure the height of each row
+        const elem = document.createElement('outerbase-td') as TableData
+        elem.withBottomBorder = true
+        elem.outerBorder = this.outerBorder
+        elem.isInteractive = true
+
+        // Temporarily add to the DOM to measure
+        this.shadowRoot?.querySelector('#scroller')?.appendChild(elem)
+        setTimeout(() => {
+            const offsetHeight = elem.offsetHeight
+            this.shadowRoot?.querySelector('#scroller')?.removeChild(elem)
+
+            if (this.rowHeight !== offsetHeight) {
+                this.rowHeight = offsetHeight
+            }
+        }, 0)
     }
 
     protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
@@ -353,6 +384,8 @@ export class Table extends ClassifiedElement {
                 m[r.id] = r
             })
             this.fromIdToRowMap = m
+            this.newRows = this.rows.filter(({ isNew }) => isNew)
+            this.updateTableView()
         }
     }
 
@@ -400,18 +433,7 @@ export class Table extends ClassifiedElement {
         document.documentElement.style.setProperty('--ob-cell-font-family', "'input-mono', monospace")
     }
 
-    // TODO @johnny this does not get update if the page containing the table changes
-    // This is problematic when deciding which direction to render a column menu
-    // An example is toggling the navigation menu (where there's a list of tables, queries, etc)
-    // Only once you switch tabs does the reference to `distanceToLeftViewport` get recomputed.
-
-    get distanceToLeftViewport() {
-        if (typeof window === 'undefined') return -1
-        return this.getBoundingClientRect().left
-    }
-
     protected renderRows(rows: Array<RowAsRecord>) {
-        const tableBoundingRect = typeof window !== 'undefined' ? JSON.stringify(this.getBoundingClientRect()) : null
         return html`${repeat(
             rows,
             ({ id }) => id,
@@ -470,8 +492,6 @@ export class Table extends ClassifiedElement {
                                           .value=${values[name]}
                                           .originalValue=${originalValues[name]}
                                           width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
-                                          left-distance-to-viewport=${this.distanceToLeftViewport}
-                                          table-bounding-rect="${tableBoundingRect}"
                                           theme=${this.theme}
                                           type=${this.columnTypes?.[name]}
                                           .plugin=${plugin}
@@ -501,15 +521,60 @@ export class Table extends ClassifiedElement {
         )}`
     }
 
+    private updateVisibleRows(scrollTop: number): void {
+        const _startIndex = Math.max(Math.floor((scrollTop ?? 0) / this.rowHeight) - SCROLL_BUFFER_SIZE, 0)
+        if (this.visibleStartIndex !== _startIndex) {
+            this.visibleStartIndex = _startIndex
+        }
+
+        const possiblyVisibleEndIndex = _startIndex + this.numberOfVisibleRows() + 2 * SCROLL_BUFFER_SIZE // 2x because we need to re-add it to the start index
+        const _endIndex = possiblyVisibleEndIndex < this.rows.length ? possiblyVisibleEndIndex : this.rows.length
+        if (this.visibleEndIndex !== _endIndex) {
+            this.visibleEndIndex = _endIndex
+        }
+
+        this.existingVisibleRows = this.rows.filter(({ isNew }) => !isNew).slice(_startIndex, _endIndex)
+    }
+
+    private numberOfVisibleRows(): number {
+        return Math.ceil((this.scrollContainer?.clientHeight ?? 0) / this.rowHeight)
+    }
+
+    private onScroll(_event: Event): void {
+        const previous = this.previousScrollPosition ?? 0
+        const current = this.scrollContainer?.scrollTop ?? 0
+
+        if (Math.abs(previous - current) > SCROLL_THRESHOLD * this.rowHeight) {
+            this.previousScrollPosition = current
+            this.updateTableView()
+        }
+    }
+
+    private updateTableView(): void {
+        const scrollTop = this.scrollContainer?.scrollTop
+        if (scrollTop) {
+            this.updateVisibleRows(scrollTop)
+        } else {
+            setTimeout(() => this.updateVisibleRows(0), 0)
+        }
+    }
+
+    @state() private rowHeight: number = 38
+    @state() private visibleEndIndex = 0
+    @state() private visibleStartIndex = 0
+    @state() private existingVisibleRows: Array<RowAsRecord> = []
+    private previousScrollPosition?: number
+
     protected override render() {
         const tableContainerClasses = {
             dark: this.theme == Theme.dark,
-            'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none': true,
+            'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none scroll-container': true,
         }
         const tableClasses = {
             'table table-fixed bg-theme-table dark:bg-theme-table-dark': true,
             'text-theme-text dark:text-theme-text-dark text-sm': true,
             'min-w-full': true,
+            relative: true,
         }
 
         const selectAllCheckbox =
@@ -537,7 +602,7 @@ export class Table extends ClassifiedElement {
                   />`
                 : ''
 
-        return html`<div class=${classMap(tableContainerClasses)}>
+        return html`<div id="scroller" class=${classMap(tableContainerClasses)}>
             <div
                 id="table"
                 class=${classMap(tableClasses)}
@@ -583,7 +648,6 @@ export class Table extends ClassifiedElement {
                                     theme=${this.theme}
                                     value="${this.renamedColumnNames[name] ?? name}"
                                     original-value="${name}"
-                                    left-distance-to-viewport=${this.distanceToLeftViewport}
                                     width="${this.widthForColumnType(name, this.columnWidthOffsets[name])}px"
                                     ?separate-cells=${true}
                                     ?outer-border=${this.outerBorder}
@@ -619,8 +683,22 @@ export class Table extends ClassifiedElement {
                 </outerbase-thead>
 
                 <outerbase-rowgroup>
+                    <div
+                        style=${styleMap({
+                            height: `${Math.max(this.visibleStartIndex * this.rowHeight, 0)}px`,
+                            'will-change': 'transform, height',
+                        })}
+                    ></div>
+
                     <!-- render a TableRow element for each row of data -->
-                    ${this.renderRows(this.rows.filter(({ isNew }) => isNew))} ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}
+                    ${this.renderRows(this.newRows)} ${this.renderRows(this.existingVisibleRows)}
+
+                    <div
+                        style=${styleMap({
+                            height: `${Math.max((this.rows.length - this.visibleEndIndex) * this.rowHeight, 0)}px`,
+                            'will-change': 'transform, height',
+                        })}
+                    ></div>
                 </outerbase-rowgroup>
             </div>
         </div>`
