@@ -4,6 +4,7 @@ import { property } from 'lit/decorators/property.js'
 import { state } from 'lit/decorators/state.js'
 import { classMap } from 'lit/directives/class-map.js'
 import { createRef, ref, type Ref } from 'lit/directives/ref.js'
+import { styleMap } from 'lit/directives/style-map.js'
 import throttle from 'lodash-es/throttle'
 import { Theme } from '../../types'
 import { ClassifiedElement } from '../classified-element'
@@ -13,66 +14,15 @@ export class ScrollableElement extends ClassifiedElement {
     static override styles = [
         ...ClassifiedElement.styles,
         css`
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            ::-webkit-scrollbar {
+                display: none; /* for Chrome, Safari, and Opera */
+            }
+
+            /* Hide scrollbar for IE, Edge, and Firefox */
             :host {
-                --z-scroll-bar: 3;
-                --scroll-bar-background-color: var(--color-neutral-200);
-                --scroll-bar-background-color-dark: var(--color-neutral-900);
-                --scroll-bar-inactive-color: var(--color-neutral-300);
-                --scroll-bar-inactive-color-dark: var(--color-neutral-800);
-                --scroll-bar-active-color: var(--color-neutral-400);
-                --scroll-bar-active-color-dark: var(--color-neutral-700);
-            }
-
-            #outer-container:hover #scrollbar-bottom {
-                opacity: 1;
-            }
-
-            #scrollbar-bottom {
-                opacity: 0;
-                position: absolute;
-                bottom: 0;
-                left: 0;
-                width: 100%;
-                height: 10px;
-                background-color: var(--scroll-bar-background-color);
-                z-index: var(--z-scroll-bar);
-                transition: opacity 0.3s;
-                border-radius: 6px;
-            }
-
-            .dark ~ #scrollbar-bottom {
-                background-color: var(--scroll-bar-background-color-dark);
-            }
-
-            #scrollbar-bottom-thumb {
-                position: absolute;
-                left: 0;
-                width: 50px;
-                height: 10px;
-                background-color: var(--scroll-bar-inactive-color);
-                border-radius: 6px;
-                cursor: pointer;
-            }
-
-            .dark ~ #scrollbar-bottom > #scrollbar-bottom-thumb {
-                background-color: var(--scroll-bar-inactive-color-dark);
-            }
-
-            #scrollbar-bottom-thumb:hover {
-                background-color: var(--scroll-bar-active-color);
-            }
-
-            .dark ~ #scrollbar-bottom > #scrollbar-bottom-thumb:hover {
-                background-color: var(--scroll-bar-active-color-dark) !important;
-            }
-
-            .scrollbar-active {
-                opacity: 1;
-                background-color: var(--scroll-bar-active-color) !important;
-            }
-
-            .dark ~ #scrollbar-bottom > .scrollbar-active {
-                background-color: var(--scroll-bar-active-color-dark) !important;
+                -ms-overflow-style: none; /* for Internet Explorer and Edge */
+                scrollbar-width: none; /* for Firefox */
             }
         `,
     ]
@@ -87,11 +37,13 @@ export class ScrollableElement extends ClassifiedElement {
     public threshold = 0
 
     @property() public scroller: Ref<HTMLDivElement> = createRef()
-    @property() public bottom: Ref<HTMLDivElement> = createRef()
+    @property() public rightScrollZone: Ref<HTMLDivElement> = createRef()
+    @property() public rightScrollHandle: Ref<HTMLDivElement> = createRef()
+    @property() public bottomScrollZone: Ref<HTMLDivElement> = createRef()
+    @property() public bottomScrollHandle: Ref<HTMLDivElement> = createRef()
 
     @state() protected isDragging = false
 
-    protected bottomHandle: Ref<HTMLDivElement> = createRef()
     protected startX = 0
     protected scrollStartX = 0
     protected previousScrollPosition?: number
@@ -99,6 +51,7 @@ export class ScrollableElement extends ClassifiedElement {
     constructor() {
         super()
         this._onScroll = this._onScroll ? throttle(this._onScroll, 100).bind(this) : this._onScroll.bind(this)
+        this.onScrollHandles = this.onScrollHandles.bind(this)
         this.updateScrollbarDimensions = this.updateScrollbarDimensions.bind(this)
     }
 
@@ -108,7 +61,7 @@ export class ScrollableElement extends ClassifiedElement {
         window.addEventListener('resize', this.updateScrollbarDimensions)
 
         setTimeout(() => {
-            this.bottomHandle.value?.addEventListener('mousedown', (e) => {
+            this.bottomScrollHandle.value?.addEventListener('mousedown', (e) => {
                 console.debug('mousedown')
 
                 this.isDragging = true
@@ -116,11 +69,11 @@ export class ScrollableElement extends ClassifiedElement {
                 this.scrollStartX = this.scroller.value?.scrollLeft ?? 0 // Starting scroll position
                 document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
 
-                this.bottomHandle.value?.classList.add('scrollbar-active') // Optional: Show scrollbar thumb as active
+                this.bottomScrollHandle.value?.classList.add('scrollbar-active') // Optional: Show scrollbar thumb as active
 
                 e.preventDefault() // Prevent text selection/dragging behavior
 
-                const mouseMover = (e: MouseEvent) => {
+                const onMouseMove = (e: MouseEvent) => {
                     console.debug('mousemove')
 
                     if (!this.isDragging) return
@@ -130,20 +83,25 @@ export class ScrollableElement extends ClassifiedElement {
                     if (this.scroller.value) this.scroller.value.scrollLeft = scrollX
                 }
 
-                const mouseUp = (e: MouseEvent) => {
+                const onMouseUp = (e: MouseEvent) => {
                     console.debug('mouseup')
 
-                    document.removeEventListener('mousemove', mouseMover)
-                    document.removeEventListener('mouseup', mouseUp)
+                    document.removeEventListener('mousemove', onMouseMove)
+                    document.removeEventListener('mouseup', onMouseUp)
 
                     this.isDragging = false
                     document.body.classList.remove('user-select-none') // Re-enable text selection after dragging
-                    this.bottomHandle.value?.classList.remove('scrollbar-active') // Optional: Show scrollbar thumb as active
+                    this.bottomScrollHandle.value?.classList.remove('scrollbar-active') // Optional: Show scrollbar thumb as active
                 }
 
-                document.addEventListener('mouseup', mouseUp)
-                document.addEventListener('mousemove', mouseMover)
+                document.addEventListener('mouseup', onMouseUp)
+                document.addEventListener('mousemove', onMouseMove)
             })
+        }, 0)
+
+        // attach scroller handles
+        setTimeout(() => {
+            this.scroller.value?.addEventListener('scroll', this.onScrollHandles)
         }, 0)
     }
 
@@ -152,15 +110,34 @@ export class ScrollableElement extends ClassifiedElement {
 
         // remove event listeners
         window.removeEventListener('resize', this.updateScrollbarDimensions)
+        this.scroller.value?.removeEventListener('scroll', this.onScrollHandles)
     }
 
-    // trigger `onScroll` when scrolling distance >= threshold
-    // for the sake of optimizing performance
+    // maintains the appearance of our scrollers (horizontal + vertical)
+    private onScrollHandles(_event: Event) {
+        const scrollTop = this.scroller.value?.scrollTop ?? 0
+        const scrollLeft = this.scroller.value?.scrollLeft ?? 0
+        const scrollHeight = this.scroller.value?.scrollHeight ?? 0
+        const scrollWidth = this.scroller.value?.scrollWidth ?? 0
+        const verticalScrollProgress = scrollTop / scrollHeight
+        const horizontalScrollProgress = scrollLeft / scrollWidth
+        const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
+        const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
+        const verticalScrollHandleHeight = (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient
+
+        this.verticalScrollSize = `${verticalScrollHandleHeight}px`
+        this.verticalScrollPosition = `${verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0)}px`
+
+        const horizontalScrollHandleWidth = (this.scroller.value?.clientWidth ?? 0) * scrollWidthCoEfficient
+        this.horizontalScrollSize = `${horizontalScrollHandleWidth}px`
+        this.horizontalScrollPosition = `${horizontalScrollProgress * (this.scroller.value?.clientHeight ?? 0)}px`
+    }
+
+    // trigger `onScroll` when scrolling distance >= threshold (for the sake of optimizing performance)
     private _onScroll(_event: Event) {
         const previous = this.previousScrollPosition ?? 0
         const current = this.scroller.value?.scrollTop ?? 0
         const difference = Math.abs(previous - current)
-
         if (difference > this.threshold) {
             this.previousScrollPosition = current
             if (typeof this.onScroll === 'function') {
@@ -171,28 +148,48 @@ export class ScrollableElement extends ClassifiedElement {
 
     updateScrollbarDimensions() {
         if (!this.scroller.value) return
-        if (this.bottom.value) {
-            this.bottom.value.style.left = `${this.bottomHandle.value?.offsetLeft}px` // Set scrollbar position to match the code container
-            this.bottom.value.style.width = `${this.bottomHandle.value?.offsetWidth}px` // Set scrollbar width to match the code container
-        }
 
-        const containerWidth = this.bottomHandle.value?.offsetWidth ?? 0 // Visible width
-        const scrollWidth = this.bottomHandle.value?.scrollWidth ?? 0 // Total scrollable content width
+        const containerWidth = this.bottomScrollHandle.value?.offsetWidth ?? 0 // Visible width
+        const scrollWidth = this.bottomScrollHandle.value?.scrollWidth ?? 0 // Total scrollable content width
         const scrollbarWidth = (containerWidth / scrollWidth) * 100 // Percentage of visible width to total width
-        if (this.bottomHandle.value) this.bottomHandle.value.style.width = `${scrollbarWidth}%` // Set thumb width as a percentage of its parent
+
+        if (this.bottomScrollHandle.value) this.bottomScrollHandle.value.style.width = `${scrollbarWidth}%` // Set thumb width as a percentage of its parent
     }
+
+    @state() verticalScrollPosition? = '0px'
+    @state() horizontalScrollPosition? = '0px'
+    @state() verticalScrollSize? = '0px'
+    @state() horizontalScrollSize? = '0px'
 
     protected override render() {
         const scrollableClasses = {
             dark: this.theme == Theme.dark,
-            'h-full absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none': true,
+            'absolute bottom-3 left-0 right-3 top-0 overflow-auto overscroll-none': true,
         }
 
-        return html`<div class=${classMap(scrollableClasses)} @scroll=${this._onScroll} @scrollend=${this._onScroll} ${ref(this.scroller)}>
-            <slot></slot>
-            <div id="scrollbar-bottom" ${ref(this.bottom)}>
-                <div id="scrollbar-bottom-thumb" ${ref(this.bottomHandle)}></div>
+        const handleClasses = {
+            'w-full rounded-md': true,
+            'bg-neutral-950/20 dark:bg-neutral-50/20': true,
+        }
+
+        const verticalHandleStyles = { transform: `translateY(${this.verticalScrollPosition})`, height: this.verticalScrollSize }
+        const horizontalHandleStyles = { transform: `translateX(${this.horizontalScrollPosition})`, width: this.horizontalScrollSize }
+
+        return html`<!-- aloha bruddah -->
+            <div class="bg-neutral-50 dark:bg-neutral-900 w-3 absolute right-0 bottom-0 top-0 z-50" ${ref(this.rightScrollZone)}>
+                <div style=${styleMap(verticalHandleStyles)} class="${classMap(handleClasses)}" ${ref(this.rightScrollHandle)}></div>
             </div>
-        </div>`
+
+            <div class="bg-neutral-50 dark:bg-neutral-900 absolute bottom-0 right-0 left-0 z-50" ${ref(this.bottomScrollZone)}>
+                <div
+                    style=${styleMap(horizontalHandleStyles)}
+                    class="${classMap({ ...handleClasses, 'h-3': true })}"
+                    ${ref(this.bottomScrollHandle)}
+                ></div>
+            </div>
+
+            <div class=${classMap(scrollableClasses)} @scroll=${this._onScroll} @scrollend=${this._onScroll} ${ref(this.scroller)}>
+                <slot></slot>
+            </div>`
     }
 }
