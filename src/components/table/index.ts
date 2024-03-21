@@ -510,7 +510,6 @@ export class Table extends ClassifiedElement {
         if (this.visibleStartIndex !== _startIndex) {
             this.visibleStartIndex = _startIndex
         }
-
         const possiblyVisibleEndIndex = _startIndex + this.numberOfVisibleRows() + 2 * bufferSize // 2x because we need to re-add it to the start index
         const _endIndex = possiblyVisibleEndIndex < rows.length ? possiblyVisibleEndIndex : rows.length
         if (this.visibleEndIndex !== _endIndex) {
