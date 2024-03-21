@@ -115,20 +115,23 @@ export class ScrollableElement extends ClassifiedElement {
 
     // maintains the appearance of our scrollers (horizontal + vertical)
     private onScrollHandles(_event: Event) {
+        // vertical
         const scrollTop = this.scroller.value?.scrollTop ?? 0
-        const scrollLeft = this.scroller.value?.scrollLeft ?? 0
         const scrollHeight = this.scroller.value?.scrollHeight ?? 0
-        const scrollWidth = this.scroller.value?.scrollWidth ?? 0
         const verticalScrollProgress = scrollTop / scrollHeight
-        const horizontalScrollProgress = scrollLeft / scrollWidth
         const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
-        const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
-        const verticalScrollHandleHeight = (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient
-
+        const verticalScrollHandleHeight =
+            scrollHeightCoEfficient === 1 ? 0 : (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient // 0 when nothing to scroll
         this.verticalScrollSize = `${verticalScrollHandleHeight}px`
         this.verticalScrollPosition = `${verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0)}px`
 
-        const horizontalScrollHandleWidth = (this.scroller.value?.clientWidth ?? 0) * scrollWidthCoEfficient
+        // horizontal
+        const scrollWidth = this.scroller.value?.scrollWidth ?? 0
+        const scrollLeft = this.scroller.value?.scrollLeft ?? 0
+        const horizontalScrollProgress = scrollLeft / scrollWidth
+        const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
+        const horizontalScrollHandleWidth =
+            scrollWidthCoEfficient === 1 ? 0 : (this.scroller.value?.clientWidth ?? 0) * scrollWidthCoEfficient // 0 when nothing to scroll
         this.horizontalScrollSize = `${horizontalScrollHandleWidth}px`
         this.horizontalScrollPosition = `${horizontalScrollProgress * (this.scroller.value?.clientHeight ?? 0)}px`
     }
@@ -176,11 +179,11 @@ export class ScrollableElement extends ClassifiedElement {
         const horizontalHandleStyles = { transform: `translateX(${this.horizontalScrollPosition})`, width: this.horizontalScrollSize }
 
         return html`<!-- aloha bruddah -->
-            <div class="bg-neutral-50 dark:bg-neutral-900 w-3 absolute right-0 bottom-0 top-0 z-50" ${ref(this.rightScrollZone)}>
+            <div class="w-3 absolute right-0 bottom-0 top-0" ${ref(this.rightScrollZone)}>
                 <div style=${styleMap(verticalHandleStyles)} class="${classMap(handleClasses)}" ${ref(this.rightScrollHandle)}></div>
             </div>
 
-            <div class="bg-neutral-50 dark:bg-neutral-900 absolute bottom-0 right-0 left-0 z-50" ${ref(this.bottomScrollZone)}>
+            <div class="absolute bottom-0 right-0 left-0" ${ref(this.bottomScrollZone)}>
                 <div
                     style=${styleMap(horizontalHandleStyles)}
                     class="${classMap({ ...handleClasses, 'h-3': true })}"
