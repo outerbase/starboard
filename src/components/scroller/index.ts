@@ -59,6 +59,7 @@ export class ScrollableElement extends ClassifiedElement {
 
     connectedCallback(): void {
         super.connectedCallback()
+
         // add event listeners
         window.addEventListener('resize', this.updateScrollbarDimensions)
 
