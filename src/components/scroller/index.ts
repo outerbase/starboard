@@ -196,18 +196,27 @@ export class ScrollableElement extends ClassifiedElement {
 
         const handleClasses = {
             'w-full rounded-md': true,
-            'bg-neutral-950/20 dark:bg-neutral-50/20': true,
+            'bg-neutral-300 dark:bg-neutral-800': true,
+            'hover:bg-neutral-400 dark:hover:bg-neutral-700': true,
+            'active:bg-neutral-400 dark:active:bg-neutral-700': true,
+        }
+
+        const scrollEndClasses = {
+            'absolute right-0 bottom-0': true,
+            'bg-neutral-200 dark:bg-neutral-900': true,
+            'transition-opacity duration-300': true,
+            'opacity-0 hover:opacity-100': true,
         }
 
         const verticalHandleStyles = { transform: `translateY(${this.verticalScrollPosition})`, height: this.verticalScrollSize }
         const horizontalHandleStyles = { transform: `translateX(${this.horizontalScrollPosition})`, width: this.horizontalScrollSize }
 
         return html`<!-- aloha bruddah -->
-            <div class="w-3 absolute right-0 bottom-0 top-0" ${ref(this.rightScrollZone)}>
+            <div class=${classMap({ ...scrollEndClasses, 'top-0 w-3': true })} ${ref(this.rightScrollZone)}>
                 <div style=${styleMap(verticalHandleStyles)} class="${classMap(handleClasses)}" ${ref(this.rightScrollHandle)}></div>
             </div>
 
-            <div class="absolute bottom-0 right-0 left-0" ${ref(this.bottomScrollZone)}>
+            <div class=${classMap({ ...scrollEndClasses, 'left-0': true })} ${ref(this.bottomScrollZone)}>
                 <div
                     style=${styleMap(horizontalHandleStyles)}
                     class="${classMap({ ...handleClasses, 'h-3': true })}"
