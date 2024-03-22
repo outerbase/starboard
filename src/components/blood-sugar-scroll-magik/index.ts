@@ -28,25 +28,30 @@ export class ScrollableElement extends ClassifiedElement {
         `,
     ]
 
-    @property()
-    public onScroll?: () => void
-
-    @property({ attribute: 'threshold', type: Number })
-    public threshold = 0
-
+    @property() public onScroll?: () => void
+    @property({ type: Number }) public threshold = 0
     @property() public scroller: Ref<HTMLDivElement> = createRef()
     @property() public rightScrollZone: Ref<HTMLDivElement> = createRef()
     @property() public rightScrollHandle: Ref<HTMLDivElement> = createRef()
     @property() public bottomScrollZone: Ref<HTMLDivElement> = createRef()
     @property() public bottomScrollHandle: Ref<HTMLDivElement> = createRef()
+    @property() public hasHoveringCursor = false
 
     @state() protected isDragging = false
+    @state() protected verticalScrollPosition = 0
+    @state() protected horizontalScrollPosition = 0
+    @state() protected verticalScrollSize = 0
+    @state() protected horizontalScrollSize = 0
 
-    protected startX = 0
-    protected startY = 0
-    protected scrollStartX = 0
-    protected scrollStartY = 0
+    protected horizontalScrollProgress = 0
+    protected verticalScrollProgress = 0
     protected previousScrollPosition?: number
+
+    private pendingMouseLeave?: number
+    private startX = 0
+    private startY = 0
+    private scrollStartX = 0
+    private scrollStartY = 0
 
     constructor() {
         super()
@@ -54,7 +59,7 @@ export class ScrollableElement extends ClassifiedElement {
         this.onScrollHandles = this.onScrollHandles.bind(this)
     }
 
-    connectedCallback(): void {
+    public override connectedCallback(): void {
         super.connectedCallback()
 
         // set initial scroller values
@@ -123,14 +128,14 @@ export class ScrollableElement extends ClassifiedElement {
         }, 0)
     }
 
-    disconnectedCallback(): void {
+    public override disconnectedCallback(): void {
         super.disconnectedCallback()
 
         // remove event listeners
         this.scroller.value?.removeEventListener('scroll', this.onScrollHandles)
     }
 
-    protected willUpdate(changedProperties: PropertyValueMap<this>): void {
+    public override willUpdate(changedProperties: PropertyValueMap<this>): void {
         super.willUpdate(changedProperties)
 
         if (changedProperties.has('theme')) {
@@ -140,6 +145,20 @@ export class ScrollableElement extends ClassifiedElement {
         if (changedProperties.has('hasHoveringCursor')) {
             // ensure scrollers appear on initial appearance
             if (this.hasHoveringCursor) this.onScrollHandles()
+        }
+    }
+
+    protected onClickVerticalScroller(event: MouseEvent) {
+        if (this.scroller.value) {
+            const clickedAtCoef = (event.clientY - this.getBoundingClientRect().top) / this.scroller.value?.clientHeight
+            this.scroller.value.scrollTop = clickedAtCoef * (this.scroller.value?.scrollHeight ?? 0) - this.verticalScrollSize
+        }
+    }
+
+    protected onClickHorizontalScroller(event: MouseEvent) {
+        if (this.scroller.value) {
+            const clickedAtCoef = (event.clientX - this.getBoundingClientRect().left) / this.scroller.value?.clientWidth
+            this.scroller.value.scrollLeft = clickedAtCoef * (this.scroller.value?.scrollWidth ?? 0) - this.horizontalScrollSize
         }
     }
 
@@ -178,30 +197,6 @@ export class ScrollableElement extends ClassifiedElement {
             }
         }
     }
-
-    private onClickVerticalScroller(event: MouseEvent) {
-        if (this.scroller.value) {
-            const clickedAtCoef = (event.clientY - this.getBoundingClientRect().top) / this.scroller.value?.clientHeight
-            this.scroller.value.scrollTop = clickedAtCoef * (this.scroller.value?.scrollHeight ?? 0) - this.verticalScrollSize
-        }
-    }
-
-    private onClickHorizontalScroller(event: MouseEvent) {
-        if (this.scroller.value) {
-            const clickedAtCoef = (event.clientX - this.getBoundingClientRect().left) / this.scroller.value?.clientWidth
-            this.scroller.value.scrollLeft = clickedAtCoef * (this.scroller.value?.scrollWidth ?? 0) - this.horizontalScrollSize
-        }
-    }
-
-    @state() verticalScrollPosition = 0
-    @state() horizontalScrollPosition = 0
-    @state() verticalScrollSize = 0
-    @state() horizontalScrollSize = 0
-    @state() hasHoveringCursor = false
-
-    protected horizontalScrollProgress = 0
-    protected verticalScrollProgress = 0
-    private pendingMouseLeave?: number
 
     protected override render() {
         const scrollGrabHandleClasses = {
