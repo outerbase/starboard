@@ -221,6 +221,7 @@ export class ScrollableElement extends ClassifiedElement {
 
     protected horizontalScrollProgress = 0
     protected verticalScrollProgress = 0
+    private pendingMouseLeave?: NodeJS.Timeout
 
     protected override render() {
         const scrollableClasses = {
@@ -253,10 +254,12 @@ export class ScrollableElement extends ClassifiedElement {
             <div
                 // class="group"
                 @mouseleave=${() => {
-                    setTimeout(() => (this.hasHoveringCursor = false), 1000)
+                    this.pendingMouseLeave = setTimeout(() => (this.hasHoveringCursor = false), 1000)
                 }}
                 @mouseenter=${() => {
                     this.hasHoveringCursor = true
+                    clearTimeout(this.pendingMouseLeave)
+                    delete this.pendingMouseLeave
                 }}
             >
                 <div
