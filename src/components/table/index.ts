@@ -686,10 +686,6 @@ export class Table extends ClassifiedElement {
                         })}
                     ></div>
                 </outerbase-rowgroup>
-
-                <!-- render a TableRow element for each row of data -->
-                ${this.renderRows(this.rows.filter(({ isNew }) => isNew))}
-                ${this.renderRows(this.rows.filter(({ isNew }) => !isNew))}
             </div>
         </div>`
     }
