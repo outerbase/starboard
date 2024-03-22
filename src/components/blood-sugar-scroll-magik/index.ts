@@ -200,7 +200,7 @@ export class ScrollableElement extends ClassifiedElement {
 
     protected horizontalScrollProgress = 0
     protected verticalScrollProgress = 0
-    private pendingMouseLeave?: NodeJS.Timeout
+    private pendingMouseLeave?: number
 
     protected override render() {
         const scrollGrabHandleClasses = {
@@ -227,7 +227,7 @@ export class ScrollableElement extends ClassifiedElement {
         return html`<!-- this comment exists to force the next line onto the next line -->
             <div
                 @mouseleave=${() => {
-                    this.pendingMouseLeave = setTimeout(() => (this.hasHoveringCursor = false), 1000)
+                    this.pendingMouseLeave = setTimeout(() => (this.hasHoveringCursor = false), 1000) as unknown as number
                 }}
                 @mouseenter=${() => {
                     this.hasHoveringCursor = true
