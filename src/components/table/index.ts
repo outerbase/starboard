@@ -95,9 +95,6 @@ export class Table extends ClassifiedElement {
     @property({ attribute: 'renamed-columns', type: Object })
     public renamedColumnNames: Record<string, string | undefined> = {}
 
-    @property({ attribute: 'theme', type: String })
-    public theme = Theme.light
-
     @property({ attribute: 'plugin-attributes', type: String })
     public pluginAttributes: String = ''
 
@@ -582,7 +579,12 @@ export class Table extends ClassifiedElement {
                 : ''
 
         return html`
-            <outerbase-scrollable threshold=${4 * this.rowHeight} .onScroll=${this.onScroll} ${ref(this.scrollable)}>
+            <outerbase-scrollable
+                threshold=${4 * this.rowHeight}
+                .onScroll=${this.onScroll}
+                ${ref(this.scrollable)}
+                class="${this.theme === Theme.dark ? 'dark' : null}"
+            >
                 <div
                     id="table"
                     class=${classMap(tableClasses)}

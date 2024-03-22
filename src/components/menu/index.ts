@@ -15,7 +15,7 @@ export class Menu extends ClassifiedElement {
             relative: true,
             'flex items-center justify-between gap-2': !this.withoutPadding,
             'font-medium select-none whitespace-nowrap': true,
-            dark: this.theme == Theme.dark,
+            ...super.classMap,
         }
     }
 
@@ -31,9 +31,6 @@ export class Menu extends ClassifiedElement {
 
     @state()
     protected activeOptions: HeaderMenuOptions = []
-
-    @property({ attribute: 'theme', type: String })
-    public theme = Theme.light
 
     @property({ attribute: 'without-padding', type: Boolean })
     public withoutPadding = false

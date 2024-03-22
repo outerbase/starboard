@@ -3,7 +3,7 @@ import { property, state } from 'lit/decorators.js'
 import { isEqual } from 'lodash-es'
 
 import { CellUpdateEvent } from '../lib/events.js'
-import { Theme, type Position, type Serializable } from '../types.js'
+import { type Position, type Serializable } from '../types.js'
 import { ClassifiedElement } from './classified-element.js'
 
 export const NUMBER_TYPES = [
@@ -26,9 +26,8 @@ export const JSON_TYPES = ['JSON', 'JSONB', 'ARRAY'].map((s) => s.toLowerCase())
 export class MutableElement extends ClassifiedElement {
     protected override get classMap() {
         return {
-            ...super.classMap,
             'cursor-pointer': this.isInteractive && !this.readonly,
-            dark: this.theme == Theme.dark,
+            ...super.classMap,
         }
     }
 
@@ -82,9 +81,6 @@ export class MutableElement extends ClassifiedElement {
 
     @property({ attribute: 'outer-border', type: Boolean })
     public outerBorder = false
-
-    @property({ attribute: 'theme', type: Number })
-    public theme = Theme.light
 
     // allows, for example, <outerbase-td separate-cells="true" />
     @property({ type: Boolean, attribute: 'separate-cells' })

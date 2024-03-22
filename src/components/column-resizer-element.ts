@@ -1,6 +1,5 @@
 import { html, type PropertyValueMap } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
-
 import { classMap } from 'lit/directives/class-map.js'
 import { ResizeEndEvent, ResizeEvent, ResizeStartEvent } from '../lib/events.js'
 import { Theme } from '../types.js'
@@ -17,9 +16,6 @@ export class ColumnResizer extends ClassifiedElement {
     // the docs explicitly say it won't be observed, but it has been tested to definitely work on the initial render
     @property({ type: Object })
     public column?: TH
-
-    @property({ attribute: 'theme', type: Number })
-    public theme = Theme.light
 
     private xPosition?: number
     private width?: number

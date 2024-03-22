@@ -24,6 +24,8 @@ export class TableRow extends ClassifiedElement {
             // when selected
             'bg-theme-row-selected dark:bg-theme-row-selected-dark hover:bg-theme-row-selected-hover dark:hover:bg-theme-row-selected-hover-dark':
                 this.selected && !this.isHeaderRow,
+
+            ...super.classMap,
         }
     }
 

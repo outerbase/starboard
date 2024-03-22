@@ -11,13 +11,6 @@ import { ClassifiedElement } from '../classified-element'
 
 @customElement('outerbase-scrollable')
 export class ScrollableElement extends ClassifiedElement {
-    protected override get classMap() {
-        return {
-            ...super.classMap,
-            dark: this.theme == Theme.dark,
-        }
-    }
-
     static override styles = [
         ...ClassifiedElement.styles,
         css`
@@ -33,9 +26,6 @@ export class ScrollableElement extends ClassifiedElement {
             }
         `,
     ]
-
-    @property({ attribute: 'theme', type: String })
-    public theme = Theme.light
 
     @property()
     public onScroll?: () => void

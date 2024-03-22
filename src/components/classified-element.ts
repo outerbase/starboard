@@ -5,6 +5,7 @@ import { property } from 'lit/decorators.js'
 
 import { TWStyles } from '../../tailwind/index.js'
 import classMapToClassName from '../lib/class-map-to-class-name.js'
+import { Theme } from '../types.js'
 
 // is propogated to the DOM and therefore it's CSS is applied
 export class ClassifiedElement extends LitElement {
@@ -14,8 +15,13 @@ export class ClassifiedElement extends LitElement {
     // such that only the truthy values are rendered out and the rest are dropped
     // if a property used in such a boolean expression changes, this value is recomputed
     protected get classMap() {
-        return {}
+        return {
+            dark: this.theme === Theme.dark,
+        }
     }
+
+    @property({ attribute: 'theme', type: String })
+    public theme = Theme.light
 
     @property({ reflect: true, attribute: 'class', type: String })
     protected _class = ''
