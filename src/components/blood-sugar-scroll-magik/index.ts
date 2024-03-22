@@ -222,7 +222,7 @@ export class ScrollableElement extends ClassifiedElement {
             'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none': true,
         }
 
-        return html`<!-- aloha bruddah -->
+        return html`<!-- this comment exists to force the next line onto the next line -->
             <div
                 @mouseleave=${() => {
                     this.pendingMouseLeave = setTimeout(() => (this.hasHoveringCursor = false), 1000)
