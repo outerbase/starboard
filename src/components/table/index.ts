@@ -104,7 +104,7 @@ export class Table extends ClassifiedElement {
     @property({ attribute: 'addable-columns', type: Boolean })
     public addableColumns = false
 
-    @state() protected scrollable: Ref<ScrollableElement> = createRef()
+    @state() protected bssm: Ref<ScrollableElement> = createRef()
     @state() protected rows: Array<RowAsRecord> = []
     @state() protected newRows: Array<RowAsRecord> = []
     @state() protected existingVisibleRows: Array<RowAsRecord> = []
@@ -423,7 +423,7 @@ export class Table extends ClassifiedElement {
     }
 
     protected updateTableView(): void {
-        const scrollTop = this.scrollable.value?.scroller.value?.scrollTop ?? 0
+        const scrollTop = this.bssm.value?.scroller.value?.scrollTop ?? 0
         if (scrollTop) {
             this.updateVisibleRows(scrollTop)
         } else {
@@ -454,7 +454,7 @@ export class Table extends ClassifiedElement {
     }
 
     public numberOfVisibleRows(): number {
-        return Math.ceil((this.scrollable.value?.scroller.value?.clientHeight ?? 0) / this.rowHeight)
+        return Math.ceil((this.bssm.value?.scroller.value?.clientHeight ?? 0) / this.rowHeight)
     }
 
     public override firstUpdated(_changedProperties: PropertyValueMap<this>): void {
@@ -476,10 +476,10 @@ export class Table extends ClassifiedElement {
         elem.isInteractive = true
 
         // Temporarily add to the DOM to measure
-        this.scrollable.value?.appendChild(elem)
+        this.bssm.value?.appendChild(elem)
         setTimeout(() => {
             const offsetHeight = elem.offsetHeight
-            this.scrollable.value?.removeChild(elem)
+            this.bssm.value?.removeChild(elem)
             if (this.rowHeight !== offsetHeight) {
                 this.rowHeight = offsetHeight
             }
@@ -559,11 +559,10 @@ export class Table extends ClassifiedElement {
                 : ''
 
         return html`
-            <blood-sugar-scroll-magik
+            <blood-sugar-scroll-magik ${ref(this.bssm)}
                 threshold=${4 * this.rowHeight}
+                theme=${this.theme}
                 .onScroll=${this.updateTableView}
-                ${ref(this.scrollable)}
-                theme="${this.theme}"
             >
                 <div
                     id="table"
