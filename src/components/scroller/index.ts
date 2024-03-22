@@ -51,14 +51,10 @@ export class ScrollableElement extends ClassifiedElement {
         super()
         this._onScroll = this._onScroll ? throttle(this._onScroll, 100).bind(this) : this._onScroll.bind(this)
         this.onScrollHandles = this.onScrollHandles.bind(this)
-        this.updateScrollbarDimensions = this.updateScrollbarDimensions.bind(this)
     }
 
     connectedCallback(): void {
         super.connectedCallback()
-
-        // add event listeners
-        window.addEventListener('resize', this.updateScrollbarDimensions)
 
         // set initial scroller values
         setTimeout(this.onScrollHandles, 0)
@@ -132,7 +128,6 @@ export class ScrollableElement extends ClassifiedElement {
         super.disconnectedCallback()
 
         // remove event listeners
-        window.removeEventListener('resize', this.updateScrollbarDimensions)
         this.scroller.value?.removeEventListener('scroll', this.onScrollHandles)
     }
 
@@ -191,16 +186,6 @@ export class ScrollableElement extends ClassifiedElement {
             const clickedAtCoef = (event.clientX - this.getBoundingClientRect().left) / this.scroller.value?.clientWidth
             this.scroller.value.scrollLeft = clickedAtCoef * (this.scroller.value?.scrollWidth ?? 0) - this.horizontalScrollSize
         }
-    }
-
-    updateScrollbarDimensions() {
-        if (!this.scroller.value) return
-
-        const containerWidth = this.bottomScrollHandle.value?.offsetWidth ?? 0 // Visible width
-        const scrollWidth = this.bottomScrollHandle.value?.scrollWidth ?? 0 // Total scrollable content width
-        const scrollbarWidth = (containerWidth / scrollWidth) * 100 // Percentage of visible width to total width
-
-        if (this.bottomScrollHandle.value) this.bottomScrollHandle.value.style.width = `${scrollbarWidth}%` // Set thumb width as a percentage of its parent
     }
 
     @state() verticalScrollPosition = 0
