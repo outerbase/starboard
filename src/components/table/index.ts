@@ -44,6 +44,9 @@ import './th.js'
 import './thead.js'
 import './tr.js'
 
+const IS_SAFARI = typeof navigator !== 'undefined' && navigator.userAgent.includes('Safari')
+const SCROLL_BUFFER_SIZE = IS_SAFARI ? 10 : 2
+
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
     // STATE
@@ -427,13 +430,12 @@ export class Table extends ClassifiedElement {
     }
 
     public updateVisibleRows(scrollTop: number): void {
-        const bufferSize = 6
         const rows = this.rows.filter(({ isNew }) => !isNew)
-        const _startIndex = Math.max(Math.floor((scrollTop ?? 0) / this.rowHeight) - bufferSize, 0)
+        const _startIndex = Math.max(Math.floor((scrollTop ?? 0) / this.rowHeight) - SCROLL_BUFFER_SIZE, 0)
         if (this.visibleStartIndex !== _startIndex) {
             this.visibleStartIndex = _startIndex
         }
-        const possiblyVisibleEndIndex = _startIndex + this.numberOfVisibleRows() + 2 * bufferSize // 2x because we need to re-add it to the start index
+        const possiblyVisibleEndIndex = _startIndex + this.numberOfVisibleRows() + 2 * SCROLL_BUFFER_SIZE // 2x because we need to re-add it to the start index
         const _endIndex = possiblyVisibleEndIndex < rows.length ? possiblyVisibleEndIndex : rows.length
         if (this.visibleEndIndex !== _endIndex) {
             this.visibleEndIndex = _endIndex
@@ -449,7 +451,8 @@ export class Table extends ClassifiedElement {
     }
 
     public numberOfVisibleRows(): number {
-        return Math.ceil((this.bssm.value?.scroller.value?.clientHeight ?? 0) / this.rowHeight)
+        // +1 because we can see a row transparently through the table header -- without this (and buffer=0) you'd see missing row as new reveals
+        return Math.ceil((this.bssm.value?.scroller.value?.clientHeight ?? 0) / this.rowHeight) + 1
     }
 
     public override firstUpdated(_changedProperties: PropertyValueMap<this>): void {
@@ -560,7 +563,7 @@ export class Table extends ClassifiedElement {
 
         return html`
             <blood-sugar-scroll-magik ${ref(this.bssm)}
-                threshold=${4 * this.rowHeight}
+                threshold=${SCROLL_BUFFER_SIZE * this.rowHeight}
                 theme=${this.theme}
                 .onScroll=${this.updateTableView}
             >
