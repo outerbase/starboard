@@ -10,12 +10,12 @@ import { Theme, type HeaderMenuOptions } from '../../types.js'
 import { ClassifiedElement } from '../classified-element.js'
 
 export class Menu extends ClassifiedElement {
-    protected override get classMap() {
+    protected override classMap() {
         return {
             relative: true,
             'flex items-center justify-between gap-2': !this.withoutPadding,
             'font-medium select-none whitespace-nowrap': true,
-            ...super.classMap,
+            ...super.classMap(),
         }
     }
 

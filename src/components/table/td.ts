@@ -23,9 +23,9 @@ const isAlphanumericOrSpecial = (key: string): boolean => {
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
 export class TableData extends MutableElement {
-    protected override get classMap() {
+    protected override classMap() {
         return {
-            ...super.classMap,
+            ...super.classMap(),
             'table-cell relative focus:z-[1]': true,
             'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
             'px-5': this.blank,

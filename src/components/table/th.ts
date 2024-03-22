@@ -25,9 +25,9 @@ import { MutableElement } from '../mutable-element.js'
 // tl;dr <th/>, table-cell
 @customElement('outerbase-th')
 export class TH extends MutableElement {
-    protected override get classMap() {
+    protected override classMap() {
         return {
-            ...super.classMap,
+            ...super.classMap(),
             'table-cell relative whitespace-nowrap h-[38px]': true, // h-[38px] was added to preserve the height when toggling to <input />
             'cursor-pointer': true,
             'border-b border-theme-border dark:border-theme-border-dark': true,

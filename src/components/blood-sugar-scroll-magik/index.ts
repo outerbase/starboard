@@ -130,6 +130,12 @@ export class ScrollableElement extends ClassifiedElement {
     }
 
     protected willUpdate(changedProperties: PropertyValueMap<this>): void {
+        super.willUpdate(changedProperties)
+
+        if (changedProperties.has('theme')) {
+            this.requestUpdate('class')
+        }
+
         if (changedProperties.has('hasHoveringCursor')) {
             // ensure scrollers appear on initial appearance
             if (this.hasHoveringCursor) this.onScrollHandles()
@@ -203,22 +209,18 @@ export class ScrollableElement extends ClassifiedElement {
             'hover:bg-neutral-300 dark:hover:bg-neutral-700': true,
             'active:bg-neutral-300 dark:active:bg-neutral-700': true,
         }
-
         const scrollTrackGutterClasses = {
             'z-50 absolute right-0 bottom-0 m-0.5': true,
             'transition-opacity duration-300': true,
             'opacity-0': !this.hasHoveringCursor,
             'opacity-100': this.hasHoveringCursor,
         }
-
         const verticalHandleStyles = { transform: `translateY(${this.verticalScrollPosition}px)`, height: `${this.verticalScrollSize}px` }
         const horizontalHandleStyles = {
             transform: `translateX(${this.horizontalScrollPosition}px)`,
             width: `${this.horizontalScrollSize}px`,
         }
-
         const scrollableClasses = {
-            dark: this.theme == Theme.dark,
             'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none': true,
         }
 
@@ -232,6 +234,7 @@ export class ScrollableElement extends ClassifiedElement {
                     clearTimeout(this.pendingMouseLeave)
                     delete this.pendingMouseLeave
                 }}
+                class="${classMap({ dark: this.theme == Theme.dark })}"
             >
                 <div
                     class=${classMap({ ...scrollTrackGutterClasses, 'top-0 w-1.5': true })}

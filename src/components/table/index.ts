@@ -396,7 +396,7 @@ export class Table extends ClassifiedElement {
     private setCssVariablesForPlugin(theme: Theme) {
         if (typeof document === 'undefined') return
 
-        if (theme === Theme.dark) {
+        if (theme == Theme.dark) {
             document.documentElement.style.setProperty('--ob-background-color', '#0A0A0A')
             document.documentElement.style.setProperty('--ob-text-color', '#D4D4D4')
             document.documentElement.style.setProperty('--ob-border-color', '#262626')
@@ -583,7 +583,8 @@ export class Table extends ClassifiedElement {
                 threshold=${4 * this.rowHeight}
                 .onScroll=${this.onScroll}
                 ${ref(this.scrollable)}
-                class="${this.theme === Theme.dark ? 'dark' : null}"
+                theme="${this.theme}"
+                class="dark"
             >
                 <div
                     id="table"

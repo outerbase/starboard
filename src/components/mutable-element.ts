@@ -24,10 +24,10 @@ export const NUMBER_TYPES = [
 export const BOOLEAN_TYPES = ['Boolean', 'Bit'].map((s) => s.toLowerCase())
 export const JSON_TYPES = ['JSON', 'JSONB', 'ARRAY'].map((s) => s.toLowerCase())
 export class MutableElement extends ClassifiedElement {
-    protected override get classMap() {
+    protected override classMap() {
         return {
             'cursor-pointer': this.isInteractive && !this.readonly,
-            ...super.classMap,
+            ...super.classMap(),
         }
     }
 

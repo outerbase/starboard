@@ -11,13 +11,13 @@ import '../menu/input-menu.js'
 
 @customElement('outerbase-add-column')
 export class AddColumnElement extends ClassifiedElement {
-    protected get classMap() {
+    protected classMap() {
         return {
             'inline-block p-3.5 w-40': true,
             'text-xs': true,
             'bg-neutral-50 dark:bg-neutral-950 text-neutral-950 dark:text-neutral-50': true,
             'rounded-lg border border-neutral-400 dark:border-neutral-600': true,
-            ...super.classMap,
+            ...super.classMap(),
         }
     }
 
@@ -116,12 +116,12 @@ export class AddColumnElement extends ClassifiedElement {
 
 @customElement('outerbase-add-column-trigger')
 export class AddColumnTriggerElement extends ClassifiedElement {
-    protected get classMap() {
+    protected classMap() {
         return {
             'p-0.5 rounded-md cursor-pointer': true,
             'dark:bg-neutral-950 hover:bg-neutral-100 dark:hover:bg-neutral-900': true,
             'border border-transparent active:border-neutral-200 dark:active:border-neutral-800': true,
-            ...super.classMap,
+            ...super.classMap(),
         }
     }
 

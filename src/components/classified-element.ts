@@ -14,9 +14,9 @@ export class ClassifiedElement extends LitElement {
     // classMap is a pairing of class(es) (a string) with a boolean expression
     // such that only the truthy values are rendered out and the rest are dropped
     // if a property used in such a boolean expression changes, this value is recomputed
-    protected get classMap() {
+    protected classMap() {
         return {
-            dark: this.theme === Theme.dark,
+            dark: this.theme == Theme.dark,
         }
     }
 
@@ -30,7 +30,7 @@ export class ClassifiedElement extends LitElement {
         super.willUpdate(_changedProperties)
 
         // ensure `_class` reflects our latest state
-        this._class = classMapToClassName(this.classMap)
+        this._class = classMapToClassName(this.classMap())
         this._class // no-op line suppress the "hint" warning us that this is unused :eyeroll:
     }
 
