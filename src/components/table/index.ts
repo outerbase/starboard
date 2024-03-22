@@ -285,11 +285,6 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    public override disconnectedCallback() {
-        super.disconnectedCallback()
-        document.removeEventListener('keydown', this.onKeyDown)
-    }
-
     /////
     // dynamically adjust the table's width when columns are being resized
     // this variable is utilized while updating widths on('mousemove')
@@ -523,6 +518,11 @@ export class Table extends ClassifiedElement {
             this.newRows = this.rows.filter(({ isNew }) => isNew)
             this.updateTableView()
         }
+    }
+
+    public override disconnectedCallback() {
+        super.disconnectedCallback()
+        document.removeEventListener('keydown', this.onKeyDown)
     }
 
     public override render() {
