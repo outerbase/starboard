@@ -5,7 +5,7 @@ import { state } from 'lit/decorators/state.js'
 import { classMap } from 'lit/directives/class-map.js'
 import { createRef, ref, type Ref } from 'lit/directives/ref.js'
 import { styleMap } from 'lit/directives/style-map.js'
-import throttle from 'lodash-es/throttle.js'
+import debounce from 'lodash-es/debounce.js'
 
 import { Theme } from '../../types.js'
 import { ClassifiedElement } from '../classified-element.js'
@@ -55,7 +55,7 @@ export class ScrollableElement extends ClassifiedElement {
 
     constructor() {
         super()
-        this._onScroll = this._onScroll ? throttle(this._onScroll, 100).bind(this) : this._onScroll.bind(this)
+        this._onScroll = this._onScroll ? debounce(this._onScroll, 10).bind(this) : this._onScroll.bind(this)
         this.updateScrollerSizeAndPosition = this.updateScrollerSizeAndPosition.bind(this)
     }
 
