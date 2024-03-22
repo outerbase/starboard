@@ -245,7 +245,7 @@ export class TableData extends MutableElement {
             return this.copyValueToClipboard()
         }
 
-        if (code === 'Backspace' || code === 'Delete') {
+        if (!this.readonly && (code === 'Backspace' || code === 'Delete')) {
             event.preventDefault()
             this.value = undefined
             return
