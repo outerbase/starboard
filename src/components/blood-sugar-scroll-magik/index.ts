@@ -9,7 +9,7 @@ import throttle from 'lodash-es/throttle'
 import { Theme } from '../../types'
 import { ClassifiedElement } from '../classified-element'
 
-@customElement('outerbase-scrollable')
+@customElement('blood-sugar-scroll-magik')
 export class ScrollableElement extends ClassifiedElement {
     static override styles = [
         ...ClassifiedElement.styles,

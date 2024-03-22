@@ -33,9 +33,9 @@ import { ClassifiedElement } from '../classified-element.js'
 // import subcomponents
 import { createRef, ref, type Ref } from 'lit/directives/ref.js'
 import { styleMap } from 'lit/directives/style-map.js'
+import '../blood-sugar-scroll-magik/index.js'
+import type { ScrollableElement } from '../blood-sugar-scroll-magik/index.js'
 import '../check-box.js'
-import '../scroller/index.js'
-import type { ScrollableElement } from '../scroller/index.js'
 import '../widgets/add-column.js'
 import './tbody.js'
 import './td.js'
@@ -579,7 +579,7 @@ export class Table extends ClassifiedElement {
                 : ''
 
         return html`
-            <outerbase-scrollable
+            <blood-sugar-scroll-magik
                 threshold=${4 * this.rowHeight}
                 .onScroll=${this.onScroll}
                 ${ref(this.scrollable)}
