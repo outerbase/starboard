@@ -228,7 +228,10 @@ export class ScrollableElement extends ClassifiedElement {
         return html`<!-- this comment exists to force the next line onto the next line -->
             <div
                 @mouseleave=${() => {
-                    this.pendingMouseLeave = setTimeout(() => (this.hasHoveringCursor = false), 1000) as unknown as number
+                    this.pendingMouseLeave = setTimeout(() => {
+                        this.hasHoveringCursor = false
+                        delete this.pendingMouseLeave
+                    }, 1000) as unknown as number
                 }}
                 @mouseenter=${() => {
                     this.hasHoveringCursor = true
