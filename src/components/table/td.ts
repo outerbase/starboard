@@ -19,6 +19,14 @@ const isAlphanumericOrSpecial = (key: string): boolean => {
     // Regular expression to match alphanumeric characters and specified special characters
     return /^[a-zA-Z0-9 \.,]+$/.test(key)
 }
+const RW_OPTIONS = [
+    { label: 'Edit', value: 'edit' },
+    { label: 'Copy', value: 'copy' },
+    { label: 'Paste', value: 'paste' },
+    { label: 'Clear', value: 'clear' },
+]
+
+const R_OPTIONS = [{ label: 'Copy', value: 'copy' }]
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
@@ -76,12 +84,7 @@ export class TableData extends MutableElement {
     public plugin?: ColumnPlugin
 
     @state()
-    protected options = [
-        { label: 'Edit', value: 'edit' },
-        { label: 'Copy', value: 'copy' },
-        { label: 'Paste', value: 'paste' },
-        { label: 'Clear', value: 'clear' },
-    ]
+    protected options = RW_OPTIONS
 
     @state()
     public isDisplayingPluginEditor = false
@@ -145,6 +148,14 @@ export class TableData extends MutableElement {
         if (this.value === null || this.value === undefined) return navigator.clipboard.writeText('')
         else if (typeof this.value === 'object') return navigator.clipboard.writeText(JSON.stringify(this.value))
         else return navigator.clipboard.writeText(this.value.toString())
+    }
+
+    protected onContentEditableKeyDown(event: KeyboardEvent) {
+        // our goal here is to prevent the user from engaging with the `contenteditable` component
+        const didNotOriginateInsidePluginEditor = event.composedPath().every((v) => {
+            return v instanceof HTMLElement && v.id !== 'plugin-editor'
+        })
+        if (didNotOriginateInsidePluginEditor) event.preventDefault()
     }
 
     protected async onKeyDown(event: KeyboardEvent): Promise<void> {
@@ -278,6 +289,11 @@ export class TableData extends MutableElement {
         }
     }
 
+    protected onPaste(event: ClipboardEvent) {
+        event.preventDefault()
+        this.value = event.clipboardData?.getData('text')
+    }
+
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
@@ -320,14 +336,9 @@ export class TableData extends MutableElement {
 
         if (changedProperties.has('readonly')) {
             if (this.readonly) {
-                this.options = [{ label: 'Copy', value: 'copy' }]
+                this.options = R_OPTIONS
             } else {
-                this.options = [
-                    { label: 'Edit', value: 'edit' },
-                    { label: 'Copy', value: 'copy' },
-                    { label: 'Paste', value: 'paste' },
-                    { label: 'Clear', value: 'clear' },
-                ]
+                this.options = RW_OPTIONS
             }
         }
 
@@ -409,17 +420,8 @@ export class TableData extends MutableElement {
                       contenteditable="true"
                       spellcheck="false"
                       autocorrect="off"
-                      @paste=${(event: ClipboardEvent) => {
-                          event.preventDefault()
-                          this.value = event.clipboardData?.getData('text')
-                      }}
-                      @keydown=${(event: KeyboardEvent) => {
-                          // our goal here is to prevent the user from engaging with the `contenteditable` component
-                          const didNotOriginateInsidePluginEditor = event.composedPath().every((v) => {
-                              return v instanceof HTMLElement && v.id !== 'plugin-editor'
-                          })
-                          if (didNotOriginateInsidePluginEditor) event.preventDefault()
-                      }}
+                      @paste=${this.onPaste}
+                      @keydown=${this.onContentEditableKeyDown}
                       ><outerbase-td-menu
                           theme=${this.theme}
                           .options=${menuOptions}
