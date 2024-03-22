@@ -45,7 +45,7 @@ import './thead.js'
 import './tr.js'
 
 const IS_SAFARI = typeof navigator !== 'undefined' && navigator.userAgent.includes('Safari')
-const SCROLL_BUFFER_SIZE = IS_SAFARI ? 10 : 2
+const SCROLL_BUFFER_SIZE = IS_SAFARI ? 20 : 4
 
 @customElement('outerbase-table')
 export class Table extends ClassifiedElement {
@@ -563,7 +563,7 @@ export class Table extends ClassifiedElement {
 
         return html`
             <blood-sugar-scroll-magik ${ref(this.bssm)}
-                threshold=${SCROLL_BUFFER_SIZE * this.rowHeight}
+                threshold=${(SCROLL_BUFFER_SIZE / 2) * this.rowHeight}
                 theme=${this.theme}
                 .onScroll=${this.updateTableView}
             >
