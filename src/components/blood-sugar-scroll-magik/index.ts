@@ -205,7 +205,7 @@ export class ScrollableElement extends ClassifiedElement {
         }
 
         const scrollTrackGutterClasses = {
-            'z-50 absolute right-0 bottom-0': true,
+            'z-50 absolute right-0 bottom-0 m-0.5': true,
             'transition-opacity duration-300': true,
             'opacity-0': !this.hasHoveringCursor,
             'opacity-100': this.hasHoveringCursor,
