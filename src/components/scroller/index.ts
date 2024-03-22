@@ -222,14 +222,13 @@ export class ScrollableElement extends ClassifiedElement {
 
         const handleClasses = {
             'w-full rounded-md': true,
-            'bg-neutral-300 dark:bg-neutral-800': true,
-            'hover:bg-neutral-400 dark:hover:bg-neutral-700': true,
-            'active:bg-neutral-400 dark:active:bg-neutral-700': true,
+            'bg-neutral-200/60 dark:bg-neutral-700/50': true,
+            'hover:bg-neutral-300 dark:hover:bg-neutral-700': true,
+            'active:bg-neutral-300 dark:active:bg-neutral-700': true,
         }
 
         const scrollEndClasses = {
             'z-50 absolute right-0 bottom-0': true,
-            'bg-neutral-200/50 dark:bg-neutral-900/50': true,
             'transition-opacity duration-300': true,
             'opacity-0 group-hover:opacity-100': true,
         }
@@ -243,7 +242,7 @@ export class ScrollableElement extends ClassifiedElement {
         return html`<!-- aloha bruddah -->
             <div class="group">
                 <div
-                    class=${classMap({ ...scrollEndClasses, 'top-0 w-2': true })}
+                    class=${classMap({ ...scrollEndClasses, 'top-0 w-1.5': true })}
                     ${ref(this.rightScrollZone)}
                     @click=${this.onClickVerticalScroller}
                 >
@@ -257,7 +256,7 @@ export class ScrollableElement extends ClassifiedElement {
                 >
                     <div
                         style=${styleMap(horizontalHandleStyles)}
-                        class="${classMap({ ...handleClasses, 'h-2': true })}"
+                        class="${classMap({ ...handleClasses, 'h-1.5': true })}"
                         ${ref(this.bottomScrollHandle)}
                     ></div>
                 </div>
