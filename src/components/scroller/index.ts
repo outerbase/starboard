@@ -1,4 +1,4 @@
-import { css, html } from 'lit'
+import { css, html, type PropertyValueMap } from 'lit'
 import { customElement } from 'lit/decorators/custom-element.js'
 import { property } from 'lit/decorators/property.js'
 import { state } from 'lit/decorators/state.js'
@@ -144,6 +144,13 @@ export class ScrollableElement extends ClassifiedElement {
         // remove event listeners
         window.removeEventListener('resize', this.updateScrollbarDimensions)
         this.scroller.value?.removeEventListener('scroll', this.onScrollHandles)
+    }
+
+    protected willUpdate(changedProperties: PropertyValueMap<this>): void {
+        if (changedProperties.has('hasHoveringCursor')) {
+            // ensure scrollers appear on initial appearance
+            if (this.hasHoveringCursor) this.onScrollHandles()
+        }
     }
 
     // maintains the appearance of our scrollers (horizontal + vertical)
