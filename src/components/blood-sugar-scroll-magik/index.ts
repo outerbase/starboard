@@ -56,14 +56,14 @@ export class ScrollableElement extends ClassifiedElement {
     constructor() {
         super()
         this._onScroll = this._onScroll ? throttle(this._onScroll, 100).bind(this) : this._onScroll.bind(this)
-        this.onScrollHandles = this.onScrollHandles.bind(this)
+        this.updateScrollerSizeAndPosition = this.updateScrollerSizeAndPosition.bind(this)
     }
 
     public override connectedCallback(): void {
         super.connectedCallback()
 
         // set initial scroller values
-        setTimeout(this.onScrollHandles, 0)
+        setTimeout(this.updateScrollerSizeAndPosition, 0)
 
         // attach horizontal scroll handle mouse events
         setTimeout(() => {
@@ -124,7 +124,7 @@ export class ScrollableElement extends ClassifiedElement {
 
         // attach scroller handles
         setTimeout(() => {
-            this.scroller.value?.addEventListener('scroll', this.onScrollHandles)
+            this.scroller.value?.addEventListener('scroll', this.updateScrollerSizeAndPosition)
         }, 0)
     }
 
@@ -132,7 +132,7 @@ export class ScrollableElement extends ClassifiedElement {
         super.disconnectedCallback()
 
         // remove event listeners
-        this.scroller.value?.removeEventListener('scroll', this.onScrollHandles)
+        this.scroller.value?.removeEventListener('scroll', this.updateScrollerSizeAndPosition)
     }
 
     public override willUpdate(changedProperties: PropertyValueMap<this>): void {
@@ -144,7 +144,7 @@ export class ScrollableElement extends ClassifiedElement {
 
         if (changedProperties.has('hasHoveringCursor')) {
             // ensure scrollers appear on initial appearance
-            if (this.hasHoveringCursor) this.onScrollHandles()
+            if (this.hasHoveringCursor) this.updateScrollerSizeAndPosition()
         }
     }
 
@@ -163,24 +163,26 @@ export class ScrollableElement extends ClassifiedElement {
     }
 
     // maintains the appearance of our scrollers (horizontal + vertical)
-    private onScrollHandles(_event?: Event) {
+    private updateScrollerSizeAndPosition(_event?: Event) {
         // vertical
         const scrollTop = this.scroller.value?.scrollTop ?? 0
         const scrollHeight = this.scroller.value?.scrollHeight ?? 0
-        this.verticalScrollProgress = scrollTop / scrollHeight
         const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
         const verticalScrollHandleHeight =
             scrollHeightCoEfficient === 1 ? 0 : (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient // 0 when nothing to scroll
+
+        this.verticalScrollProgress = scrollTop / scrollHeight
         this.verticalScrollSize = verticalScrollHandleHeight
         this.verticalScrollPosition = this.verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0)
 
         // horizontal
         const scrollWidth = this.scroller.value?.scrollWidth ?? 0
         const scrollLeft = this.scroller.value?.scrollLeft ?? 0
-        this.horizontalScrollProgress = scrollLeft / scrollWidth
         const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
         const horizontalScrollHandleWidth =
             scrollWidthCoEfficient === 1 ? 0 : (this.scroller.value?.clientWidth ?? 0) * scrollWidthCoEfficient // 0 when nothing to scroll
+
+        this.horizontalScrollProgress = scrollLeft / scrollWidth
         this.horizontalScrollSize = horizontalScrollHandleWidth
         this.horizontalScrollPosition = this.horizontalScrollProgress * (this.scroller.value?.clientWidth ?? 0)
     }
