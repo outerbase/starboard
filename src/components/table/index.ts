@@ -584,7 +584,6 @@ export class Table extends ClassifiedElement {
                 .onScroll=${this.onScroll}
                 ${ref(this.scrollable)}
                 theme="${this.theme}"
-                class="dark"
             >
                 <div
                     id="table"
