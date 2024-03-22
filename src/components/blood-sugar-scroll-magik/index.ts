@@ -111,6 +111,20 @@ export class ScrollableElement extends ClassifiedElement {
         }
     }
 
+    protected onWheelHorizontalScroller(event: WheelEvent) {
+        event.preventDefault()
+        if (this.scroller.value) {
+            this.scroller.value.scrollLeft += event.deltaX
+        }
+    }
+
+    protected onWheelVerticalScroller(event: WheelEvent) {
+        event.preventDefault()
+        if (this.scroller.value) {
+            this.scroller.value.scrollTop += event.deltaY
+        }
+    }
+
     public override connectedCallback(): void {
         super.connectedCallback()
 
@@ -235,16 +249,17 @@ export class ScrollableElement extends ClassifiedElement {
                     clearTimeout(this.pendingMouseLeave)
                     delete this.pendingMouseLeave
                 }}
-                class="${classMap({ dark: this.theme == Theme.dark })}"
+                class=${classMap({ dark: this.theme == Theme.dark })}
             >
                 <div
                     class=${classMap({ ...scrollTrackGutterClasses, 'top-0 w-1.5': true })}
                     ${ref(this.rightScrollZone)}
                     @click=${this.onClickVerticalScroller}
+                    @wheel=${this.onWheelVerticalScroller}
                 >
                     <div
                         style=${styleMap(verticalHandleStyles)}
-                        class="${classMap(scrollGrabHandleClasses)}"
+                        class=${classMap(scrollGrabHandleClasses)}
                         ${ref(this.rightScrollHandle)}
                     ></div>
                 </div>
@@ -252,11 +267,12 @@ export class ScrollableElement extends ClassifiedElement {
                 <div
                     class=${classMap({ ...scrollTrackGutterClasses, 'left-0': true })}
                     ${ref(this.bottomScrollZone)}
-                    @click="${this.onClickHorizontalScroller}"
+                    @click=${this.onClickHorizontalScroller}
+                    @wheel=${this.onWheelHorizontalScroller}
                 >
                     <div
                         style=${styleMap(horizontalHandleStyles)}
-                        class="${classMap({ ...scrollGrabHandleClasses, 'h-1.5': true })}"
+                        class=${classMap({ ...scrollGrabHandleClasses, 'h-1.5': true })}
                         ${ref(this.bottomScrollHandle)}
                     ></div>
                 </div>
