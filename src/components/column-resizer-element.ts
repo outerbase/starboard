@@ -20,7 +20,7 @@ export class ColumnResizer extends ClassifiedElement {
     private xPosition?: number
     private width?: number
 
-    private _mouseDown(downEvent: MouseEvent) {
+    private onMouseDown(downEvent: MouseEvent) {
         if (!this.column) throw new Error('`column` is unset; aborting')
         const v = this.column.value ?? this.column.originalValue ?? ''
 
@@ -51,15 +51,15 @@ export class ColumnResizer extends ClassifiedElement {
 
     public override connectedCallback() {
         super.connectedCallback()
-        this.addEventListener('mousedown', this._mouseDown)
+        this.addEventListener('mousedown', this.onMouseDown)
     }
 
     public override disconnectedCallback() {
         super.disconnectedCallback()
-        this.removeEventListener('mousedown', this._mouseDown)
+        this.removeEventListener('mousedown', this.onMouseDown)
     }
 
-    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    public override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
         if (_changedProperties.has('height')) {
@@ -67,7 +67,7 @@ export class ColumnResizer extends ClassifiedElement {
         }
     }
 
-    protected override render() {
+    public override render() {
         const classes = classMap({
             'absolute z-[1] top-0 bottom-0 -right-[7px] w-4': true,
             'flex justify-center': true,

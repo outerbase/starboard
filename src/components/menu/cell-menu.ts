@@ -21,7 +21,7 @@ export class CellMenu extends Menu {
         return 'right-0 top-8'
     }
 
-    protected override render() {
+    public override render() {
         const darkClass = classMap({ dark: this.theme == Theme.dark })
 
         // @click shows/hides the menu

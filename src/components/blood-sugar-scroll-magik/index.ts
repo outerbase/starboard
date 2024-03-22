@@ -59,6 +59,58 @@ export class ScrollableElement extends ClassifiedElement {
         this.updateScrollerSizeAndPosition = this.updateScrollerSizeAndPosition.bind(this)
     }
 
+    // maintains the appearance of our scrollers (horizontal + vertical)
+    private updateScrollerSizeAndPosition(_event?: Event) {
+        // vertical
+        const scrollTop = this.scroller.value?.scrollTop ?? 0
+        const scrollHeight = this.scroller.value?.scrollHeight ?? 0
+        const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
+        const verticalScrollHandleHeight =
+            scrollHeightCoEfficient === 1 ? 0 : (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient // 0 when nothing to scroll
+
+        this.verticalScrollProgress = scrollTop / scrollHeight
+        this.verticalScrollSize = verticalScrollHandleHeight
+        this.verticalScrollPosition = this.verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0)
+
+        // horizontal
+        const scrollWidth = this.scroller.value?.scrollWidth ?? 0
+        const scrollLeft = this.scroller.value?.scrollLeft ?? 0
+        const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
+        const horizontalScrollHandleWidth =
+            scrollWidthCoEfficient === 1 ? 0 : (this.scroller.value?.clientWidth ?? 0) * scrollWidthCoEfficient // 0 when nothing to scroll
+
+        this.horizontalScrollProgress = scrollLeft / scrollWidth
+        this.horizontalScrollSize = horizontalScrollHandleWidth
+        this.horizontalScrollPosition = this.horizontalScrollProgress * (this.scroller.value?.clientWidth ?? 0)
+    }
+
+    // trigger `onScroll` when scrolling distance >= threshold (for the sake of optimizing performance)
+    private _onScroll(_event: Event) {
+        const previous = this.previousScrollPosition ?? 0
+        const current = this.scroller.value?.scrollTop ?? 0
+        const difference = Math.abs(previous - current)
+        if (difference > this.threshold) {
+            this.previousScrollPosition = current
+            if (typeof this.onScroll === 'function') {
+                this.onScroll()
+            }
+        }
+    }
+
+    protected onClickVerticalScroller(event: MouseEvent) {
+        if (this.scroller.value) {
+            const clickedAtCoef = (event.clientY - this.getBoundingClientRect().top) / this.scroller.value?.clientHeight
+            this.scroller.value.scrollTop = clickedAtCoef * (this.scroller.value?.scrollHeight ?? 0) - this.verticalScrollSize
+        }
+    }
+
+    protected onClickHorizontalScroller(event: MouseEvent) {
+        if (this.scroller.value) {
+            const clickedAtCoef = (event.clientX - this.getBoundingClientRect().left) / this.scroller.value?.clientWidth
+            this.scroller.value.scrollLeft = clickedAtCoef * (this.scroller.value?.scrollWidth ?? 0) - this.horizontalScrollSize
+        }
+    }
+
     public override connectedCallback(): void {
         super.connectedCallback()
 
@@ -148,59 +200,7 @@ export class ScrollableElement extends ClassifiedElement {
         }
     }
 
-    protected onClickVerticalScroller(event: MouseEvent) {
-        if (this.scroller.value) {
-            const clickedAtCoef = (event.clientY - this.getBoundingClientRect().top) / this.scroller.value?.clientHeight
-            this.scroller.value.scrollTop = clickedAtCoef * (this.scroller.value?.scrollHeight ?? 0) - this.verticalScrollSize
-        }
-    }
-
-    protected onClickHorizontalScroller(event: MouseEvent) {
-        if (this.scroller.value) {
-            const clickedAtCoef = (event.clientX - this.getBoundingClientRect().left) / this.scroller.value?.clientWidth
-            this.scroller.value.scrollLeft = clickedAtCoef * (this.scroller.value?.scrollWidth ?? 0) - this.horizontalScrollSize
-        }
-    }
-
-    // maintains the appearance of our scrollers (horizontal + vertical)
-    private updateScrollerSizeAndPosition(_event?: Event) {
-        // vertical
-        const scrollTop = this.scroller.value?.scrollTop ?? 0
-        const scrollHeight = this.scroller.value?.scrollHeight ?? 0
-        const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
-        const verticalScrollHandleHeight =
-            scrollHeightCoEfficient === 1 ? 0 : (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient // 0 when nothing to scroll
-
-        this.verticalScrollProgress = scrollTop / scrollHeight
-        this.verticalScrollSize = verticalScrollHandleHeight
-        this.verticalScrollPosition = this.verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0)
-
-        // horizontal
-        const scrollWidth = this.scroller.value?.scrollWidth ?? 0
-        const scrollLeft = this.scroller.value?.scrollLeft ?? 0
-        const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
-        const horizontalScrollHandleWidth =
-            scrollWidthCoEfficient === 1 ? 0 : (this.scroller.value?.clientWidth ?? 0) * scrollWidthCoEfficient // 0 when nothing to scroll
-
-        this.horizontalScrollProgress = scrollLeft / scrollWidth
-        this.horizontalScrollSize = horizontalScrollHandleWidth
-        this.horizontalScrollPosition = this.horizontalScrollProgress * (this.scroller.value?.clientWidth ?? 0)
-    }
-
-    // trigger `onScroll` when scrolling distance >= threshold (for the sake of optimizing performance)
-    private _onScroll(_event: Event) {
-        const previous = this.previousScrollPosition ?? 0
-        const current = this.scroller.value?.scrollTop ?? 0
-        const difference = Math.abs(previous - current)
-        if (difference > this.threshold) {
-            this.previousScrollPosition = current
-            if (typeof this.onScroll === 'function') {
-                this.onScroll()
-            }
-        }
-    }
-
-    protected override render() {
+    public override render() {
         const scrollGrabHandleClasses = {
             'w-full rounded-md': true,
             'bg-neutral-200/60 dark:bg-neutral-700/50': true,

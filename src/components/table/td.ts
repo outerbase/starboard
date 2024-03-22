@@ -83,11 +83,10 @@ export class TableData extends MutableElement {
     @property({ attribute: 'plugin', type: String })
     public plugin?: ColumnPlugin
 
-    @state()
-    protected options = RW_OPTIONS
-
-    @state()
+    @property({ attribute: 'is-displaying-plugin-editor', type: Boolean })
     public isDisplayingPluginEditor = false
+
+    @state() protected options = RW_OPTIONS
 
     protected onContextMenu(event: MouseEvent) {
         const isPlugin = eventTargetIsPluginEditor(event)
@@ -138,16 +137,6 @@ export class TableData extends MutableElement {
                 this.dispatchChangedEvent()
                 return
         }
-    }
-
-    public focus() {
-        this.shadowRoot?.querySelector<HTMLElement>('[contenteditable]')?.focus()
-    }
-
-    public copyValueToClipboard() {
-        if (this.value === null || this.value === undefined) return navigator.clipboard.writeText('')
-        else if (typeof this.value === 'object') return navigator.clipboard.writeText(JSON.stringify(this.value))
-        else return navigator.clipboard.writeText(this.value.toString())
     }
 
     protected onContentEditableKeyDown(event: KeyboardEvent) {
@@ -294,6 +283,26 @@ export class TableData extends MutableElement {
         this.value = event.clipboardData?.getData('text')
     }
 
+    protected onDisplayEditor(event: MouseEvent) {
+        const didClickInsidePluginEditor = event.composedPath().some((v) => {
+            return v instanceof HTMLElement && v.id === 'plugin-editor'
+        })
+
+        if (!didClickInsidePluginEditor) {
+            this.isDisplayingPluginEditor = false
+        }
+    }
+
+    public focus() {
+        this.shadowRoot?.querySelector<HTMLElement>('[contenteditable]')?.focus()
+    }
+
+    public copyValueToClipboard() {
+        if (this.value === null || this.value === undefined) return navigator.clipboard.writeText('')
+        else if (typeof this.value === 'object') return navigator.clipboard.writeText(JSON.stringify(this.value))
+        else return navigator.clipboard.writeText(this.value.toString())
+    }
+
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
@@ -321,17 +330,7 @@ export class TableData extends MutableElement {
         }
     }
 
-    onDisplayEditor(event: MouseEvent) {
-        const didClickInsidePluginEditor = event.composedPath().some((v) => {
-            return v instanceof HTMLElement && v.id === 'plugin-editor'
-        })
-
-        if (!didClickInsidePluginEditor) {
-            this.isDisplayingPluginEditor = false
-        }
-    }
-
-    protected willUpdate(changedProperties: PropertyValues<this>): void {
+    public override willUpdate(changedProperties: PropertyValues<this>): void {
         super.willUpdate(changedProperties)
 
         if (changedProperties.has('readonly')) {
@@ -355,7 +354,7 @@ export class TableData extends MutableElement {
         }
     }
 
-    protected override render() {
+    public override render() {
         const value = this.value === null ? null : typeof this.value === 'object' ? JSON.stringify(this.value) : this.value
         const contentWrapperClass = classMap({ 'font-normal': true, dark: this.theme == Theme.dark })
 

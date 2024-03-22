@@ -67,12 +67,6 @@ export class Table extends ClassifiedElement {
     @property({ attribute: 'installed-plugins', type: Array })
     public installedPlugins?: Record<string, PluginWorkspaceInstallationId | undefined>
 
-    @state()
-    protected rows: Array<RowAsRecord> = []
-
-    @state()
-    private newRows: Array<RowAsRecord> = []
-
     @property({ attribute: 'non-interactive', type: Boolean })
     public isNonInteractive = false
 
@@ -110,17 +104,22 @@ export class Table extends ClassifiedElement {
     @property({ attribute: 'addable-columns', type: Boolean })
     public addableColumns = false
 
-    @state()
-    public allRowsSelected = false
+    @state() protected scrollable: Ref<ScrollableElement> = createRef()
+    @state() protected rows: Array<RowAsRecord> = []
+    @state() protected newRows: Array<RowAsRecord> = []
+    @state() protected existingVisibleRows: Array<RowAsRecord> = []
+    @state() protected allRowsSelected = false
+    @state() protected columns: Columns = []
+    @state() protected visibleColumns: Columns = []
+    @state() protected selectedRowUUIDs: Set<string> = new Set()
+    @state() protected removedRowUUIDs: Set<string> = new Set()
+    @state() protected columnTypes?: Record<string, string | number | boolean | undefined>
+    @state() protected rowHeight: number = 38
 
-    @state()
-    private _height?: number
+    @state() private visibleEndIndex = 0
+    @state() private visibleStartIndex = 0
+    @state() private _height?: number
 
-    @state()
-    protected columns: Columns = []
-
-    @state()
-    protected visibleColumns: Columns = []
     protected updateVisibleColumns() {
         this.visibleColumns = this.columns.filter(
             ({ name, status }) =>
@@ -129,18 +128,9 @@ export class Table extends ClassifiedElement {
                 this.deletedColumnNames.indexOf(name) === -1
         )
     }
-    @state()
-    protected selectedRowUUIDs: Set<string> = new Set()
-
-    @state()
-    protected removedRowUUIDs: Set<string> = new Set()
-
-    @state()
-    columnTypes?: Record<string, string | number | boolean | undefined>
 
     constructor() {
         super()
-        this.onScroll = this.onScroll.bind(this)
         this.updateTableView = this.updateTableView.bind(this)
         this.onKeyDown = this.onKeyDown.bind(this)
     }
@@ -162,7 +152,7 @@ export class Table extends ClassifiedElement {
         return _row
     }
 
-    protected addNewColumn(name: string) {
+    public addNewColumn(name: string) {
         const column: TableColumn = {
             is_nullable: false,
             name,
@@ -300,74 +290,6 @@ export class Table extends ClassifiedElement {
         document.removeEventListener('keydown', this.onKeyDown)
     }
 
-    protected override firstUpdated(_changedProperties: PropertyValueMap<this>): void {
-        if (this.keyboardShortcuts) {
-            document.addEventListener('keydown', this.onKeyDown)
-        }
-
-        // set table width
-        const table = this.shadowRoot?.getElementById('table')
-        if (!table) throw new Error('Unexpectedly missing a table')
-        this._previousWidth = table.clientWidth
-        table.style.width = `${this._previousWidth}px`
-
-        // ensure that `this.rowHeight` is correct
-        // measure the height of each row
-        const elem = document.createElement('outerbase-td') as TableData
-        elem.withBottomBorder = true
-        elem.outerBorder = this.outerBorder
-        elem.isInteractive = true
-
-        // Temporarily add to the DOM to measure
-        this.scrollable.value?.appendChild(elem)
-        setTimeout(() => {
-            const offsetHeight = elem.offsetHeight
-            this.scrollable.value?.removeChild(elem)
-            if (this.rowHeight !== offsetHeight) {
-                this.rowHeight = offsetHeight
-            }
-        }, 0)
-        // end: ensure that `this.rowHeight` is correct
-    }
-
-    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        super.willUpdate(_changedProperties)
-
-        // identify columns from the schema
-        if (_changedProperties.has('schema')) {
-            if (this.schema) {
-                this.columns = this.schema.columns
-                this.columnTypes = arrayToObject(this.columns, 'name', 'type')
-                this.updateVisibleColumns()
-            }
-        }
-
-        if (_changedProperties.has('theme')) {
-            this.setCssVariablesForPlugin(this.theme)
-        }
-
-        if (_changedProperties.has('selectedRowUUIDs')) {
-            // disqualify 0 === 0
-            if (this.rows.length === 0) return
-
-            if (this.selectedRowUUIDs.size !== this.rows.length && this.allRowsSelected) {
-                this.allRowsSelected = false
-            } else if (this.selectedRowUUIDs.size === this.rows.length && !this.allRowsSelected) {
-                this.allRowsSelected = true
-            }
-        }
-
-        if (_changedProperties.has('rows')) {
-            const m: Record<string, RowAsRecord | undefined> = {}
-            this.rows.forEach((r) => {
-                m[r.id] = r
-            })
-            this.fromIdToRowMap = m
-            this.newRows = this.rows.filter(({ isNew }) => isNew)
-            this.updateTableView()
-        }
-    }
-
     /////
     // dynamically adjust the table's width when columns are being resized
     // this variable is utilized while updating widths on('mousemove')
@@ -500,7 +422,16 @@ export class Table extends ClassifiedElement {
         )}`
     }
 
-    private updateVisibleRows(scrollTop: number): void {
+    protected updateTableView(): void {
+        const scrollTop = this.scrollable.value?.scroller.value?.scrollTop ?? 0
+        if (scrollTop) {
+            this.updateVisibleRows(scrollTop)
+        } else {
+            setTimeout(() => this.updateVisibleRows(0), 0)
+        }
+    }
+
+    public updateVisibleRows(scrollTop: number): void {
         const bufferSize = 6
         const rows = this.rows.filter(({ isNew }) => !isNew)
         const _startIndex = Math.max(Math.floor((scrollTop ?? 0) / this.rowHeight) - bufferSize, 0)
@@ -522,30 +453,79 @@ export class Table extends ClassifiedElement {
         }
     }
 
-    private numberOfVisibleRows(): number {
+    public numberOfVisibleRows(): number {
         return Math.ceil((this.scrollable.value?.scroller.value?.clientHeight ?? 0) / this.rowHeight)
     }
 
-    public onScroll(_event: Event): void {
-        this.updateTableView()
+    public override firstUpdated(_changedProperties: PropertyValueMap<this>): void {
+        if (this.keyboardShortcuts) {
+            document.addEventListener('keydown', this.onKeyDown)
+        }
+
+        // set table width
+        const table = this.shadowRoot?.getElementById('table')
+        if (!table) throw new Error('Unexpectedly missing a table')
+        this._previousWidth = table.clientWidth
+        table.style.width = `${this._previousWidth}px`
+
+        // ensure that `this.rowHeight` is correct
+        // measure the height of each row
+        const elem = document.createElement('outerbase-td') as TableData
+        elem.withBottomBorder = true
+        elem.outerBorder = this.outerBorder
+        elem.isInteractive = true
+
+        // Temporarily add to the DOM to measure
+        this.scrollable.value?.appendChild(elem)
+        setTimeout(() => {
+            const offsetHeight = elem.offsetHeight
+            this.scrollable.value?.removeChild(elem)
+            if (this.rowHeight !== offsetHeight) {
+                this.rowHeight = offsetHeight
+            }
+        }, 0)
+        // end: ensure that `this.rowHeight` is correct
     }
 
-    private updateTableView(): void {
-        const scrollTop = this.scrollable.value?.scroller.value?.scrollTop ?? 0
-        if (scrollTop) {
-            this.updateVisibleRows(scrollTop)
-        } else {
-            setTimeout(() => this.updateVisibleRows(0), 0)
+    public override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.willUpdate(_changedProperties)
+
+        // identify columns from the schema
+        if (_changedProperties.has('schema')) {
+            if (this.schema) {
+                this.columns = this.schema.columns
+                this.columnTypes = arrayToObject(this.columns, 'name', 'type')
+                this.updateVisibleColumns()
+            }
+        }
+
+        if (_changedProperties.has('theme')) {
+            this.setCssVariablesForPlugin(this.theme)
+        }
+
+        if (_changedProperties.has('selectedRowUUIDs')) {
+            // disqualify 0 === 0
+            if (this.rows.length === 0) return
+
+            if (this.selectedRowUUIDs.size !== this.rows.length && this.allRowsSelected) {
+                this.allRowsSelected = false
+            } else if (this.selectedRowUUIDs.size === this.rows.length && !this.allRowsSelected) {
+                this.allRowsSelected = true
+            }
+        }
+
+        if (_changedProperties.has('rows')) {
+            const m: Record<string, RowAsRecord | undefined> = {}
+            this.rows.forEach((r) => {
+                m[r.id] = r
+            })
+            this.fromIdToRowMap = m
+            this.newRows = this.rows.filter(({ isNew }) => isNew)
+            this.updateTableView()
         }
     }
 
-    @state() private rowHeight: number = 38
-    @state() private visibleEndIndex = 0
-    @state() private visibleStartIndex = 0
-    @state() private existingVisibleRows: Array<RowAsRecord> = []
-    @property() public scrollable: Ref<ScrollableElement> = createRef()
-
-    protected override render() {
+    public override render() {
         const tableClasses = {
             'table table-fixed bg-theme-table dark:bg-theme-table-dark': true,
             'text-theme-text dark:text-theme-text-dark text-sm': true,
@@ -581,7 +561,7 @@ export class Table extends ClassifiedElement {
         return html`
             <blood-sugar-scroll-magik
                 threshold=${4 * this.rowHeight}
-                .onScroll=${this.onScroll}
+                .onScroll=${this.updateTableView}
                 ${ref(this.scrollable)}
                 theme="${this.theme}"
             >
@@ -604,11 +584,10 @@ export class Table extends ClassifiedElement {
                             ${
                                 this.selectableRows
                                     ? html`<outerbase-th
-                              table-height=${ifDefined(this._height)}
                               theme=${this.theme}
-                              width="42px"
-                              .value=${null}
-                              .originalValue=${null}
+                              table-height=${ifDefined(this._height)}                              width="42px"
+                              .value=${null} .originalValue=${null}
+                              
                               ?separate-cells=${true}
                               ?outer-border=${this.outerBorder}
                               ?is-last=${0 === this.visibleColumns.length}

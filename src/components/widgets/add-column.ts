@@ -40,14 +40,9 @@ export class AddColumnElement extends ClassifiedElement {
         'disabled:bg-neutral-400 disabled:dark:bg-neutral-600': true,
     }
 
-    @state()
-    protected columnName = ''
-
-    @state()
-    protected columnType = ''
-
-    @state()
-    protected errorMessage: TemplateResult<1> | undefined
+    @state() protected columnName = ''
+    @state() protected columnType = ''
+    @state() protected errorMessage: TemplateResult<1> | undefined
 
     protected onChange(event: InputEvent) {
         const { value } = event.target as HTMLInputElement
@@ -66,7 +61,7 @@ export class AddColumnElement extends ClassifiedElement {
         this.dispatchEvent(new ColumnAddedEvent({ name: this.columnName, data: { type: this.columnType } }))
     }
 
-    render() {
+    public override render() {
         return html`<form @submit=${this.onSubmit} class="flex flex-col gap-3.5 text-xs">
             <div class="flex flex-col gap-1">
                 <label for="column-name" class=${classMap(AddColumnElement.labelClasses)}>Column Name</label>
@@ -125,7 +120,7 @@ export class AddColumnTriggerElement extends ClassifiedElement {
         }
     }
 
-    protected render() {
+    public override render() {
         return html`${Plus(16)}`
     }
 }

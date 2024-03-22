@@ -61,10 +61,10 @@ export class TH extends MutableElement {
     protected isLastColumn = false
 
     @property({ attribute: 'menu', type: Boolean })
-    hasMenu = false
+    public hasMenu = false
 
     @property({ attribute: 'options', type: Array })
-    options: HeaderMenuOptions = [
+    public options: HeaderMenuOptions = [
         {
             label: 'Sort A-Z',
             value: 'sort:alphabetical:ascending',
@@ -88,6 +88,7 @@ export class TH extends MutableElement {
         },
     ]
 
+    @property({ attribute: 'value', type: String })
     override get value(): string | undefined {
         return this._value?.toString()
     }
@@ -96,6 +97,8 @@ export class TH extends MutableElement {
         this._value = newValue
         this.requestUpdate('value', oldValue)
     }
+
+    @property({ attribute: 'original-value', type: String })
     override get originalValue(): string | undefined {
         return this._originalValue?.toString()
     }
@@ -105,14 +108,9 @@ export class TH extends MutableElement {
         this.requestUpdate('value', oldValue)
     }
 
-    @state()
-    private _previousWidth = 0
-
-    @state()
-    protected _options: HeaderMenuOptions = []
-
-    @state()
-    protected _pluginOptions: HeaderMenuOptions = []
+    @state() private _previousWidth = 0
+    @state() protected _options: HeaderMenuOptions = []
+    @state() protected _pluginOptions: HeaderMenuOptions = []
 
     protected override dispatchChangedEvent() {
         if (typeof this.originalValue !== 'string') return
@@ -121,26 +119,6 @@ export class TH extends MutableElement {
             new ColumnRenameEvent({
                 name: this.originalValue,
                 data: { name: this.value },
-            })
-        )
-    }
-
-    protected removeColumn() {
-        if (!this.originalValue) throw new Error('missing OG value')
-
-        this.dispatchEvent(
-            new ColumnRemovedEvent({
-                name: this.originalValue,
-            })
-        )
-    }
-
-    protected hideColumn() {
-        if (!this.originalValue) throw new Error('missing OG value')
-
-        this.dispatchEvent(
-            new ColumnHiddenEvent({
-                name: this.originalValue,
             })
         )
     }
@@ -227,6 +205,26 @@ export class TH extends MutableElement {
         }
     }
 
+    public removeColumn() {
+        if (!this.originalValue) throw new Error('missing OG value')
+
+        this.dispatchEvent(
+            new ColumnRemovedEvent({
+                name: this.originalValue,
+            })
+        )
+    }
+
+    public hideColumn() {
+        if (!this.originalValue) throw new Error('missing OG value')
+
+        this.dispatchEvent(
+            new ColumnHiddenEvent({
+                name: this.originalValue,
+            })
+        )
+    }
+
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
@@ -240,13 +238,13 @@ export class TH extends MutableElement {
         this.removeEventListener('click', this.onClick)
     }
 
-    protected firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    public override firstUpdated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         if (this.width && this.style) {
             this.style.width = this.width
         }
     }
 
-    protected override willUpdate(changedProperties: PropertyValues<this>) {
+    public override willUpdate(changedProperties: PropertyValues<this>) {
         super.willUpdate(changedProperties)
 
         if (changedProperties.has('plugins')) {
@@ -311,7 +309,7 @@ export class TH extends MutableElement {
         }
     }
 
-    protected override render() {
+    public override render() {
         const name = this.originalValue ?? this.value ?? ''
         const hasPlugin = typeof this.installedPlugins?.[name] !== 'undefined' && !this.installedPlugins?.[name]?.isDefaultPlugin
         const options = this.dirty

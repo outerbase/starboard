@@ -24,9 +24,9 @@ export class ClassifiedElement extends LitElement {
     public theme = Theme.light
 
     @property({ reflect: true, attribute: 'class', type: String })
-    protected _class = ''
+    public _class = ''
 
-    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    public override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
         // ensure `_class` reflects our latest state
@@ -38,7 +38,7 @@ export class ClassifiedElement extends LitElement {
     // but our component itself is being rendered,
     // and it's appearance/style is provided by each component's `get _componentsInitialClassAttribute() {}` override
     // i.e. `table` vs `table-row-group` vs `table-cell` vs ...etc...
-    protected override render() {
+    public override render() {
         return html`<slot></slot>`
     }
 }

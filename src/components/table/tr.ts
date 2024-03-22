@@ -33,12 +33,12 @@ export class TableRow extends ClassifiedElement {
     public selected: boolean = false
 
     @property({ type: Boolean, attribute: 'header', reflect: true })
-    protected isHeaderRow: boolean = false
+    public isHeaderRow: boolean = false
 
     @property({ type: Boolean, attribute: 'new' })
     public new = false
 
-    protected override willUpdate(_changedProperties: PropertyValueMap<this>): void {
+    public override willUpdate(_changedProperties: PropertyValueMap<this>): void {
         super.willUpdate(_changedProperties)
 
         // dispatch event when row is selected/unselected
