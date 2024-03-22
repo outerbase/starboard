@@ -1,6 +1,5 @@
 import { html, type PropertyValueMap } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
-
 import { classMap } from 'lit/directives/class-map.js'
 import { ResizeEndEvent, ResizeEvent, ResizeStartEvent } from '../lib/events.js'
 import { Theme } from '../types.js'
@@ -18,13 +17,10 @@ export class ColumnResizer extends ClassifiedElement {
     @property({ type: Object })
     public column?: TH
 
-    @property({ attribute: 'theme', type: Number })
-    public theme = Theme.light
-
     private xPosition?: number
     private width?: number
 
-    private _mouseDown(downEvent: MouseEvent) {
+    private onMouseDown(downEvent: MouseEvent) {
         if (!this.column) throw new Error('`column` is unset; aborting')
         const v = this.column.value ?? this.column.originalValue ?? ''
 
@@ -55,15 +51,15 @@ export class ColumnResizer extends ClassifiedElement {
 
     public override connectedCallback() {
         super.connectedCallback()
-        this.addEventListener('mousedown', this._mouseDown)
+        this.addEventListener('mousedown', this.onMouseDown)
     }
 
     public override disconnectedCallback() {
         super.disconnectedCallback()
-        this.removeEventListener('mousedown', this._mouseDown)
+        this.removeEventListener('mousedown', this.onMouseDown)
     }
 
-    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    public override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
         if (_changedProperties.has('height')) {
@@ -71,12 +67,12 @@ export class ColumnResizer extends ClassifiedElement {
         }
     }
 
-    protected override render() {
+    public override render() {
         const classes = classMap({
             'absolute z-[1] top-0 bottom-0 -right-[7px] w-4': true,
             'flex justify-center': true,
             'cursor-col-resize group': true,
-            dark: this.theme === Theme.dark,
+            dark: this.theme == Theme.dark,
         })
 
         // the reason for nested div's here is to increase the click/draggable area while preserving a smaller visual element

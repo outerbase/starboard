@@ -25,7 +25,7 @@ export class InputMenu extends Menu {
         return 'left-0 right-0 top-8'
     }
 
-    onMenuSelection(event: Event) {
+    protected onMenuSelection(event: Event) {
         // event.stopPropagation()
         const { value } = event as MenuSelectedEvent
         this.value = value
@@ -52,7 +52,7 @@ export class InputMenu extends Menu {
         this.removeEventListener('menu-selection', this.onMenuSelection)
     }
 
-    protected override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
+    public override willUpdate(_changedProperties: Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
         if (_changedProperties.has('value') && this.dispatchEvent) {
@@ -60,7 +60,7 @@ export class InputMenu extends Menu {
         }
     }
 
-    protected override render() {
+    public override render() {
         const triggerClasses = {
             'absolute right-1': true,
             'border border-transparent': true,

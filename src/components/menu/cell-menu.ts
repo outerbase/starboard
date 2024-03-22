@@ -1,6 +1,7 @@
 import { html } from 'lit'
 import { customElement, property } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
+
 import { Theme } from '../../types.js'
 import { Menu } from './index.js'
 
@@ -20,7 +21,7 @@ export class CellMenu extends Menu {
         return 'right-0 top-8'
     }
 
-    protected override render() {
+    public override render() {
         const darkClass = classMap({ dark: this.theme == Theme.dark })
 
         // @click shows/hides the menu

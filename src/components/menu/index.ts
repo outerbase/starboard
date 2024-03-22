@@ -10,39 +10,30 @@ import { Theme, type HeaderMenuOptions } from '../../types.js'
 import { ClassifiedElement } from '../classified-element.js'
 
 export class Menu extends ClassifiedElement {
-    protected override get classMap() {
+    protected override classMap() {
         return {
             relative: true,
             'flex items-center justify-between gap-2': !this.withoutPadding,
             'font-medium select-none whitespace-nowrap': true,
-            dark: this.theme == Theme.dark,
+            ...super.classMap(),
         }
     }
 
     @property({ type: Boolean, attribute: 'open', reflect: true })
     public open = false
 
-    // @property({ attribute: 'selection', type: String })
-    @state()
+    @property({ attribute: 'selection', type: String })
     public selection?: string
 
     @property({ type: Array, attribute: 'options' })
     public options: HeaderMenuOptions = []
 
-    @state()
-    protected activeOptions: HeaderMenuOptions = []
-
-    @property({ attribute: 'theme', type: String })
-    public theme = Theme.light
-
     @property({ attribute: 'without-padding', type: Boolean })
     public withoutPadding = false
 
-    @state()
-    protected historyStack: Array<HeaderMenuOptions> = []
-
-    @state()
-    protected focused?: string
+    @state() protected activeOptions: HeaderMenuOptions = []
+    @state() protected historyStack: Array<HeaderMenuOptions> = []
+    @state() protected focused?: string
 
     // this function is intended to be overriden in a subclass
     // and not accessed otherwise
@@ -59,51 +50,40 @@ export class Menu extends ClassifiedElement {
     // for the scenario when the same menu is repeatedly opened
     private close = () => (this.open = false)
 
-    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        super.willUpdate(_changedProperties)
+    protected get listElement() {
+        if (!this.open) return null
 
-        // when the menu is being opened
-        if (_changedProperties.has('open') && this.open) {
-            this.setAttribute('aria-expanded', '')
-            this.outsideClicker = (event: MouseEvent) => {
-                if (event !== this.activeEvent) {
-                    this.open = false
-                    delete this.activeEvent
-                    if (this.outsideClicker) document.removeEventListener('click', this.outsideClicker)
-                }
-            }
-            document.addEventListener('click', this.outsideClicker)
-
-            this.dispatchEvent(new MenuOpenEvent(this.close))
-        }
-        // when the menu is being closed
-        else if (_changedProperties.has('open') && !this.open) {
-            this.removeAttribute('aria-expanded')
-
-            // reset history; restore root menu ietms
-            if (this.historyStack.length > 0) {
-                this.options = this.historyStack[0]
-                this.historyStack = []
-            }
-            if (this.outsideClicker) {
-                delete this.activeEvent
-                document.removeEventListener('click', this.outsideClicker)
-            }
+        const classes = {
+            [this.menuPositionClasses]: true,
+            'absolute z-[2] max-w-56 overflow-hidden': true,
+            'text-base': true,
+            'bg-white dark:bg-black shadow-lg': true,
+            'rounded-2xl p-1': true,
+            'duration-150 ease-bounce': true,
         }
 
-        if (_changedProperties.has('options')) {
-            // reset the menu to it's root
-            this.activeOptions = this.options
-        }
-    }
-
-    protected override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
-        super.updated(_changedProperties)
-
-        // when closing
-        if (_changedProperties.has('open') && !this.open) {
-            this.focused = undefined
-        }
+        return html`<ul class=${classMap(classes)} role="menu">
+            ${repeat(
+                this.activeOptions,
+                ({ label }) => label,
+                ({ label, value, classes }) =>
+                    html`<li
+                        @click=${this.onItemClick}
+                        data-value=${value}
+                        class=${classMapToClassName({
+                            [classes ?? '']: !!classes,
+                            'text-ellipsis overflow-hidden': true,
+                            'rounded-xl px-4 py-3': true,
+                            'cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700': true,
+                            'bg-neutral-100 dark:bg-neutral-700': this.focused === value,
+                        })}
+                        role="menuitem"
+                        ?selected=${this.selection === value}
+                    >
+                        ${label}
+                    </li>`
+            )}
+        </ul>`
     }
 
     protected onTrigger(event: Event) {
@@ -183,43 +163,54 @@ export class Menu extends ClassifiedElement {
         trigger?.focus()
     }
 
-    protected get listElement() {
-        if (!this.open) return null
+    public override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.willUpdate(_changedProperties)
 
-        const classes = {
-            [this.menuPositionClasses]: true,
-            'absolute z-[2] max-w-56 overflow-hidden': true,
-            'text-base': true,
-            'bg-white dark:bg-black shadow-lg': true,
-            'rounded-2xl p-1': true,
-            'duration-150 ease-bounce': true,
+        // when the menu is being opened
+        if (_changedProperties.has('open') && this.open) {
+            this.setAttribute('aria-expanded', '')
+            this.outsideClicker = (event: MouseEvent) => {
+                if (event !== this.activeEvent) {
+                    this.open = false
+                    delete this.activeEvent
+                    if (this.outsideClicker) document.removeEventListener('click', this.outsideClicker)
+                }
+            }
+            document.addEventListener('click', this.outsideClicker)
+
+            this.dispatchEvent(new MenuOpenEvent(this.close))
+        }
+        // when the menu is being closed
+        else if (_changedProperties.has('open') && !this.open) {
+            this.removeAttribute('aria-expanded')
+
+            // reset history; restore root menu ietms
+            if (this.historyStack.length > 0) {
+                this.options = this.historyStack[0]
+                this.historyStack = []
+            }
+            if (this.outsideClicker) {
+                delete this.activeEvent
+                document.removeEventListener('click', this.outsideClicker)
+            }
         }
 
-        return html`<ul class=${classMap(classes)} role="menu">
-            ${repeat(
-                this.activeOptions,
-                ({ label }) => label,
-                ({ label, value, classes }) =>
-                    html`<li
-                        @click=${this.onItemClick}
-                        data-value=${value}
-                        class=${classMapToClassName({
-                            [classes ?? '']: !!classes,
-                            'text-ellipsis overflow-hidden': true,
-                            'rounded-xl px-4 py-3': true,
-                            'cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700': true,
-                            'bg-neutral-100 dark:bg-neutral-700': this.focused === value,
-                        })}
-                        role="menuitem"
-                        ?selected=${this.selection === value}
-                    >
-                        ${label}
-                    </li>`
-            )}
-        </ul>`
+        if (_changedProperties.has('options')) {
+            // reset the menu to it's root
+            this.activeOptions = this.options
+        }
     }
 
-    protected override render() {
+    public override updated(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+        super.updated(_changedProperties)
+
+        // when closing
+        if (_changedProperties.has('open') && !this.open) {
+            this.focused = undefined
+        }
+    }
+
+    public override render() {
         // @click shows/hides the menu
         // @dblclick prevents parent's dblclick
         // @keydown navigates the menu

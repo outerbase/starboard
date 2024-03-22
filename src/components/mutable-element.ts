@@ -1,9 +1,9 @@
 import type { PropertyValues } from 'lit'
-import { property, state } from 'lit/decorators.js'
+import { property } from 'lit/decorators.js'
 import { isEqual } from 'lodash-es'
 
 import { CellUpdateEvent } from '../lib/events.js'
-import { Theme, type Position, type Serializable } from '../types.js'
+import { type Position, type Serializable } from '../types.js'
 import { ClassifiedElement } from './classified-element.js'
 
 export const NUMBER_TYPES = [
@@ -23,12 +23,12 @@ export const NUMBER_TYPES = [
 ].map((s) => s.toLowerCase())
 export const BOOLEAN_TYPES = ['Boolean', 'Bit'].map((s) => s.toLowerCase())
 export const JSON_TYPES = ['JSON', 'JSONB', 'ARRAY'].map((s) => s.toLowerCase())
+
 export class MutableElement extends ClassifiedElement {
-    protected override get classMap() {
+    protected override classMap() {
         return {
-            ...super.classMap,
             'cursor-pointer': this.isInteractive && !this.readonly,
-            dark: this.theme == Theme.dark,
+            ...super.classMap(),
         }
     }
 
@@ -83,9 +83,6 @@ export class MutableElement extends ClassifiedElement {
     @property({ attribute: 'outer-border', type: Boolean })
     public outerBorder = false
 
-    @property({ attribute: 'theme', type: Number })
-    public theme = Theme.light
-
     // allows, for example, <outerbase-td separate-cells="true" />
     @property({ type: Boolean, attribute: 'separate-cells' })
     public separateCells: boolean = false
@@ -102,23 +99,10 @@ export class MutableElement extends ClassifiedElement {
         this._type = newValue?.toLowerCase()
     }
 
-    @state()
+    @property({ attribute: 'is-editing', type: Boolean })
     public isEditing = false
 
-    protected convertToType(newValue: Serializable) {
-        // convert strings to their proper value-types; json, boolean, number, and null
-        const v = newValue
-        const t = this.type
-
-        if (t && typeof v === 'string') {
-            if (NUMBER_TYPES.includes(t)) return parseInt(v, 10)
-            if (JSON_TYPES.includes(t)) return JSON.parse(v)
-            if (BOOLEAN_TYPES.includes(t)) return v.toLowerCase().trim() === 'true'
-            if (v === '') return null
-        }
-    }
-
-    protected override updated(changedProps: PropertyValues<this>) {
+    public override updated(changedProps: PropertyValues<this>) {
         super.updated(changedProps)
 
         if (changedProps.has('isEditing') && this.isEditing) {
@@ -130,7 +114,7 @@ export class MutableElement extends ClassifiedElement {
         }
     }
 
-    protected override willUpdate(changedProperties: PropertyValues<this>) {
+    public override willUpdate(changedProperties: PropertyValues<this>) {
         super.willUpdate(changedProperties)
 
         // dispatch changes when the user stops editing
@@ -149,6 +133,19 @@ export class MutableElement extends ClassifiedElement {
             const oldOriginalValue = this.originalValue
             this._originalValue = this.convertToType(this.originalValue) ?? this.originalValue
             this.requestUpdate('originalValue', oldOriginalValue)
+        }
+    }
+
+    protected convertToType(newValue: Serializable) {
+        // convert strings to their proper value-types; json, boolean, number, and null
+        const v = newValue
+        const t = this.type
+
+        if (t && typeof v === 'string') {
+            if (NUMBER_TYPES.includes(t)) return parseInt(v, 10)
+            if (JSON_TYPES.includes(t)) return JSON.parse(v)
+            if (BOOLEAN_TYPES.includes(t)) return v.toLowerCase().trim() === 'true'
+            if (v === '') return null
         }
     }
 

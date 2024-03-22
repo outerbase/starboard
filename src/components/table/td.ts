@@ -19,13 +19,21 @@ const isAlphanumericOrSpecial = (key: string): boolean => {
     // Regular expression to match alphanumeric characters and specified special characters
     return /^[a-zA-Z0-9 \.,]+$/.test(key)
 }
+const RW_OPTIONS = [
+    { label: 'Edit', value: 'edit' },
+    { label: 'Copy', value: 'copy' },
+    { label: 'Paste', value: 'paste' },
+    { label: 'Clear', value: 'clear' },
+]
+
+const R_OPTIONS = [{ label: 'Copy', value: 'copy' }]
 
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
 export class TableData extends MutableElement {
-    protected override get classMap() {
+    protected override classMap() {
         return {
-            ...super.classMap,
+            ...super.classMap(),
             'table-cell relative focus:z-[1]': true,
             'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
             'px-5': this.blank,
@@ -75,16 +83,10 @@ export class TableData extends MutableElement {
     @property({ attribute: 'plugin', type: String })
     public plugin?: ColumnPlugin
 
-    @state()
-    protected options = [
-        { label: 'Edit', value: 'edit' },
-        { label: 'Copy', value: 'copy' },
-        { label: 'Paste', value: 'paste' },
-        { label: 'Clear', value: 'clear' },
-    ]
-
-    @state()
+    @property({ attribute: 'is-displaying-plugin-editor', type: Boolean })
     public isDisplayingPluginEditor = false
+
+    @state() protected options = RW_OPTIONS
 
     protected onContextMenu(event: MouseEvent) {
         const isPlugin = eventTargetIsPluginEditor(event)
@@ -137,14 +139,12 @@ export class TableData extends MutableElement {
         }
     }
 
-    public focus() {
-        this.shadowRoot?.querySelector<HTMLElement>('[contenteditable]')?.focus()
-    }
-
-    public copyValueToClipboard() {
-        if (this.value === null || this.value === undefined) return navigator.clipboard.writeText('')
-        else if (typeof this.value === 'object') return navigator.clipboard.writeText(JSON.stringify(this.value))
-        else return navigator.clipboard.writeText(this.value.toString())
+    protected onContentEditableKeyDown(event: KeyboardEvent) {
+        // our goal here is to prevent the user from engaging with the `contenteditable` component
+        const didNotOriginateInsidePluginEditor = event.composedPath().every((v) => {
+            return v instanceof HTMLElement && v.id !== 'plugin-editor'
+        })
+        if (didNotOriginateInsidePluginEditor) event.preventDefault()
     }
 
     protected async onKeyDown(event: KeyboardEvent): Promise<void> {
@@ -278,6 +278,31 @@ export class TableData extends MutableElement {
         }
     }
 
+    protected onPaste(event: ClipboardEvent) {
+        event.preventDefault()
+        this.value = event.clipboardData?.getData('text')
+    }
+
+    protected onDisplayEditor(event: MouseEvent) {
+        const didClickInsidePluginEditor = event.composedPath().some((v) => {
+            return v instanceof HTMLElement && v.id === 'plugin-editor'
+        })
+
+        if (!didClickInsidePluginEditor) {
+            this.isDisplayingPluginEditor = false
+        }
+    }
+
+    public focus() {
+        this.shadowRoot?.querySelector<HTMLElement>('[contenteditable]')?.focus()
+    }
+
+    public copyValueToClipboard() {
+        if (this.value === null || this.value === undefined) return navigator.clipboard.writeText('')
+        else if (typeof this.value === 'object') return navigator.clipboard.writeText(JSON.stringify(this.value))
+        else return navigator.clipboard.writeText(this.value.toString())
+    }
+
     public override connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('contextmenu', this.onContextMenu)
@@ -305,29 +330,14 @@ export class TableData extends MutableElement {
         }
     }
 
-    onDisplayEditor(event: MouseEvent) {
-        const didClickInsidePluginEditor = event.composedPath().some((v) => {
-            return v instanceof HTMLElement && v.id === 'plugin-editor'
-        })
-
-        if (!didClickInsidePluginEditor) {
-            this.isDisplayingPluginEditor = false
-        }
-    }
-
-    protected willUpdate(changedProperties: PropertyValues<this>): void {
+    public override willUpdate(changedProperties: PropertyValues<this>): void {
         super.willUpdate(changedProperties)
 
         if (changedProperties.has('readonly')) {
             if (this.readonly) {
-                this.options = [{ label: 'Copy', value: 'copy' }]
+                this.options = R_OPTIONS
             } else {
-                this.options = [
-                    { label: 'Edit', value: 'edit' },
-                    { label: 'Copy', value: 'copy' },
-                    { label: 'Paste', value: 'paste' },
-                    { label: 'Clear', value: 'clear' },
-                ]
+                this.options = RW_OPTIONS
             }
         }
 
@@ -344,7 +354,7 @@ export class TableData extends MutableElement {
         }
     }
 
-    protected override render() {
+    public override render() {
         const value = this.value === null ? null : typeof this.value === 'object' ? JSON.stringify(this.value) : this.value
         const contentWrapperClass = classMap({ 'font-normal': true, dark: this.theme == Theme.dark })
 
@@ -409,17 +419,8 @@ export class TableData extends MutableElement {
                       contenteditable="true"
                       spellcheck="false"
                       autocorrect="off"
-                      @paste=${(event: ClipboardEvent) => {
-                          event.preventDefault()
-                          this.value = event.clipboardData?.getData('text')
-                      }}
-                      @keydown=${(event: KeyboardEvent) => {
-                          // our goal here is to prevent the user from engaging with the `contenteditable` component
-                          const didNotOriginateInsidePluginEditor = event.composedPath().every((v) => {
-                              return v instanceof HTMLElement && v.id !== 'plugin-editor'
-                          })
-                          if (didNotOriginateInsidePluginEditor) event.preventDefault()
-                      }}
+                      @paste=${this.onPaste}
+                      @keydown=${this.onContentEditableKeyDown}
                       ><outerbase-td-menu
                           theme=${this.theme}
                           .options=${menuOptions}

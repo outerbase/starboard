@@ -5,6 +5,7 @@ import { property } from 'lit/decorators.js'
 
 import { TWStyles } from '../../tailwind/index.js'
 import classMapToClassName from '../lib/class-map-to-class-name.js'
+import { Theme } from '../types.js'
 
 // is propogated to the DOM and therefore it's CSS is applied
 export class ClassifiedElement extends LitElement {
@@ -13,18 +14,23 @@ export class ClassifiedElement extends LitElement {
     // classMap is a pairing of class(es) (a string) with a boolean expression
     // such that only the truthy values are rendered out and the rest are dropped
     // if a property used in such a boolean expression changes, this value is recomputed
-    protected get classMap() {
-        return {}
+    protected classMap() {
+        return {
+            dark: this.theme == Theme.dark,
+        }
     }
 
-    @property({ reflect: true, attribute: 'class', type: String })
-    protected _class = ''
+    @property({ attribute: 'theme', type: String })
+    public theme = Theme.light
 
-    protected override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
+    @property({ reflect: true, attribute: 'class', type: String })
+    public _class = ''
+
+    public override willUpdate(_changedProperties: PropertyValueMap<any> | Map<PropertyKey, unknown>): void {
         super.willUpdate(_changedProperties)
 
         // ensure `_class` reflects our latest state
-        this._class = classMapToClassName(this.classMap)
+        this._class = classMapToClassName(this.classMap())
         this._class // no-op line suppress the "hint" warning us that this is unused :eyeroll:
     }
 
@@ -32,7 +38,7 @@ export class ClassifiedElement extends LitElement {
     // but our component itself is being rendered,
     // and it's appearance/style is provided by each component's `get _componentsInitialClassAttribute() {}` override
     // i.e. `table` vs `table-row-group` vs `table-cell` vs ...etc...
-    protected override render() {
+    public override render() {
         return html`<slot></slot>`
     }
 }

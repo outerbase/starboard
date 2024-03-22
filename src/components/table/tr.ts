@@ -6,7 +6,7 @@ import { ClassifiedElement } from '../classified-element.js'
 // tl;dr <tr/>, table-row
 @customElement('outerbase-tr')
 export class TableRow extends ClassifiedElement {
-    protected override get classMap() {
+    protected override classMap() {
         return {
             'table-row group': true,
             // 'hover:bg-theme-row-hover dark:hover:bg-theme-row-hover-dark': true,
@@ -24,6 +24,8 @@ export class TableRow extends ClassifiedElement {
             // when selected
             'bg-theme-row-selected dark:bg-theme-row-selected-dark hover:bg-theme-row-selected-hover dark:hover:bg-theme-row-selected-hover-dark':
                 this.selected && !this.isHeaderRow,
+
+            ...super.classMap(),
         }
     }
 
@@ -31,12 +33,12 @@ export class TableRow extends ClassifiedElement {
     public selected: boolean = false
 
     @property({ type: Boolean, attribute: 'header', reflect: true })
-    protected isHeaderRow: boolean = false
+    public isHeaderRow: boolean = false
 
     @property({ type: Boolean, attribute: 'new' })
     public new = false
 
-    protected override willUpdate(_changedProperties: PropertyValueMap<this>): void {
+    public override willUpdate(_changedProperties: PropertyValueMap<this>): void {
         super.willUpdate(_changedProperties)
 
         // dispatch event when row is selected/unselected
