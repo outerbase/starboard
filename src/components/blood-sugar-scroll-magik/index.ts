@@ -5,9 +5,10 @@ import { state } from 'lit/decorators/state.js'
 import { classMap } from 'lit/directives/class-map.js'
 import { createRef, ref, type Ref } from 'lit/directives/ref.js'
 import { styleMap } from 'lit/directives/style-map.js'
-import throttle from 'lodash-es/throttle'
-import { Theme } from '../../types'
-import { ClassifiedElement } from '../classified-element'
+import throttle from 'lodash-es/throttle.js'
+
+import { Theme } from '../../types.js'
+import { ClassifiedElement } from '../classified-element.js'
 
 @customElement('blood-sugar-scroll-magik')
 export class ScrollableElement extends ClassifiedElement {
