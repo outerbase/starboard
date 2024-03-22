@@ -95,7 +95,6 @@ export class ScrollableElement extends ClassifiedElement {
                 this.startY = mouseDownEvent.pageY // Starting X position of the mouse
                 this.scrollStartY = this.scroller.value?.scrollTop ?? 0 // Starting scroll position
                 // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
-                // this.rightScrollHandle.value?.classList.add('scrollbar-active') // Optional: Show scrollbar thumb as active
 
                 const onMouseMove = (mouseMoveEvent: MouseEvent) => {
                     mouseMoveEvent.preventDefault()
@@ -110,7 +109,6 @@ export class ScrollableElement extends ClassifiedElement {
                     document.removeEventListener('mouseup', onMouseUp)
 
                     // document.body.classList.remove('user-select-none') // Re-enable text selection after dragging
-                    // this.rightScrollHandle.value?.classList.remove('scrollbar-active') // Optional: Show scrollbar thumb as active
                 }
 
                 document.addEventListener('mouseup', onMouseUp)
@@ -199,22 +197,16 @@ export class ScrollableElement extends ClassifiedElement {
     private pendingMouseLeave?: NodeJS.Timeout
 
     protected override render() {
-        const scrollableClasses = {
-            dark: this.theme == Theme.dark,
-            'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none': true,
-        }
-
-        const handleClasses = {
+        const scrollGrabHandleClasses = {
             'w-full rounded-md': true,
             'bg-neutral-200/60 dark:bg-neutral-700/50': true,
             'hover:bg-neutral-300 dark:hover:bg-neutral-700': true,
             'active:bg-neutral-300 dark:active:bg-neutral-700': true,
         }
 
-        const scrollEndClasses = {
+        const scrollTrackGutterClasses = {
             'z-50 absolute right-0 bottom-0': true,
             'transition-opacity duration-300': true,
-            // 'opacity-0 group-hover:opacity-100': true,
             'opacity-0': !this.hasHoveringCursor,
             'opacity-100': this.hasHoveringCursor,
         }
@@ -225,9 +217,13 @@ export class ScrollableElement extends ClassifiedElement {
             width: `${this.horizontalScrollSize}px`,
         }
 
+        const scrollableClasses = {
+            dark: this.theme == Theme.dark,
+            'absolute bottom-0 left-0 right-0 top-0 overflow-auto overscroll-none': true,
+        }
+
         return html`<!-- aloha bruddah -->
             <div
-                // class="group"
                 @mouseleave=${() => {
                     this.pendingMouseLeave = setTimeout(() => (this.hasHoveringCursor = false), 1000)
                 }}
@@ -238,21 +234,25 @@ export class ScrollableElement extends ClassifiedElement {
                 }}
             >
                 <div
-                    class=${classMap({ ...scrollEndClasses, 'top-0 w-1.5': true })}
+                    class=${classMap({ ...scrollTrackGutterClasses, 'top-0 w-1.5': true })}
                     ${ref(this.rightScrollZone)}
                     @click=${this.onClickVerticalScroller}
                 >
-                    <div style=${styleMap(verticalHandleStyles)} class="${classMap(handleClasses)}" ${ref(this.rightScrollHandle)}></div>
+                    <div
+                        style=${styleMap(verticalHandleStyles)}
+                        class="${classMap(scrollGrabHandleClasses)}"
+                        ${ref(this.rightScrollHandle)}
+                    ></div>
                 </div>
 
                 <div
-                    class=${classMap({ ...scrollEndClasses, 'left-0': true })}
+                    class=${classMap({ ...scrollTrackGutterClasses, 'left-0': true })}
                     ${ref(this.bottomScrollZone)}
                     @click="${this.onClickHorizontalScroller}"
                 >
                     <div
                         style=${styleMap(horizontalHandleStyles)}
-                        class="${classMap({ ...handleClasses, 'h-1.5': true })}"
+                        class="${classMap({ ...scrollGrabHandleClasses, 'h-1.5': true })}"
                         ${ref(this.bottomScrollHandle)}
                     ></div>
                 </div>
