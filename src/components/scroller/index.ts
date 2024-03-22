@@ -210,6 +210,7 @@ export class ScrollableElement extends ClassifiedElement {
     @state() horizontalScrollPosition = 0
     @state() verticalScrollSize = 0
     @state() horizontalScrollSize = 0
+    @state() hasHoveringCursor = false
 
     protected horizontalScrollProgress = 0
     protected verticalScrollProgress = 0
@@ -230,7 +231,9 @@ export class ScrollableElement extends ClassifiedElement {
         const scrollEndClasses = {
             'z-50 absolute right-0 bottom-0': true,
             'transition-opacity duration-300': true,
-            'opacity-0 group-hover:opacity-100': true,
+            // 'opacity-0 group-hover:opacity-100': true,
+            'opacity-0': !this.hasHoveringCursor,
+            'opacity-100': this.hasHoveringCursor,
         }
 
         const verticalHandleStyles = { transform: `translateY(${this.verticalScrollPosition}px)`, height: `${this.verticalScrollSize}px` }
@@ -240,7 +243,15 @@ export class ScrollableElement extends ClassifiedElement {
         }
 
         return html`<!-- aloha bruddah -->
-            <div class="group">
+            <div
+                // class="group"
+                @mouseleave=${() => {
+                    setTimeout(() => (this.hasHoveringCursor = false), 1000)
+                }}
+                @mouseenter=${() => {
+                    this.hasHoveringCursor = true
+                }}
+            >
                 <div
                     class=${classMap({ ...scrollEndClasses, 'top-0 w-1.5': true })}
                     ${ref(this.rightScrollZone)}
