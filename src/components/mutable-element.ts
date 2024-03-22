@@ -175,6 +175,13 @@ export class MutableElement extends ClassifiedElement {
             })
         }
 
+        if (event.code === 'Enter' && !this.isEditing && this.readonly) {
+            // we're using `contenteditable` to hold the value (when isEditing=fale)
+            // if this element receives `Enter`, it'll add them to the value, erroneously
+            // so we prevent that scenario right HERE.
+            event.preventDefault()
+        }
+
         if (event.code === 'Enter' && !this.isEditing && !this.readonly) {
             if (event.target instanceof HTMLElement && !this.isEditing) {
                 if (!event.didCloseMenu) this.isEditing = true
