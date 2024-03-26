@@ -60,9 +60,6 @@ export class TH extends MutableElement {
     @property({ attribute: 'is-last', type: Boolean })
     protected isLastColumn = false
 
-    @property({ attribute: 'menu', type: Boolean })
-    public hasMenu = false
-
     @property({ attribute: 'options', type: Array })
     public options: HeaderMenuOptions = [
         {

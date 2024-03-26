@@ -32,10 +32,12 @@ export class CustomCheckbox extends LitElement {
             this.toggleCheckbox(event)
         }
     }
+
     connectedCallback(): void {
         super.connectedCallback()
         this.addEventListener('keydown', this.onKeyDown)
     }
+
     disconnectedCallback(): void {
         super.disconnectedCallback()
         this.removeEventListener('keydown', this.onKeyDown)

@@ -263,9 +263,6 @@ export class TableData extends MutableElement {
     @property({ type: Boolean, attribute: 'draw-right-border' })
     public _drawRightBorder = false
 
-    @property({ type: Boolean, attribute: 'menu' })
-    public hasMenu = false
-
     @property({ type: Boolean, attribute: 'row-selector' })
     public isRowSelector = false
 
@@ -452,7 +449,6 @@ export class TableData extends MutableElement {
                           theme=${this.theme}
                           .options=${menuOptions}
                           ?without-padding=${!!this.plugin}
-                          ?menu=${this.hasMenu}
                           ?selectable-text=${!this.isInteractive}
                           @menu-selection=${this.onMenuSelection}
                           ><span class=${contentWrapperClass}>${cellContents}</span

@@ -182,6 +182,9 @@ export class MutableElement extends ClassifiedElement {
     @property({ attribute: 'is-editing', type: Boolean })
     public isEditing = false
 
+    @property({ attribute: 'menu', type: Boolean })
+    public hasMenu = false
+
     public override updated(changedProps: PropertyValues<this>) {
         super.updated(changedProps)
 

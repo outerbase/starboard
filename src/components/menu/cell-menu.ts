@@ -7,9 +7,6 @@ import { Menu } from './index.js'
 
 @customElement('outerbase-td-menu')
 export class CellMenu extends Menu {
-    @property({ attribute: 'menu', type: Boolean })
-    public hasMenu = false
-
     // JOHNNY this is unused
     @property({ attribute: 'selectable-text', type: Boolean })
     public selectableText = false
