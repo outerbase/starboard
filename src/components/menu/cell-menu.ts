@@ -1,5 +1,5 @@
 import { html } from 'lit'
-import { customElement, property } from 'lit/decorators.js'
+import { customElement } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
 
 import { Theme } from '../../types.js'
@@ -7,10 +7,6 @@ import { Menu } from './index.js'
 
 @customElement('outerbase-td-menu')
 export class CellMenu extends Menu {
-    // JOHNNY this is unused
-    @property({ attribute: 'selectable-text', type: Boolean })
-    public selectableText = false
-
     protected override get menuPositionClasses() {
         const isRenderingInBrowser = typeof window !== 'undefined'
         if (!isRenderingInBrowser) return ''
