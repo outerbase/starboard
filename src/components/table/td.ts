@@ -1,4 +1,4 @@
-import { html, type PropertyValues, type TemplateResult } from 'lit'
+import { css, html, type PropertyValues, type TemplateResult } from 'lit'
 import type { DirectiveResult } from 'lit/async-directive.js'
 import { customElement, property, state } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
@@ -31,6 +31,68 @@ const R_OPTIONS = [{ label: 'Copy', value: 'copy' }]
 // tl;dr <td/>, table-cell
 @customElement('outerbase-td')
 export class TableData extends MutableElement {
+    static override styles = [
+        ...MutableElement.styles,
+        css`
+            .nbsp::after {
+                content: '.'; /* Non-breaking space */
+                visibility: hidden;
+            }
+        `,
+    ]
+
+    static onClick(event: MouseEvent) {
+        const el = event.currentTarget as HTMLElement
+        el.focus()
+    }
+
+    static onContextMenu(event: MouseEvent) {
+        const isPlugin = eventTargetIsPluginEditor(event)
+        if (isPlugin) return
+
+        const menu = (event.currentTarget as HTMLElement).shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
+        if (menu) {
+            event.preventDefault()
+            menu.focus()
+            menu.open = true
+        }
+    }
+
+    static onContentEditableKeyDown(event: KeyboardEvent) {
+        // our goal here is to prevent the user from engaging with the `contenteditable` component
+        const didNotOriginateInsidePluginEditor = event.composedPath().every((v) => {
+            return v instanceof HTMLElement && v.id !== 'plugin-editor'
+        })
+        if (didNotOriginateInsidePluginEditor) event.preventDefault()
+    }
+
+    static onDragOver(event: DragEvent) {
+        event.preventDefault()
+    }
+
+    static onDrop(event: DragEvent) {
+        event.preventDefault()
+    }
+
+    static onDoubleClick(event: MouseEvent) {
+        const self = event.currentTarget as TableData
+        if (self.isEditing) return // allow double-clicking to select text while editing
+
+        if (!eventTargetIsPlugin(event)) {
+            self.isEditing = true
+            setTimeout(() => {
+                const input = self.shadowRoot?.querySelector('input')
+
+                if (input) {
+                    input.focus()
+
+                    // set cursor to end if writable
+                    if (!self.readonly) input.setSelectionRange(input.value.length, input.value.length)
+                }
+            }, 0)
+        }
+    }
+
     protected override classMap() {
         return {
             ...super.classMap(),
@@ -88,20 +150,6 @@ export class TableData extends MutableElement {
 
     @state() protected options = RW_OPTIONS
 
-    protected onContextMenu(event: MouseEvent) {
-        const isPlugin = eventTargetIsPluginEditor(event)
-        if (isPlugin) return
-
-        if (this.blank) return
-
-        const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
-        if (menu) {
-            event.preventDefault()
-            menu.focus()
-            menu.open = true
-        }
-    }
-
     protected onPluginEvent({ detail: { action, value } }: PluginActionEvent) {
         // TODO not `.toLowerCase()`? update the enum to match what is emitted?
         const eventName = action.toLowerCase()
@@ -139,33 +187,26 @@ export class TableData extends MutableElement {
         }
     }
 
-    protected onContentEditableKeyDown(event: KeyboardEvent) {
-        // our goal here is to prevent the user from engaging with the `contenteditable` component
-        const didNotOriginateInsidePluginEditor = event.composedPath().every((v) => {
-            return v instanceof HTMLElement && v.id !== 'plugin-editor'
-        })
-        if (didNotOriginateInsidePluginEditor) event.preventDefault()
-    }
-
-    protected async onKeyDown(event: KeyboardEvent): Promise<void> {
+    static async onKeyDown(event: KeyboardEvent): Promise<void> {
         // ignore events being fired from a Plugin
         if (eventTargetIsPlugin(event)) return
 
+        const self = event.currentTarget as TableData
+
         // don't interfere with menu behavior
-        const menu = this.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
+        const menu = self.shadowRoot?.querySelector('outerbase-td-menu') as CellMenu | null
         if (menu?.open) {
             return
         }
-
-        if (this.plugin && event.code === 'Enter' && event.target instanceof HTMLElement) {
-            this.moveFocusToNextRow(event.target)
+        if (self.plugin && event.code === 'Enter' && event.target instanceof HTMLElement) {
+            MutableElement.moveFocusToNextRow(event.target)
             return
         }
 
-        super.onKeyDown(event)
+        MutableElement.onKeyDown(event)
 
         // ignore events fired while editing
-        if (this.isEditing) return
+        if (self.isEditing) return
 
         const { code } = event
 
@@ -192,22 +233,22 @@ export class TableData extends MutableElement {
         // begin editing if keys are ASCII-ish
         const isInputTriggering = event.key.length === 1 && isAlphanumericOrSpecial(event.key)
         const noMetaKeys = !(event.metaKey || event.shiftKey)
-        const typeIsNotJSON = !(this.type && JSON_TYPES.includes(this.type))
-        const typeIsNotBoolean = !(this.type && BOOLEAN_TYPES.includes(this.type))
+        const typeIsNotJSON = !(self.type && JSON_TYPES.includes(self.type))
+        const typeIsNotBoolean = !(self.type && BOOLEAN_TYPES.includes(self.type))
 
         if (isInputTriggering && noMetaKeys && typeIsNotJSON && typeIsNotBoolean) {
             event.preventDefault()
 
             // toggle editing mode
-            this.isEditing = true
+            self.isEditing = true
 
             // append this character
-            if (this.value === undefined || this.value === null) this.value = event.key
-            else this.value += event.key
+            if (self.value === undefined || self.value === null) self.value = event.key
+            else self.value += event.key
 
             // set the cursor input to the end
             setTimeout(() => {
-                const input = this.shadowRoot?.querySelector('input')
+                const input = self.shadowRoot?.querySelector('input')
                 input?.focus()
                 input?.setSelectionRange(input.value.length, input.value.length)
             }, 0)
@@ -227,14 +268,14 @@ export class TableData extends MutableElement {
             return
         } else if (code === 'ArrowDown') {
             event.preventDefault()
-            if (event.target instanceof HTMLElement && !this.isEditing) {
-                this.moveFocusToNextRow(event.target)
+            if (event.target instanceof HTMLElement && !self.isEditing) {
+                MutableElement.moveFocusToNextRow(event.target)
                 return
             }
         } else if (code === 'ArrowUp') {
             event.preventDefault()
-            if (event.target instanceof HTMLElement && !this.isEditing) {
-                this.moveFocusToPreviousRow(event.target)
+            if (event.target instanceof HTMLElement && !self.isEditing) {
+                MutableElement.moveFocusToPreviousRow(event.target)
                 return
             }
         }
@@ -242,39 +283,13 @@ export class TableData extends MutableElement {
         // copy focused cells
         if (event.metaKey && code === 'KeyC') {
             event.preventDefault()
-            return this.copyValueToClipboard()
+            return self.copyValueToClipboard()
         }
 
-        if (!this.readonly && (code === 'Backspace' || code === 'Delete')) {
+        if (!self.readonly && (code === 'Backspace' || code === 'Delete')) {
             event.preventDefault()
-            this.value = undefined
+            self.value = undefined
             return
-        }
-    }
-
-    protected onClick(_event: MouseEvent) {
-        // set focus on the inner contenteditable
-        const didClickInsidePluginEditor = _event.composedPath().some((v) => {
-            return v instanceof HTMLElement && v.id === 'plugin-editor'
-        })
-        if (!didClickInsidePluginEditor) this.focus()
-    }
-
-    protected onDoubleClick(event: MouseEvent) {
-        if (this.isEditing) return // allow double-clicking to select text while editing
-
-        if (!eventTargetIsPlugin(event)) {
-            this.isEditing = true
-            setTimeout(() => {
-                const input = this.shadowRoot?.querySelector('input')
-
-                if (input) {
-                    input.focus()
-
-                    // set cursor to end if writable
-                    if (!this.readonly) input.setSelectionRange(input.value.length, input.value.length)
-                }
-            }, 0)
         }
     }
 
@@ -293,14 +308,6 @@ export class TableData extends MutableElement {
         }
     }
 
-    static onDragOver(event: DragEvent) {
-        event.preventDefault()
-    }
-
-    static onDrop(event: DragEvent) {
-        event.preventDefault()
-    }
-
     public focus() {
         this.shadowRoot?.querySelector<HTMLElement>('[contenteditable]')?.focus()
     }
@@ -313,29 +320,26 @@ export class TableData extends MutableElement {
 
     public override connectedCallback(): void {
         super.connectedCallback()
-        this.addEventListener('contextmenu', this.onContextMenu)
+
+        this.addEventListener('contextmenu', TableData.onContextMenu)
+        this.addEventListener('keydown', TableData.onKeyDown)
+        this.addEventListener('click', TableData.onClick)
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.addEventListener('custom-change', this.onPluginEvent)
 
-        this.addEventListener('keydown', this.onKeyDown)
-
         if (this.isInteractive) {
-            this.addEventListener('click', this.onClick)
-            if (!this.plugin) this.addEventListener('dblclick', this.onDoubleClick)
+            if (!this.plugin) this.addEventListener('dblclick', TableData.onDoubleClick)
         }
     }
 
     public override disconnectedCallback(): void {
         super.disconnectedCallback()
-        this.removeEventListener('contextmenu', this.onContextMenu)
+
+        this.removeEventListener('contextmenu', TableData.onContextMenu)
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.removeEventListener('custom-change', this.onPluginEvent)
-        this.removeEventListener('keydown', this.onKeyDown)
-
-        if (this.isInteractive) {
-            this.removeEventListener('click', this.onClick)
-            if (!this.plugin) this.removeEventListener('dblclick', this.onDoubleClick)
-        }
+        this.removeEventListener('keydown', TableData.onKeyDown)
+        if (!this.plugin) this.removeEventListener('dblclick', TableData.onDoubleClick)
     }
 
     public override willUpdate(changedProperties: PropertyValues<this>): void {
@@ -385,7 +389,8 @@ export class TableData extends MutableElement {
                 )
             }
         } else {
-            cellContents = html`${value ?? html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}`
+            cellContents = html`${html`<span class="nbsp">${value}</span>` ??
+            html`<span class="italic text-neutral-400 dark:text-neutral-500">NULL</span>`}`
         }
 
         const inputEl = this.isEditing // &nbsp; prevents the row from collapsing (in height) when there is only 1 column
@@ -428,7 +433,7 @@ export class TableData extends MutableElement {
                       spellcheck="false"
                       autocorrect="off"
                       @paste=${this.onPaste}
-                      @keydown=${this.onContentEditableKeyDown}
+                      @keydown=${TableData.onContentEditableKeyDown}
                       @dragover=${TableData.onDragOver}
                       @drop=${TableData.onDrop}
                       ><outerbase-td-menu
