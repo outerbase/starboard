@@ -67,31 +67,24 @@ export class ScrollableElement extends ClassifiedElement {
 
     // maintains the appearance of our scrollers (horizontal + vertical)
     private updateScrollerSizeAndPosition(_event?: Event) {
-        const SIZE_LIMIT = 20
-
         // vertical
         const scrollTop = this.scroller.value?.scrollTop ?? 0
         const scrollHeight = this.scroller.value?.scrollHeight ?? 0
         const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
 
-        const actualVerticalScrollSize = (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient
-        this.verticalScrollSize = scrollHeightCoEfficient === 1 ? 0 : Math.max(actualVerticalScrollSize, SIZE_LIMIT)
+        this.verticalScrollSize = scrollHeightCoEfficient === 1 ? 0 : (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient // 0 when nothing to scroll
         this.verticalScrollProgress = scrollTop / scrollHeight
-        this.verticalScrollPosition =
-            this.verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0) -
-            (actualVerticalScrollSize < SIZE_LIMIT ? SIZE_LIMIT - actualVerticalScrollSize : 0)
+        this.verticalScrollPosition = this.verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0)
 
         // horizontal
         const scrollWidth = this.scroller.value?.scrollWidth ?? 0
         const scrollLeft = this.scroller.value?.scrollLeft ?? 0
         const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
-        this.horizontalScrollSize = Math.max(
-            scrollWidthCoEfficient === 1 ? 0 : (this.scroller.value?.clientWidth ?? 0) * scrollWidthCoEfficient,
-            SIZE_LIMIT
-        )
-
+        const horizontalScrollHandleWidth =
+            scrollWidthCoEfficient === 1 ? 0 : (this.scroller.value?.clientWidth ?? 0) * scrollWidthCoEfficient // 0 when nothing to scroll
         this.horizontalScrollProgress = scrollLeft / scrollWidth
-        this.horizontalScrollPosition = this.horizontalScrollProgress * (this.scroller.value?.clientWidth ?? 0) //- this.horizontalScrollSize
+        this.horizontalScrollSize = horizontalScrollHandleWidth
+        this.horizontalScrollPosition = this.horizontalScrollProgress * (this.scroller.value?.clientWidth ?? 0)
     }
 
     // trigger `onScroll` when scrolling distance >= threshold (for the sake of optimizing performance)
