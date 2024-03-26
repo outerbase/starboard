@@ -6,7 +6,7 @@ import { unsafeHTML, UnsafeHTMLDirective } from 'lit/directives/unsafe-html.js'
 
 import { eventTargetIsPlugin, eventTargetIsPluginEditor } from '../../lib/event-target-is-plugin.js'
 import { type MenuSelectedEvent } from '../../lib/events.js'
-import { PluginEvent, Theme, type ColumnPlugin } from '../../types.js'
+import { PluginEvent, Theme, type ColumnPlugin, type Serializable } from '../../types.js'
 import { BOOLEAN_TYPES, JSON_TYPES, MutableElement } from '../mutable-element.js'
 
 import type { CellMenu } from '../menu/cell-menu.js'
@@ -93,97 +93,21 @@ export class TableData extends MutableElement {
         }
     }
 
-    protected override classMap() {
-        return {
-            ...super.classMap(),
-            'table-cell relative focus:z-[1]': true,
-            'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
-            'px-5': this.blank,
-            'border-theme-border dark:border-theme-border-dark': true,
-            'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
-            'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty && !this.hideDirt, // dirty cells
-            'group-hover:bg-theme-row-hover dark:group-hover:bg-theme-row-hover-dark': !this.dirty || this.hideDirt,
-            'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none':
-                !this.isEditing && this.isInteractive,
-            'border-r':
-                this.isInteractive ||
-                (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outerBorder) || // include last column when outerBorder
-                (this._drawRightBorder && this.separateCells && !this.isLastColumn), // internal cell walls
-            'first:border-l': this.separateCells && this.outerBorder, // left/right borders when the `separate-cells` attribute is set
-            'border-b': this.withBottomBorder, // bottom border when the `with-bottom-border` attribute is set
-        }
+    static copyValueToClipboard(value: Serializable) {
+        if (value === null || value === undefined) return navigator.clipboard.writeText('')
+        else if (typeof value === 'object') return navigator.clipboard.writeText(JSON.stringify(value))
+        else return navigator.clipboard.writeText(value.toString())
     }
 
-    @property({ attribute: 'plugin-attributes', type: String })
-    public pluginAttributes: String = ''
+    static onDisplayEditor(event: MouseEvent) {
+        const self = event.currentTarget as TableData
 
-    // allows, for example, <outerbase-td bottom-border="true" />
-    @property({ type: Boolean, attribute: 'bottom-border' })
-    public withBottomBorder: boolean = false
+        const didClickInsidePluginEditor = event.composedPath().some((v) => {
+            return v instanceof HTMLElement && v.id === 'plugin-editor'
+        })
 
-    @property({ type: Boolean, attribute: 'odd' })
-    public isOdd?: boolean
-
-    @property({ type: Boolean, attribute: 'draw-right-border' })
-    public _drawRightBorder = false
-
-    @property({ type: Boolean, attribute: 'menu' })
-    public hasMenu = false
-
-    @property({ type: Boolean, attribute: 'row-selector' })
-    public isRowSelector = false
-
-    @property({ attribute: 'is-last-column', type: Boolean })
-    public isLastColumn = false
-
-    @property({ attribute: 'is-last-row', type: Boolean })
-    public isLastRow = false
-
-    @property({ attribute: 'hide-dirt', type: Boolean })
-    public hideDirt = false
-
-    @property({ attribute: 'plugin', type: String })
-    public plugin?: ColumnPlugin
-
-    @property({ attribute: 'is-displaying-plugin-editor', type: Boolean })
-    public isDisplayingPluginEditor = false
-
-    @state() protected options = RW_OPTIONS
-
-    protected onPluginEvent({ detail: { action, value } }: PluginActionEvent) {
-        // TODO not `.toLowerCase()`? update the enum to match what is emitted?
-        const eventName = action.toLowerCase()
-
-        if (eventName === PluginEvent.onEdit) {
-            this.isDisplayingPluginEditor = true
-        } else if (eventName === PluginEvent.onStopEdit) {
-            this.isDisplayingPluginEditor = false
-            // TODO update our value to match the one from the editor
-        } else if (eventName === PluginEvent.onCancelEdit) {
-            this.isDisplayingPluginEditor = false
-        } else if (eventName === PluginEvent.updateCell) {
-            this.value = value
-        }
-    }
-
-    protected async onMenuSelection(event: MenuSelectedEvent) {
-        switch (event.value) {
-            case 'edit':
-                return (this.isEditing = true)
-            case 'copy':
-                return this.copyValueToClipboard()
-            case 'paste':
-                this.value = await navigator.clipboard.readText()
-                this.dispatchChangedEvent()
-                return
-            case 'clear':
-                this.value = null
-                this.dispatchChangedEvent()
-                return
-            case 'reset':
-                this.value = this.originalValue
-                this.dispatchChangedEvent()
-                return
+        if (!didClickInsidePluginEditor) {
+            self.isDisplayingPluginEditor = false
         }
     }
 
@@ -283,7 +207,7 @@ export class TableData extends MutableElement {
         // copy focused cells
         if (event.metaKey && code === 'KeyC') {
             event.preventDefault()
-            return self.copyValueToClipboard()
+            return TableData.copyValueToClipboard(self.value)
         }
 
         if (!self.readonly && (code === 'Backspace' || code === 'Delete')) {
@@ -293,29 +217,114 @@ export class TableData extends MutableElement {
         }
     }
 
-    protected onPaste(event: ClipboardEvent) {
-        event.preventDefault()
-        this.value = event.clipboardData?.getData('text')
+    static onPaste(event: ClipboardEvent) {
+        const td = event.composedPath().find((t) => {
+            const el = t as HTMLElement
+            if (el.tagName?.toLowerCase() === 'outerbase-td') return true
+        }) as TableData | undefined
+
+        if (td) {
+            event.preventDefault()
+            td.value = event.clipboardData?.getData('text')
+        }
     }
 
-    protected onDisplayEditor(event: MouseEvent) {
-        const didClickInsidePluginEditor = event.composedPath().some((v) => {
-            return v instanceof HTMLElement && v.id === 'plugin-editor'
-        })
+    protected override classMap() {
+        return {
+            ...super.classMap(),
+            'table-cell relative focus:z-[1]': true,
+            'px-cell-padding-x py-cell-padding-y ': !this.plugin && !this.blank,
+            'px-5': this.blank,
+            'border-theme-border dark:border-theme-border-dark': true,
+            'bg-theme-cell dark:bg-theme-cell-dark text-theme-cell-text dark:text-theme-cell-text-dark': true,
+            'bg-theme-cell-dirty dark:bg-theme-cell-dirty-dark': this.dirty && !this.hideDirt, // dirty cells
+            'group-hover:bg-theme-row-hover dark:group-hover:bg-theme-row-hover-dark': !this.dirty || this.hideDirt,
+            'focus:shadow-ringlet dark:focus:shadow-ringlet-dark focus:rounded-[4px] focus:ring-1 focus:ring-black dark:focus:ring-neutral-300 focus:outline-none':
+                !this.isEditing && this.isInteractive,
+            'border-r':
+                this.isInteractive ||
+                (this._drawRightBorder && this.separateCells && this.isLastColumn && this.outerBorder) || // include last column when outerBorder
+                (this._drawRightBorder && this.separateCells && !this.isLastColumn), // internal cell walls
+            'first:border-l': this.separateCells && this.outerBorder, // left/right borders when the `separate-cells` attribute is set
+            'border-b': this.withBottomBorder, // bottom border when the `with-bottom-border` attribute is set
+        }
+    }
 
-        if (!didClickInsidePluginEditor) {
+    @property({ attribute: 'plugin-attributes', type: String })
+    public pluginAttributes: String = ''
+
+    // allows, for example, <outerbase-td bottom-border="true" />
+    @property({ type: Boolean, attribute: 'bottom-border' })
+    public withBottomBorder: boolean = false
+
+    @property({ type: Boolean, attribute: 'odd' })
+    public isOdd?: boolean
+
+    @property({ type: Boolean, attribute: 'draw-right-border' })
+    public _drawRightBorder = false
+
+    @property({ type: Boolean, attribute: 'menu' })
+    public hasMenu = false
+
+    @property({ type: Boolean, attribute: 'row-selector' })
+    public isRowSelector = false
+
+    @property({ attribute: 'is-last-column', type: Boolean })
+    public isLastColumn = false
+
+    @property({ attribute: 'is-last-row', type: Boolean })
+    public isLastRow = false
+
+    @property({ attribute: 'hide-dirt', type: Boolean })
+    public hideDirt = false
+
+    @property({ attribute: 'plugin', type: String })
+    public plugin?: ColumnPlugin
+
+    @property({ attribute: 'is-displaying-plugin-editor', type: Boolean })
+    public isDisplayingPluginEditor = false
+
+    @state() protected options = RW_OPTIONS
+
+    protected onPluginEvent({ detail: { action, value } }: PluginActionEvent) {
+        // TODO not `.toLowerCase()`? update the enum to match what is emitted?
+        const eventName = action.toLowerCase()
+
+        if (eventName === PluginEvent.onEdit) {
+            this.isDisplayingPluginEditor = true
+        } else if (eventName === PluginEvent.onStopEdit) {
             this.isDisplayingPluginEditor = false
+            // TODO update our value to match the one from the editor
+        } else if (eventName === PluginEvent.onCancelEdit) {
+            this.isDisplayingPluginEditor = false
+        } else if (eventName === PluginEvent.updateCell) {
+            this.value = value
+        }
+    }
+
+    protected async onMenuSelection(event: MenuSelectedEvent) {
+        switch (event.value) {
+            case 'edit':
+                return (this.isEditing = true)
+            case 'copy':
+                return TableData.copyValueToClipboard(this.value)
+            case 'paste':
+                this.value = await navigator.clipboard.readText()
+                this.dispatchChangedEvent()
+                return
+            case 'clear':
+                this.value = null
+                this.dispatchChangedEvent()
+                return
+            case 'reset':
+                this.value = this.originalValue
+                this.dispatchChangedEvent()
+                return
         }
     }
 
     public focus() {
         this.shadowRoot?.querySelector<HTMLElement>('[contenteditable]')?.focus()
-    }
-
-    public copyValueToClipboard() {
-        if (this.value === null || this.value === undefined) return navigator.clipboard.writeText('')
-        else if (typeof this.value === 'object') return navigator.clipboard.writeText(JSON.stringify(this.value))
-        else return navigator.clipboard.writeText(this.value.toString())
     }
 
     public override connectedCallback(): void {
@@ -324,11 +333,12 @@ export class TableData extends MutableElement {
         this.addEventListener('contextmenu', TableData.onContextMenu)
         this.addEventListener('keydown', TableData.onKeyDown)
         this.addEventListener('click', TableData.onClick)
+
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.addEventListener('custom-change', this.onPluginEvent)
 
-        if (this.isInteractive) {
-            if (!this.plugin) this.addEventListener('dblclick', TableData.onDoubleClick)
+        if (this.isInteractive && !this.plugin) {
+            this.addEventListener('dblclick', TableData.onDoubleClick)
         }
     }
 
@@ -336,10 +346,12 @@ export class TableData extends MutableElement {
         super.disconnectedCallback()
 
         this.removeEventListener('contextmenu', TableData.onContextMenu)
+        this.removeEventListener('keydown', TableData.onKeyDown)
+        this.removeEventListener('click', TableData.onClick)
+        this.removeEventListener('dblclick', TableData.onDoubleClick)
+
         // @ts-ignore insists on `Event` instead of `PluginActionEvent`
         this.removeEventListener('custom-change', this.onPluginEvent)
-        this.removeEventListener('keydown', TableData.onKeyDown)
-        if (!this.plugin) this.removeEventListener('dblclick', TableData.onDoubleClick)
     }
 
     public override willUpdate(changedProperties: PropertyValues<this>): void {
@@ -358,10 +370,10 @@ export class TableData extends MutableElement {
             if (this.isDisplayingPluginEditor) {
                 // setTimeout is necessary or else it receives the current click event (?!)
                 setTimeout(() => {
-                    document.addEventListener('click', this.onDisplayEditor.bind(this))
+                    document.addEventListener('click', TableData.onDisplayEditor)
                 }, 0)
             } else {
-                document.removeEventListener('click', this.onDisplayEditor)
+                document.removeEventListener('click', TableData.onDisplayEditor)
             }
         }
     }
@@ -432,7 +444,7 @@ export class TableData extends MutableElement {
                       contenteditable="true"
                       spellcheck="false"
                       autocorrect="off"
-                      @paste=${this.onPaste}
+                      @paste=${TableData.onPaste}
                       @keydown=${TableData.onContentEditableKeyDown}
                       @dragover=${TableData.onDragOver}
                       @drop=${TableData.onDrop}
