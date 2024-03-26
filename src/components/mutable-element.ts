@@ -105,6 +105,19 @@ export class MutableElement extends ClassifiedElement {
         }
     }
 
+    static convertToType(type: string | undefined, newValue: Serializable) {
+        // convert strings to their proper value-types; json, boolean, number, and null
+        const v = newValue
+        const t = type
+
+        if (t && typeof v === 'string') {
+            if (NUMBER_TYPES.includes(t)) return parseInt(v, 10)
+            if (JSON_TYPES.includes(t)) return JSON.parse(v)
+            if (BOOLEAN_TYPES.includes(t)) return v.toLowerCase().trim() === 'true'
+            if (v === '') return null
+        }
+    }
+
     protected override classMap() {
         return {
             'cursor-pointer': this.isInteractive && !this.readonly,
@@ -219,25 +232,6 @@ export class MutableElement extends ClassifiedElement {
         }
     }
 
-    static convertToType(type: string | undefined, newValue: Serializable) {
-        // convert strings to their proper value-types; json, boolean, number, and null
-        const v = newValue
-        const t = type
-
-        if (t && typeof v === 'string') {
-            if (NUMBER_TYPES.includes(t)) return parseInt(v, 10)
-            if (JSON_TYPES.includes(t)) return JSON.parse(v)
-            if (BOOLEAN_TYPES.includes(t)) return v.toLowerCase().trim() === 'true'
-            if (v === '') return null
-        }
-    }
-
-    protected onChange(event: Event) {
-        const { value } = event.target as HTMLInputElement
-        if (value === '') this.value = null
-        else this.value = value
-    }
-
     protected dispatchChangedEvent() {
         this.dispatchEvent(
             new CellUpdateEvent({
@@ -251,5 +245,11 @@ export class MutableElement extends ClassifiedElement {
 
     protected onBlur() {
         this.isEditing = false
+    }
+
+    protected onChange(event: Event) {
+        const { value } = event.target as HTMLInputElement
+        if (value === '') this.value = null
+        else this.value = value
     }
 }
