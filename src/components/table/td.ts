@@ -293,6 +293,14 @@ export class TableData extends MutableElement {
         }
     }
 
+    static onDragOver(event: DragEvent) {
+        event.preventDefault()
+    }
+
+    static onDrop(event: DragEvent) {
+        event.preventDefault()
+    }
+
     public focus() {
         this.shadowRoot?.querySelector<HTMLElement>('[contenteditable]')?.focus()
     }
@@ -421,6 +429,8 @@ export class TableData extends MutableElement {
                       autocorrect="off"
                       @paste=${this.onPaste}
                       @keydown=${this.onContentEditableKeyDown}
+                      @dragover=${TableData.onDragOver}
+                      @drop=${TableData.onDrop}
                       ><outerbase-td-menu
                           theme=${this.theme}
                           .options=${menuOptions}
