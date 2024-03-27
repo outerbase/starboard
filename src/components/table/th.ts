@@ -60,9 +60,6 @@ export class TH extends MutableElement {
     @property({ attribute: 'is-last', type: Boolean })
     protected isLastColumn = false
 
-    @property({ attribute: 'menu', type: Boolean })
-    public hasMenu = false
-
     @property({ attribute: 'options', type: Array })
     public options: HeaderMenuOptions = [
         {
@@ -352,7 +349,7 @@ export class TH extends MutableElement {
             return html`<div class=${classMap(blankElementClasses)}><slot></slot></div> `
         } else {
             const body = this.isEditing
-                ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${this.onKeyDown} class=${classMap({
+                ? html`<input .value=${this.value} @input=${this.onChange} @keydown=${MutableElement.onKeyDown} class=${classMap({
                       'z-[1] absolute top-0 bottom-0 right-0 left-0': true,
                       'bg-blue-50 dark:bg-blue-950 outline-none focus:ring-2 focus:ring-blue-300 dark:focus:ring-blue-700': true,
                       'px-cell-padding-x font-normal': true,
