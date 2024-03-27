@@ -50,7 +50,6 @@ export class MutableElement extends ClassifiedElement {
     }
 
     static onKeyDown(event: KeyboardEvent & { didCloseMenu?: boolean }) {
-        console.log('onKeyDown')
         const self = event.currentTarget as MutableElement
 
         // WARNING: the input's onBlur will NOT called
