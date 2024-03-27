@@ -25,7 +25,7 @@
         "prepack": "pnpm build:lit"
     },
     "dependencies": {
-        "lit": "^2.8.0",
+        "lit": "^3.1.2",
         "lodash-es": "^4.17.21",
         "tailwindcss": "^3.4.3",
         "typescript": "^5.4.3",
@@ -33,7 +33,7 @@
     },
     "devDependencies": {
         "@astrojs/check": "^0.5.10",
-        "@astrojs/lit": "^3.0.3",
+        "@astrojs/lit": "^4.0.1",
         "@astrojs/tailwind": "^5.1.0",
         "@types/lodash-es": "^4.17.12",
         "@types/yargs": "^17.0.32",
