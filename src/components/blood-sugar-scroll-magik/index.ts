@@ -55,8 +55,14 @@ export class ScrollableElement extends ClassifiedElement {
 
     constructor() {
         super()
+
         this._onScroll = this._onScroll ? debounce(this._onScroll, 10).bind(this) : this._onScroll.bind(this)
+
         this.updateScrollerSizeAndPosition = this.updateScrollerSizeAndPosition.bind(this)
+        this.onWheelVerticalScroller = this.onWheelVerticalScroller.bind(this)
+        this.onWheelHorizontalScroller = this.onWheelHorizontalScroller.bind(this)
+        this.onHorizontalScrollerHandleMouseDown = this.onHorizontalScrollerHandleMouseDown.bind(this)
+        this.onVerticalScrollerHandleMouseDown = this.onVerticalScrollerHandleMouseDown.bind(this)
     }
 
     // maintains the appearance of our scrollers (horizontal + vertical)
@@ -65,11 +71,9 @@ export class ScrollableElement extends ClassifiedElement {
         const scrollTop = this.scroller.value?.scrollTop ?? 0
         const scrollHeight = this.scroller.value?.scrollHeight ?? 0
         const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
-        const verticalScrollHandleHeight =
-            scrollHeightCoEfficient === 1 ? 0 : (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient // 0 when nothing to scroll
 
+        this.verticalScrollSize = scrollHeightCoEfficient === 1 ? 0 : (this.scroller.value?.clientHeight ?? 0) * scrollHeightCoEfficient // 0 when nothing to scroll
         this.verticalScrollProgress = scrollTop / scrollHeight
-        this.verticalScrollSize = verticalScrollHandleHeight
         this.verticalScrollPosition = this.verticalScrollProgress * (this.scroller.value?.clientHeight ?? 0)
 
         // horizontal
@@ -78,7 +82,6 @@ export class ScrollableElement extends ClassifiedElement {
         const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
         const horizontalScrollHandleWidth =
             scrollWidthCoEfficient === 1 ? 0 : (this.scroller.value?.clientWidth ?? 0) * scrollWidthCoEfficient // 0 when nothing to scroll
-
         this.horizontalScrollProgress = scrollLeft / scrollWidth
         this.horizontalScrollSize = horizontalScrollHandleWidth
         this.horizontalScrollPosition = this.horizontalScrollProgress * (this.scroller.value?.clientWidth ?? 0)
@@ -112,86 +115,15 @@ export class ScrollableElement extends ClassifiedElement {
     }
 
     protected onWheelHorizontalScroller(event: WheelEvent) {
-        event.preventDefault()
         if (this.scroller.value) {
             this.scroller.value.scrollLeft += event.deltaX
         }
     }
 
     protected onWheelVerticalScroller(event: WheelEvent) {
-        event.preventDefault()
         if (this.scroller.value) {
             this.scroller.value.scrollTop += event.deltaY
         }
-    }
-
-    public override connectedCallback(): void {
-        super.connectedCallback()
-
-        // set initial scroller values
-        setTimeout(this.updateScrollerSizeAndPosition, 0)
-
-        // attach horizontal scroll handle mouse events
-        setTimeout(() => {
-            this.bottomScrollHandle.value?.addEventListener('mousedown', (mouseDownEvent: MouseEvent) => {
-                mouseDownEvent.preventDefault() // Prevent text selection/dragging behavior
-
-                this.startX = mouseDownEvent.pageX // Starting X position of the mouse
-                this.scrollStartX = this.scroller.value?.scrollLeft ?? 0 // Starting scroll position
-                // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
-
-                const onMouseMove = (mouseMoveEvent: MouseEvent) => {
-                    const deltaX = mouseMoveEvent.pageX - this.startX // Calculate mouse movement
-                    const scrollWidth = this.scroller.value?.scrollWidth ?? 0
-                    const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
-                    if (this.scroller.value) this.scroller.value.scrollLeft = this.scrollStartX + deltaX / scrollWidthCoEfficient
-                }
-
-                const onMouseUp = (_event: MouseEvent) => {
-                    document.removeEventListener('mousemove', onMouseMove)
-                    document.removeEventListener('mouseup', onMouseUp)
-
-                    // document.body.classList.remove('user-select-none') // Re-enable text selection after dragging
-                }
-
-                document.addEventListener('mouseup', onMouseUp)
-                document.addEventListener('mousemove', onMouseMove)
-            })
-        }, 0)
-
-        // attach vertical scroll handle mouse events
-        setTimeout(() => {
-            this.rightScrollHandle.value?.addEventListener('mousedown', (mouseDownEvent: MouseEvent) => {
-                mouseDownEvent.preventDefault() // Prevent text selection/dragging behavior
-
-                this.startY = mouseDownEvent.pageY // Starting X position of the mouse
-                this.scrollStartY = this.scroller.value?.scrollTop ?? 0 // Starting scroll position
-                // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
-
-                const onMouseMove = (mouseMoveEvent: MouseEvent) => {
-                    mouseMoveEvent.preventDefault()
-                    const deltaY = mouseMoveEvent.pageY - this.startY // Calculate mouse movement
-                    const scrollHeight = this.scroller.value?.scrollHeight ?? 0
-                    const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
-                    if (this.scroller.value) this.scroller.value.scrollTop = this.scrollStartY + deltaY / scrollHeightCoEfficient
-                }
-
-                const onMouseUp = (_event: MouseEvent) => {
-                    document.removeEventListener('mousemove', onMouseMove)
-                    document.removeEventListener('mouseup', onMouseUp)
-
-                    // document.body.classList.remove('user-select-none') // Re-enable text selection after dragging
-                }
-
-                document.addEventListener('mouseup', onMouseUp)
-                document.addEventListener('mousemove', onMouseMove)
-            })
-        }, 0)
-
-        // attach scroller handles
-        setTimeout(() => {
-            this.scroller.value?.addEventListener('scroll', this.updateScrollerSizeAndPosition)
-        }, 0)
     }
 
     public override disconnectedCallback(): void {
@@ -199,6 +131,79 @@ export class ScrollableElement extends ClassifiedElement {
 
         // remove event listeners
         this.scroller.value?.removeEventListener('scroll', this.updateScrollerSizeAndPosition)
+        this.scroller.value?.removeEventListener('scroll', this._onScroll)
+        this.scroller.value?.removeEventListener('scrollend', this._onScroll)
+
+        this.rightScrollZone.value?.removeEventListener('wheel', this.onWheelVerticalScroller)
+        this.bottomScrollZone.value?.removeEventListener('wheel', this.onWheelHorizontalScroller)
+
+        this.bottomScrollHandle.value?.removeEventListener('mousedown', this.onHorizontalScrollerHandleMouseDown)
+        this.rightScrollHandle.value?.removeEventListener('mousedown', this.onVerticalScrollerHandleMouseDown)
+    }
+
+    protected onHorizontalScrollerHandleMouseDown(mouseDownEvent: MouseEvent) {
+        mouseDownEvent.preventDefault() // Prevent text selection/dragging behavior
+
+        this.startX = mouseDownEvent.pageX // Starting X position of the mouse
+        this.scrollStartX = this.scroller.value?.scrollLeft ?? 0 // Starting scroll position
+        // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
+
+        const onMouseMove = (mouseMoveEvent: MouseEvent) => {
+            const deltaX = mouseMoveEvent.pageX - this.startX // Calculate mouse movement
+            const scrollWidth = this.scroller.value?.scrollWidth ?? 0
+            const scrollWidthCoEfficient = (this.scroller.value?.clientWidth ?? 0) / scrollWidth
+            if (this.scroller.value) this.scroller.value.scrollLeft = this.scrollStartX + deltaX / scrollWidthCoEfficient
+        }
+
+        const onMouseUp = (_event: MouseEvent) => {
+            document.removeEventListener('mousemove', onMouseMove)
+            document.removeEventListener('mouseup', onMouseUp)
+
+            // document.body.classList.remove('user-select-none') // Re-enable text selection after dragging
+        }
+
+        document.addEventListener('mouseup', onMouseUp)
+        document.addEventListener('mousemove', onMouseMove)
+    }
+
+    protected onVerticalScrollerHandleMouseDown(mouseDownEvent: MouseEvent) {
+        mouseDownEvent.preventDefault() // Prevent text selection/dragging behavior
+
+        this.startY = mouseDownEvent.pageY // Starting X position of the mouse
+        this.scrollStartY = this.scroller.value?.scrollTop ?? 0 // Starting scroll position
+        // document.body.classList.add('user-select-none') // Optional: Disable text selection during drag
+
+        const onMouseMove = (mouseMoveEvent: MouseEvent) => {
+            mouseMoveEvent.preventDefault()
+            const deltaY = mouseMoveEvent.pageY - this.startY // Calculate mouse movement
+            const scrollHeight = this.scroller.value?.scrollHeight ?? 0
+            const scrollHeightCoEfficient = (this.scroller.value?.clientHeight ?? 0) / scrollHeight
+            if (this.scroller.value) this.scroller.value.scrollTop = this.scrollStartY + deltaY / scrollHeightCoEfficient
+        }
+
+        const onMouseUp = (_event: MouseEvent) => {
+            document.removeEventListener('mousemove', onMouseMove)
+            document.removeEventListener('mouseup', onMouseUp)
+
+            // document.body.classList.remove('user-select-none') // Re-enable text selection after dragging
+        }
+
+        document.addEventListener('mouseup', onMouseUp)
+        document.addEventListener('mousemove', onMouseMove)
+    }
+
+    public override firstUpdated(_hangedProperties: PropertyValueMap<this>): void {
+        this.scroller.value?.addEventListener('scroll', this.updateScrollerSizeAndPosition, { passive: true })
+        this.scroller.value?.addEventListener('scroll', this._onScroll, { passive: true })
+        this.scroller.value?.addEventListener('scrollend', this._onScroll, { passive: true })
+
+        this.rightScrollZone.value?.addEventListener('wheel', this.onWheelVerticalScroller, { passive: true })
+        this.bottomScrollZone.value?.addEventListener('wheel', this.onWheelHorizontalScroller, { passive: true })
+
+        this.bottomScrollHandle.value?.addEventListener('mousedown', this.onHorizontalScrollerHandleMouseDown)
+        this.rightScrollHandle.value?.addEventListener('mousedown', this.onVerticalScrollerHandleMouseDown)
+
+        this.updateScrollerSizeAndPosition()
     }
 
     public override willUpdate(changedProperties: PropertyValueMap<this>): void {
@@ -227,7 +232,10 @@ export class ScrollableElement extends ClassifiedElement {
             'opacity-0': !this.hasHoveringCursor,
             'opacity-100': this.hasHoveringCursor,
         }
-        const verticalHandleStyles = { transform: `translateY(${this.verticalScrollPosition}px)`, height: `${this.verticalScrollSize}px` }
+        const verticalHandleStyles = {
+            transform: `translateY(${this.verticalScrollPosition}px)`,
+            height: `${this.verticalScrollSize}px`,
+        }
         const horizontalHandleStyles = {
             transform: `translateX(${this.horizontalScrollPosition}px)`,
             width: `${this.horizontalScrollSize}px`,
@@ -255,7 +263,6 @@ export class ScrollableElement extends ClassifiedElement {
                     class=${classMap({ ...scrollTrackGutterClasses, 'top-0 w-1.5': true })}
                     ${ref(this.rightScrollZone)}
                     @click=${this.onClickVerticalScroller}
-                    @wheel=${this.onWheelVerticalScroller}
                 >
                     <div
                         style=${styleMap(verticalHandleStyles)}
@@ -268,7 +275,6 @@ export class ScrollableElement extends ClassifiedElement {
                     class=${classMap({ ...scrollTrackGutterClasses, 'left-0': true })}
                     ${ref(this.bottomScrollZone)}
                     @click=${this.onClickHorizontalScroller}
-                    @wheel=${this.onWheelHorizontalScroller}
                 >
                     <div
                         style=${styleMap(horizontalHandleStyles)}
@@ -277,7 +283,7 @@ export class ScrollableElement extends ClassifiedElement {
                     ></div>
                 </div>
 
-                <div class=${classMap(scrollableClasses)} @scroll=${this._onScroll} @scrollend=${this._onScroll} ${ref(this.scroller)}>
+                <div class=${classMap(scrollableClasses)} ${ref(this.scroller)}>
                     <slot></slot>
                 </div>
             </div>`
