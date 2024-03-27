@@ -31,6 +31,9 @@ devDependencies:
   '@astrojs/tailwind':
     specifier: ^5.1.0
     version: 5.1.0(astro@4.5.10)(tailwindcss@3.4.3)
+  '@outerbase/scrollable-element':
+    specifier: ^0.0.1
+    version: 0.0.1
   '@types/lodash-es':
     specifier: ^4.17.12
     version: 4.17.12
@@ -1073,6 +1076,18 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.16.0
+
+  /@outerbase/scrollable-element@0.0.1:
+    resolution: {integrity: sha512-yDAu4MzC9YBhtOFa8OWMlyZZ8whCQzowposikCua8oHq77pZHIYL5dHOVhBYtW6EvDUh80kTVOh6gdX7U2j03w==}
+    dependencies:
+      lit: 3.1.2
+      lodash-es: 4.17.21
+      tailwindcss: 3.4.3
+      typescript: 5.4.3
+      yargs: 17.7.2
+    transitivePeerDependencies:
+      - ts-node
+    dev: true
 
   /@parse5/tools@0.3.0:
     resolution: {integrity: sha512-zxRyTHkqb7WQMV8kTNBKWb1BeOFUKXBXTBWuxg9H9hfvQB3IwP6Iw2U75Ia5eyRxPNltmY7E8YAlz6zWwUnjKg==}
@@ -2699,7 +2714,6 @@ packages:
 
   /lodash-es@4.17.21:
     resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
-    dev: false
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}

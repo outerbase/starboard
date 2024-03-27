@@ -1,9 +1,9 @@
+import type { ScrollableElement } from '@outerbase/scrollable-element/lit-dist/src/components/scrollable-element/index.js'
 import { html, nothing, type PropertyValueMap } from 'lit'
 import { customElement, property, state } from 'lit/decorators.js'
 import { classMap } from 'lit/directives/class-map.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
 import { repeat } from 'lit/directives/repeat.js'
-
 import arrayToObject from '../../lib/array-to-object.js'
 import {
     ColumnAddedEvent,
@@ -33,8 +33,6 @@ import { ClassifiedElement } from '../classified-element.js'
 // import subcomponents
 import { createRef, ref, type Ref } from 'lit/directives/ref.js'
 import { styleMap } from 'lit/directives/style-map.js'
-import '../blood-sugar-scroll-magik/index.js'
-import type { ScrollableElement } from '../blood-sugar-scroll-magik/index.js'
 import '../check-box.js'
 import '../widgets/add-column.js'
 import './tbody.js'
@@ -107,7 +105,7 @@ export class Table extends ClassifiedElement {
     @property({ attribute: 'addable-columns', type: Boolean })
     public addableColumns = false
 
-    @state() protected bssm: Ref<ScrollableElement> = createRef()
+    @state() protected scrollableEl: Ref<ScrollableElement> = createRef()
     @state() protected rows: Array<RowAsRecord> = []
     @state() protected newRows: Array<RowAsRecord> = []
     @state() protected existingVisibleRows: Array<RowAsRecord> = []
@@ -421,7 +419,7 @@ export class Table extends ClassifiedElement {
     }
 
     protected updateTableView(): void {
-        const scrollTop = this.bssm.value?.scroller.value?.scrollTop ?? 0
+        const scrollTop = this.scrollableEl.value?.scroller.value?.scrollTop ?? 0
         if (scrollTop) {
             this.updateVisibleRows(scrollTop)
         } else {
@@ -452,7 +450,7 @@ export class Table extends ClassifiedElement {
 
     public numberOfVisibleRows(): number {
         // +1 because we can see a row transparently through the table header -- without this (and buffer=0) you'd see missing row as new reveals
-        return Math.ceil((this.bssm.value?.scroller.value?.clientHeight ?? 0) / this.rowHeight) + 1
+        return Math.ceil((this.scrollableEl.value?.scroller.value?.clientHeight ?? 0) / this.rowHeight) + 1
     }
 
     public override firstUpdated(_changedProperties: PropertyValueMap<this>): void {
@@ -474,10 +472,10 @@ export class Table extends ClassifiedElement {
         elem.isInteractive = true
 
         // Temporarily add to the DOM to measure
-        this.bssm.value?.appendChild(elem)
+        this.scrollableEl.value?.appendChild(elem)
         setTimeout(() => {
             const offsetHeight = elem.offsetHeight
-            this.bssm.value?.removeChild(elem)
+            this.scrollableEl.value?.removeChild(elem)
             if (this.rowHeight !== offsetHeight) {
                 this.rowHeight = offsetHeight
             }
@@ -562,7 +560,7 @@ export class Table extends ClassifiedElement {
                 : ''
 
         return html`
-            <blood-sugar-scroll-magik ${ref(this.bssm)}
+            <outerbase-scrollable ${ref(this.scrollableEl)}
                 threshold=${(SCROLL_BUFFER_SIZE / 2) * this.rowHeight}
                 theme=${this.theme}
                 .onScroll=${this.updateTableView}
